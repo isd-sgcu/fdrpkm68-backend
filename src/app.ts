@@ -13,7 +13,6 @@ const PORT = process.env.PORT || 3000;
 // Middlewares
 app.use(cors());
 app.use(bodyParser.json());
-
 app.use('/api', apiRoutes);
 
 // Error Handling Middleware
@@ -24,8 +23,8 @@ async function startServer() {
   try {
     await connectDB();
     console.log('Connected to PostgreSQL');
-    await connectRedis();
-    console.log('Connected to Redis');
+    // await connectRedis();
+    // console.log('Connected to Redis');
 
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);

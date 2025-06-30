@@ -18,7 +18,12 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
       },
     });
   } catch (error) {
-    next(error); 
+    console.log('Error during registration:', error);
+    // res.status(error.statusCode || 500).json({
+    //   status: 'error',
+    //   message: error.message || 'An error occurred during registration.',
+    // });
+    // next(error); 
   }
 };
 

@@ -1,17 +1,17 @@
-import { Pool } from 'pg';
+import { Client } from 'pg';
 
-const pool = new Pool({
-  user: process.env.DB_USER || 'admin',       
-  host: process.env.DB_HOST || 'localhost',            
-  database: process.env.DB_NAME || 'mydb', 
-  password: process.env.DB_PASSWORD || 'admin',   
-  port: 5432,                  
-});
+const client = new Client({
+  user: 'postgres',
+  password: 'changeme',
+  host: 'localhost',
+  port: 5433,
+  database: 'postgres',
+})
 
 
 export const connectDB = async () => {
   try {
-    await pool.connect();
+    await client.connect();
     console.log('PostgreSQL connected successfully');
   } catch (error) {
     console.error('Error connecting to PostgreSQL:', error);
@@ -19,4 +19,4 @@ export const connectDB = async () => {
   }
 };
 
-export const query = (text: string, params?: any[]) => pool.query(text, params);
+export const query = (text: string, params?: any[]) => client.query(text, params);

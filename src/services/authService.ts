@@ -1,84 +1,64 @@
-import { query } from '../database/client'; 
-import { User, UserRegistrationRequest } from '../types/user';
-import { CustomError } from '../types/error';
-import { validateCitizenIdChecksum } from '../utils/validationUtils'; 
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import * as userService from './userService'; 
+import { config } from '../config';
+import { User, UserRegistrationRequest } from '../types/user'; 
+import { CustomError } from '../types/error'; 
 
-// Function สำหรับสร้างผู้ใช้ใหม่
-export const createUser = async (userData: User): Promise<User> => {
-  // ตรวจสอบ checksum เลขบัตรประชาชน
-  if (!validateCitizenIdChecksum(userData.citizen_id)) {
-    const error: CustomError = new Error('Invalid Citizen ID checksum.');
+// Register Logic
+export const register = async (userData: UserRegistrationRequest) => {
+  const { student_id, citizen_id, password} = userData;
+
+  // check if user already exists
+  const existingUser = await userService.findUserByStudentIdAndCitizenId(student_id, citizen_id);
+  if (existingUser) {
+    const error: CustomError = new Error('User with this student ID and citizen ID already exists.');
     error.statusCode = 400;
     throw error;
   }
 
-  const {
-    student_id,
-    citizen_id,
-    prefix,
-    first_name,
-    last_name,
-    nickname,
-    academic_year,
-    faculty,
-    password_hash,
-    phone_number,
-    parent_name,
-    parent_phone_number,
-    parent_relationship,
-    role,
-  } = userData;
+  // hash the password
+  const salt = await bcrypt.genSalt(10);
+    console.log('Password received for hashing:', password);
+  console.log('Salt Rounds:', salt);
+  const password_hash = await bcrypt.hash(password, salt);
 
-  const result = await query(
-    `INSERT INTO users (
-      student_id, citizen_id, prefix, first_name, last_name, nickname,
-      academic_year, faculty, password_hash, phone_number,
-      parent_name, parent_phone_number, parent_relationship, role
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
-    RETURNING *`, // RETURNING * เพื่อให้ได้ข้อมูลที่ insert กลับมา
-    [
-      student_id,
-      citizen_id,
-      prefix,
-      first_name,
-      last_name,
-      nickname,
-      academic_year,
-      faculty,
-      password_hash,
-      phone_number,
-      parent_name,
-      parent_phone_number,
-      parent_relationship,
-      role,
-    ]
-  );
-  return result.rows[0]; // คืนค่าผู้ใช้ที่สร้างขึ้นมา
+  // crerate user for database
+  const role = (userData as any).role || 'student'; 
+  const newUser : User = {...userData, password_hash, role, created_at: new Date(), updated_at: new Date()}
+  
+  return   await userService.createUser(newUser);
 };
 
-// Function สำหรับค้นหาผู้ใช้ด้วย student_id และ citizen_id
-export const findUserByStudentIdAndCitizenId = async (
-  student_id: string,
-  citizen_id: string
-): Promise<User | undefined> => {
-  const result = await query(
-    `SELECT * FROM users WHERE student_id = $1 AND citizen_id = $2`,
-    [student_id, citizen_id]
-  );
-  return result.rows[0];
-};
+// Login 
+export const login = async (student_id: string, password: string): Promise<{ token: string; user: User }> => {
 
-// Function สำหรับค้นหาผู้ใช้ด้วย student_id (อาจมีหลายคนถ้า citizen_id ต่างกัน)
-export const findUsersByStudentId = async (student_id: string): Promise<User[]> => {
-  const result = await query(
-    `SELECT * FROM users WHERE student_id = $1`,
-    [student_id]
-  );
-  return result.rows;
-};
+  const users = await userService.findUsersByStudentId(student_id);
+  if (users.length === 0) {
+    const error: CustomError = new Error('Invalid credentials.');
+    error.statusCode = 401;
+    throw error;
+  }
 
-// Function สำหรับค้นหาผู้ใช้ด้วย ID (ถ้าใช้ ID แทน Composite Key)
-// export const findUserById = async (id: number): Promise<User | undefined> => {
-//   const result = await query(`SELECT * FROM users WHERE id = $1`, [id]);
-//   return result.rows[0];
-// };
+  const user = users[0]; 
+
+  // check password
+  const isMatch = await bcrypt.compare(password, user.password_hash);
+  if (!isMatch) {
+    const error: CustomError = new Error('Invalid credentials.');
+    error.statusCode = 401;
+    throw error;
+  }
+
+  // create JWT token
+  const payload = {
+    student_id: user.student_id,
+    citizen_id: user.citizen_id,
+    role: user.role,
+  };
+  const token = jwt.sign(payload, config.jwtSecret, {
+    expiresIn: '1h', // กำหนดเวลาในการหมดอายุของ token
+  });
+
+    return { token, user };
+};

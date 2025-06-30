@@ -1,8 +1,7 @@
-// src/services/userService.ts
-import { query } from '../database/client'; // ใช้ connection จาก DB client
+import { query } from '../database/client';
 import { User, UserRegistrationRequest } from '../types/user';
 import { CustomError } from '../types/error';
-import { validateCitizenIdChecksum } from '../utils/validationUtils'; // ใช้ utility สำหรับ checksum
+import { validateCitizenIdChecksum } from '../utils/validationUtils'; 
 
 export const createUser = async (userData: User): Promise<User> => {
   // checksum SSN
