@@ -1,0 +1,52 @@
+{
+  "name": "fdrpkm68-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+   "scripts": {
+    "start": "node dist/app.js",        
+    "dev": "nodemon --exec ts-node src/app.ts", 
+    "build": "tsc",                     
+    "lint": "eslint src --ext .ts",  
+    "lint:fix": "eslint src --ext .ts --fix", 
+    "db:migrate": "ts-node src/database/migrations/run-migrations.ts", 
+    "db:seed": "ts-node src/database/seeds/run-seeds.ts",    
+    "swagger:gen": "ts-node src/docs/generate-swagger-docs.ts" 
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/isd-sgcu/fdrpkm68-backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/isd-sgcu/fdrpkm68-backend/issues"
+  },
+  "homepage": "https://github.com/isd-sgcu/fdrpkm68-backend#readme",
+  "dependencies": {
+    "@types/node": "^24.0.7",
+    "bcryptjs": "^3.0.2",
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.0.0",
+    "express": "^5.1.0",
+    "ioredis": "^5.6.1",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.16.3",
+    "qrcode": "^1.5.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/ioredis": "^4.28.10",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/pg": "^8.15.4",
+    "@types/qrcode": "^1.5.5",
+    "nodemon": "^3.1.10"
+  }
+}
