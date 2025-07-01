@@ -1,4 +1,4 @@
-import { PrefixType, FacultyId ,RoleType , EventType ,CheckinStatusType} from "./enum";
+import { PrefixType, FacultyId ,RoleType , EventType ,CheckinStatusType, GroupRoleType} from "./enum";
 
 // Interface สำหรับข้อมูลผู้ใช้ทั้งหมด
 export interface User {
@@ -22,6 +22,8 @@ export interface User {
   role: RoleType;
   created_at: Date;
   updated_at: Date;
+  group_role: GroupRoleType; // rpkm group
+  group_id: string; // rpkm group
 }
 
 // Interface สำหรับข้อมูลที่รับเข้ามาตอน Register 
@@ -64,4 +66,6 @@ export interface UserPublic {
   illness?: string;
   avatar_id: number;
   role: RoleType;
+  group_role: GroupRoleType;
+  group_id: string;
 }

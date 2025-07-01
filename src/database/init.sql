@@ -89,18 +89,10 @@ CREATE TABLE houses (
 -- Group schema
 CREATE TABLE "group" (
     group_id TEXT PRIMARY KEY NOT NULL,
-    house_rank_1 TEXT,
-    house_rank_2 TEXT,
-    house_rank_3 TEXT,
-    house_rank_4 TEXT,
-    house_rank_5 TEXT,
-    house_rank_6 TEXT,
-    FOREIGN KEY (house_rank_1) REFERENCES houses(name_thai),
-    FOREIGN KEY (house_rank_2) REFERENCES houses(name_thai),
-    FOREIGN KEY (house_rank_3) REFERENCES houses(name_thai),
-    FOREIGN KEY (house_rank_4) REFERENCES houses(name_thai),
-    FOREIGN KEY (house_rank_5) REFERENCES houses(name_thai),
-    FOREIGN KEY (house_rank_6) REFERENCES houses(name_thai)
+    house_name_thai TEXT NOT NULL,
+    house_rank INT NOT NULL,
+    submitted BOOLEAN DEFAULT FALSE NOT NULL,
+    CONSTRAINT fk_house_name_thai FOREIGN KEY (house_name_thai) REFERENCES houses(name_thai)
 );
 
 ALTER TABLE users
