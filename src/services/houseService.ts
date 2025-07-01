@@ -9,12 +9,13 @@ export const getAllHousesFromDB = async(): Promise<House[]> => {
 }
 
 export const getSelectedHousesFromDB = async(group_id: string): Promise<(string | null)[]> => {
-    const result = await query(
-        `SELECT
-            g.group_id
-            
-            g.house`
-    )
+  // FIXME: Take a look at this someone, may not work  
+  const result = await query(
+        `SELECT * FROM houses WHERE house_id IN 
+        (SELECT selected_houses FROM groups WHERE group_id = $1)`, 
+        [group_id]
+    );
+    return result.rows
 }
 
 // export const saveHousesToDB = async(student_ids: string[], citizen_ids: string[]): Promise<string> => {
