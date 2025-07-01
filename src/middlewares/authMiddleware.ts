@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { config } from '../config';
-import { RoleType } from '../types/enum'; 
+import { RoleType } from '../types/enum';
 
 declare module 'express-serve-static-core' {
   interface Request {
@@ -26,7 +26,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
     const decoded = jwt.verify(token, config.SECRET_JWT_KEY as string) as {
       student_id: string;
       citizen_id: string;
-      role:RoleType; 
+      role: RoleType;
     };
     req.user = decoded; 
     next();

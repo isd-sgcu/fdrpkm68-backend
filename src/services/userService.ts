@@ -29,6 +29,7 @@ export const createUser = async (userData: User): Promise<User> => {
       food_allergy,
       drug_allergy,
       illness,
+      avatar_id, 
       role
     } = userData;
 
@@ -36,8 +37,8 @@ export const createUser = async (userData: User): Promise<User> => {
       `INSERT INTO users (
         student_id, citizen_id, prefix, first_name, last_name, nickname,
         academic_year, faculty, password_hash, phone_number,
-        parent_name, parent_phone_number, parent_relationship, food_allergy, drug_allergy, illness, role
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16 ,$17) RETURNING *`, 
+        parent_name, parent_phone_number, parent_relationship, food_allergy, drug_allergy, illness, avatar_id ,role
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16 ,$17 ,$18) RETURNING *`, 
       [
         student_id,
         citizen_id,
@@ -55,6 +56,7 @@ export const createUser = async (userData: User): Promise<User> => {
         food_allergy,
         drug_allergy,
         illness,
+        avatar_id,
         role
       ]
     );
@@ -81,7 +83,7 @@ export const findUsersByStudentId = async (student_id: string): Promise<User[]> 
   }
 };
 
-export const findUserBySSN = async (citizen_id: string): Promise<User | undefined> => {
+export const findUserByCitizenId = async (citizen_id: string): Promise<User | undefined> => {
   try {
     const result = await query(
       `SELECT * FROM users WHERE citizen_id = $1`,
