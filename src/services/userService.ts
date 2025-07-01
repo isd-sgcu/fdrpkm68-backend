@@ -26,15 +26,18 @@ export const createUser = async (userData: User): Promise<User> => {
       parent_name,
       parent_phone_number,
       parent_relationship,
-      role,
+      food_allergy,
+      drug_allergy,
+      illness,
+      role
     } = userData;
 
     const result = await query(
       `INSERT INTO users (
         student_id, citizen_id, prefix, first_name, last_name, nickname,
         academic_year, faculty, password_hash, phone_number,
-        parent_name, parent_phone_number, parent_relationship, role
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`, 
+        parent_name, parent_phone_number, parent_relationship, food_allergy, drug_allergy, illness, role
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16 ,$17) RETURNING *`, 
       [
         student_id,
         citizen_id,
@@ -49,16 +52,17 @@ export const createUser = async (userData: User): Promise<User> => {
         parent_name,
         parent_phone_number,
         parent_relationship,
-        role,
+        food_allergy,
+        drug_allergy,
+        illness,
+        role
       ]
     );
+    // console.log('User created successfully:', result);
     return result.rows[0]; 
-  } catch (error) {
-    if (error instanceof Error && 'statusCode' in error) {
-      throw error;
-    }
-    const customError: CustomError = new Error('Failed to create user');
-    customError.statusCode = 500;
+  } catch (error: any) {
+    const customError: CustomError = new Error(error.message || 'Failed to create user');
+    customError.statusCode = error.statusCode || 500;
     throw customError;
   }
 };
