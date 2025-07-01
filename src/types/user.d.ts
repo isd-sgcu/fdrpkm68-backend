@@ -17,7 +17,8 @@ export interface User {
   parent_relationship: string; 
   food_allergy?: string; 
   drug_allergy?: string; 
-  illness?: string; 
+  illness?: string;
+  avatar_id: number;
   role: RoleType;
   created_at: Date;
   updated_at: Date;
@@ -41,6 +42,7 @@ export interface UserRegistrationRequest {
   food_allergy?: string; 
   drug_allergy?: string; 
   illness?: string; 
+  avatar_id: number; 
 }
 
 // Interface UserPublic สำหรับข้อมูลที่ส่งกลับไปยัง Frontend
@@ -57,5 +59,9 @@ export interface UserPublic {
   parent_name: string;
   parent_phone_number: string;
   parent_relationship: string;
+  food_allergy?: string;
+  drug_allergy?: string;
+  illness?: string;
+  avatar_id: number;
   role: RoleType;
 }
