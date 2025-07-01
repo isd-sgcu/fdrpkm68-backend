@@ -1,18 +1,20 @@
 import { Client } from 'pg';
+import { config } from '../config';
+
 
 const client = new Client({
-  user: 'postgres',
-  password: 'changeme',
-  host: 'localhost',
-  port: 5433,
-  database: 'postgres',
+  //this is for TESTING purposes only btw
+  user: config.DB_USER,
+  password: config.DB_PASSWORD,
+  host: config.DB_HOST,
+  port: parseInt(config.DB_PORT as string, 10),
+  database: config.DB_NAME,
 })
 
 
 export const connectDB = async () => {
   try {
     await client.connect();
-    console.log('PostgreSQL connected successfully');
   } catch (error) {
     console.error('Error connecting to PostgreSQL:', error);
     throw error;

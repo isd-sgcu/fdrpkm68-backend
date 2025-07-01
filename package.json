@@ -3,15 +3,15 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-   "scripts": {
-    "start": "node dist/app.js",        
-    "dev": "nodemon --exec ts-node src/app.ts", 
-    "build": "tsc",                     
-    "lint": "eslint src --ext .ts",  
-    "lint:fix": "eslint src --ext .ts --fix", 
-    "db:migrate": "ts-node src/database/migrations/run-migrations.ts", 
-    "db:seed": "ts-node src/database/seeds/run-seeds.ts",    
-    "swagger:gen": "ts-node src/docs/generate-swagger-docs.ts" 
+  "scripts": {
+    "start": "node dist/app.js",
+    "dev": "nodemon --exec ts-node src/app.ts",
+    "build": "tsc",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "db:migrate": "ts-node src/database/migrations/run-migrations.ts",
+    "db:seed": "ts-node src/database/seeds/run-seeds.ts",
+    "swagger:gen": "ts-node src/docs/generate-swagger-docs.ts"
   },
   "repository": {
     "type": "git",
@@ -36,6 +36,8 @@
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.16.3",
     "qrcode": "^1.5.4",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
@@ -47,6 +49,8 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/pg": "^8.15.4",
     "@types/qrcode": "^1.5.5",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
     "nodemon": "^3.1.10"
   }
 }

@@ -19,8 +19,8 @@ export const register = async (userData: UserRegistrationRequest) => {
 
   // hash the password
   const salt = await bcrypt.genSalt(10);
-    console.log('Password received for hashing:', password);
-  console.log('Salt Rounds:', salt);
+  //   console.log('Password received for hashing:', password);
+  // console.log('Salt Rounds:', salt);
   const password_hash = await bcrypt.hash(password, salt);
 
   // crerate user for database
@@ -56,8 +56,8 @@ export const login = async (student_id: string, password: string): Promise<{ tok
     citizen_id: user.citizen_id,
     role: user.role,
   };
-  const token = jwt.sign(payload, config.jwtSecret, {
-    expiresIn: '1h', // กำหนดเวลาในการหมดอายุของ token
+  const token = jwt.sign(payload, config.SECRET_JWT_KEY as string, {
+    expiresIn: '1h', 
   });
 
     return { token, user };
