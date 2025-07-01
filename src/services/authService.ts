@@ -7,8 +7,7 @@ import { CustomError } from '../types/error';
 
 // Register Logic
 export const register = async (userData: UserRegistrationRequest) => {
-  const { student_id, citizen_id, password ,...rest} = userData;
-  // console.log('Registering user with data:', userData);
+  const { student_id, citizen_id, password} = userData;
 
   // check if user already exists
   const existingUser = await userService.findUserByStudentIdAndCitizenId(student_id, citizen_id);
@@ -27,8 +26,7 @@ export const register = async (userData: UserRegistrationRequest) => {
 
   // crerate user for database
   const role = (userData as any).role || 'FRESHMAN'; //testing purposes naja
-  const newUser : User = {...userData, password_hash, ...rest ,role, created_at: new Date(), updated_at: new Date()}
-  console.log('New user object to be created:', newUser);
+  const newUser : User = {...userData, password_hash, role, created_at: new Date(), updated_at: new Date()}
   const addedUser = await userService.createUser(newUser);
   // console.log('User created successfully:', addedUser);
   return addedUser;
