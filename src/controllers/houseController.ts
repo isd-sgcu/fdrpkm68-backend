@@ -13,22 +13,28 @@ export const getAllHouses = async (req: Request, res: Response, next: NextFuncti
         })
     }
     catch (error){
-        console.log(error)
-        next(error)
+        res.status(500).json({
+            status: 'error',
+            message: 'Error occured while fetching houses data.'
+        })
     }
 }
 
 // retrieve user's selected house(s)
 export const getSelectedHouses = async (req: Request, res: Response, next: NextFunction) => {
     try {
-
+        // const group_id = req.group?.group_id
+        // const selectedHouses = 
     }
     catch (error) {
-
+        res.status(500).json({
+            status: 'error',
+            message: 'Fetching '
+        })
     }
 }
 
-export const saveHousesDraft = async (req: Request, res: Response, next: NextFunction) => {
+export const createHousesDraft = async (req: Request, res: Response, next: NextFunction) => {
     try {
         // ?
         const student_ids = req.body.student_ids
@@ -41,37 +47,60 @@ export const saveHousesDraft = async (req: Request, res: Response, next: NextFun
         // ...
     }
     catch (error){
-
+        res.status(500).json({
+            status: 'error',
+            message: 'Error occured while fetching houses data.'
+        })
     }
 }
 
-export const deleteOneHouseDraft = async (req: Request, res: Response, next: NextFunction) => {
+export const upDateHousesDraft = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+
+    }
+    catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: 'Could not update a house'
+        })
+    }
+}
+
+export const deleteOneHouseFromDraft = async (req: Request, res: Response, next: NextFunction) => {
     try {
         // check if the person is the group leader (non-group leader can't make changes on house)
         // get primary key (name_Thai) of the house to be deleted
         // delete the house from users' selected house in the db
     }
     catch (error) {
-
+        res.status(500).json({
+            status: 'error',
+            message: 'Could not delete a house off the group.'
+        })
     }
 }
 
-export const deleteAllHousesDraft = async (req: Request, res: Response, next: NextFunction) => {
+export const deleteAllHousesFromDraft = async (req: Request, res: Response, next: NextFunction) => {
     try {
         // check if the person is the group leader
         // and just delete all selected houses from 
     }
     catch (error) {
-
+        res.status(500).json({
+            status: 'error',
+            message: 'Could not delete all houses off the group.'
+        })
     }
 }
 
-export const confirmSelectedHouses = async (req: Request, res: Response, next: NextFunction) => {
+export const submitHousesDraft = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        // may be redundant because already have saveHousesDraft?
-        // Even when user confirm and actually submit houses, we can just call saveHousesDraft right?
+        
     }
     catch (error) {
-
+        res.status(500).json({
+            status: 'error',
+            message: 'Could not submit selected houses.'
+        })
     }
 }
