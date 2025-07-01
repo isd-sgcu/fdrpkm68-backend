@@ -12,9 +12,9 @@ export const register = async (userData: UserRegistrationRequest) => {
   // check if user already exists
   const existingUser = await userService.findUserByStudentIdAndCitizenId(student_id, citizen_id);
   if (existingUser) {
-    const error: CustomError = new Error('User with this student ID and citizen ID already exists.');
+    const error: CustomError = new Error('User already exists with this student ID and citizen ID.');
     error.statusCode = 400;
-    throw error;
+    console.error('User already exists:', error);
   }
 
   // hash the password
@@ -24,10 +24,11 @@ export const register = async (userData: UserRegistrationRequest) => {
   const password_hash = await bcrypt.hash(password, salt);
 
   // crerate user for database
-  const role = (userData as any).role || 'student'; 
+  const role = (userData as any).role || 'FRESHMAN'; //testing purposes naja
   const newUser : User = {...userData, password_hash, role, created_at: new Date(), updated_at: new Date()}
-  
-  return   await userService.createUser(newUser);
+  const addedUser = await userService.createUser(newUser);
+  console.log('User created successfully:', addedUser);
+  return addedUser;
 };
 
 // Login 

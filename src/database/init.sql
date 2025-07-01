@@ -28,6 +28,7 @@ CREATE TYPE housesize_letter_type AS ENUM ('S', 'M', 'L', 'XL', 'XXL');
 CREATE TYPE group_role_type AS ENUM ('OWNER', 'MEMBER');
 
 
+
 -- Create "users" table
 CREATE TABLE users (
     student_id VARCHAR(10) NOT NULL,
@@ -65,6 +66,7 @@ CREATE TABLE "checkin" (
     FOREIGN KEY (user_student_id, user_citizen_id) REFERENCES users (student_id, citizen_id),
     UNIQUE(user_student_id, user_citizen_id, event)
 );
+
 
 
 -- Houses schema
@@ -107,6 +109,7 @@ ALTER TABLE users
 ADD group_id TEXT NOT NULL,
 ADD group_role group_role_type NOT NULL,
 ADD CONSTRAINT fk_group_id FOREIGN KEY (group_id) REFERENCES "group"(group_id);
+
 
 
 

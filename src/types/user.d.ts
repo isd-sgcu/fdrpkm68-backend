@@ -15,6 +15,9 @@ export interface User {
   parent_name: string; 
   parent_phone_number: string; 
   parent_relationship: string; 
+  food_allergy?: string; 
+  drug_allergy?: string; 
+  illness?: string; 
   role: RoleType;
   created_at: Date;
   updated_at: Date;
@@ -37,7 +40,7 @@ export interface UserRegistrationRequest {
   parent_relationship: string;
   food_allergy?: string; 
   drug_allergy?: string; 
-  congenital_disease?: string; 
+  illness?: string; 
 }
 
 // Interface UserPublic สำหรับข้อมูลที่ส่งกลับไปยัง Frontend
