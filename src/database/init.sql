@@ -93,6 +93,7 @@ CREATE TABLE "group" (
     house_name_thai TEXT NOT NULL,
     house_rank INT NOT NULL,
     submitted BOOLEAN DEFAULT FALSE NOT NULL,
+    selected_houses TEXT[6], -- ordered: 1st, 2nd, ..., 5th, extra
     CONSTRAINT fk_house_name_thai FOREIGN KEY (house_name_thai) REFERENCES houses(name_thai)
 );
 
