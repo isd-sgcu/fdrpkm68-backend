@@ -22,8 +22,8 @@ export interface User {
   role: RoleType;
   created_at: Date;
   updated_at: Date;
-  group_role: GroupRoleType; // rpkm group
-  group_id: string; // rpkm group
+  group_role?: GroupRoleType; // rpkm group
+  group_id?: string; // rpkm group
 }
 
 // Interface สำหรับข้อมูลที่รับเข้ามาตอน Register 
