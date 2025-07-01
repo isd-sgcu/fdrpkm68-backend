@@ -82,6 +82,7 @@ CREATE TABLE houses (
     size_letter housesize_letter_type NOT NULL,
     member_count INT NOT NULL,
     instagram TEXT NOT NULL,
+    house_id TEXT NOT NULL, -- here for "easier" retrieval of houses
     CONSTRAINT fk_size_letter FOREIGN KEY (size_letter) REFERENCES house_sizes(size_letter)
 );
 
