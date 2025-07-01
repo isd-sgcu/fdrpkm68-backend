@@ -43,6 +43,7 @@ CREATE TABLE users (
     food_allergy TEXT DEFAULT NULL,
     drug_allergy TEXT DEFAULT NULL,
     illness TEXT DEFAULT NULL,
+    avatar_id SMALLINT DEFAULT 1 NOT NULL,
     role role_type DEFAULT 'FRESHMAN' NOT NULL,
     created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT now() NOT NULL,
     updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT now() NOT NULL,
