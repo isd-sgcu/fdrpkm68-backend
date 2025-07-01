@@ -1,4 +1,4 @@
-import { PrefixType, FacultyId ,RoleType , EventType ,CheckinStatusType, GroupRoleType} from "./enum";
+import { PrefixType, FacultyId ,RoleType , EventType ,CheckinStatusType, GroupRoleType } from "./enum";
 
 // Interface สำหรับข้อมูลผู้ใช้ทั้งหมด
 export interface User {
