@@ -41,7 +41,7 @@ export const getMyProfile = async (req: Request, res: Response, next: NextFuncti
     };
 
     res.status(200).json({
-      status: 'success',
+      status: 'User profile retrieved successfully',
       user: userPublicData,
     });
     return;

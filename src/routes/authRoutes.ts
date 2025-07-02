@@ -21,7 +21,8 @@ const router = Router();
  *               citizen_id:
  *                 type: string
  *               prefix:
- *                 type: string
+ *                 type: PrefixType
+ *                 enum: [MR., MRS., MS.]
  *               first_name:
  *                 type: string
  *               last_name:
@@ -31,7 +32,7 @@ const router = Router();
  *               academic_year:
  *                 type: string
  *               faculty:
- *                 type: string
+ *                 type: FacultyId
  *               password:
  *                 type: string
  *               phone_number:
