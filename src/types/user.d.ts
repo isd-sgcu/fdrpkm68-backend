@@ -69,3 +69,10 @@ export interface UserPublic {
   group_role: GroupRoleType;
   group_id: string;
 }
+
+export type ForgotPasswordReq = {
+  student_id: string;
+  citizen_id: string;
+  new_password: string;
+  confirm_new_password: string;
+};

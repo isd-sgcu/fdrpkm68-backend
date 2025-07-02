@@ -2,6 +2,9 @@ import { query } from '../database/client';
 import { User, UserRegistrationRequest } from '../types/user';
 import { CustomError } from '../types/error';
 import { validateCitizenIdChecksum } from '../utils/validationUtils'; 
+import bcrypt from 'bcryptjs';
+import { ForgotPasswordReq } from '../types/user';
+
 
 export const createUser = async (userData: User): Promise<User> => {
   try {
@@ -113,4 +116,31 @@ export const findUserByStudentIdAndCitizenId = async (
     throw customError;
   }
 };
+
+export const updateUserPassword = async ( Userdata : ForgotPasswordReq): Promise<User> => {
+    const { student_id, citizen_id, new_password ,confirm_new_password} = Userdata;
+
+    if(new_password !== confirm_new_password) {
+      const error: CustomError = new Error('New password and confirmation do not match.');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    // hash the new password
+    const salt = await bcrypt.genSalt(10);
+    const password_hash = await bcrypt.hash(new_password, salt);
+
+    const result = await query(
+      `UPDATE users SET password_hash = $1, updated_at = NOW() WHERE student_id = $2 AND citizen_id = $3 RETURNING *`,
+      [password_hash, student_id, citizen_id]
+    );
+
+    if (result.rows.length === 0) {
+      const error: CustomError = new Error('User not found with the provided student ID and citizen ID.');
+      error.statusCode = 404;
+      throw error;
+    }
+
+    return result.rows[0];
+}
 

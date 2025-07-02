@@ -45,3 +45,4 @@ export const getMyProfile = async (req: Request, res: Response, next: NextFuncti
     });
   }
 };
+
