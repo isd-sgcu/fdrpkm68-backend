@@ -23,7 +23,7 @@ export const register = async (userData: UserRegistrationRequest) => {
   // console.log('Salt Rounds:', salt);
   const password_hash = await bcrypt.hash(password, salt);
 
-  // crerate user for database
+  // create user for database
   const role = (userData as any).role || 'FRESHMAN'; //testing purposes naja
   const newUser : User = {...userData, password_hash, role, created_at: new Date(), updated_at: new Date()}
   const addedUser = await userService.createUser(newUser);
