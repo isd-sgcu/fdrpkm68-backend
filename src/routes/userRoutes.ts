@@ -12,6 +12,9 @@ const router = Router();
  *     tags: [User]
  *     security:
  *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User profile retrieved successfully
  *         content:
  *           application/json:
  *             schema:
@@ -48,9 +51,6 @@ const router = Router();
  *                   type: string
  *                 illness:
  *                   type: string
- *         responses:
- *           200:
- *             description: Successfully retrieved user profile
  */
 router.get('/me', authMiddleware, roleMiddleware([RoleType.FRESHMAN, RoleType.STAFF]),getMyProfile);
 export default router;
