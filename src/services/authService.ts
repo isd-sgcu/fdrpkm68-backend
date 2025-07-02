@@ -14,9 +14,8 @@ export const register = async (userData: UserRegistrationRequest) => {
   const existingUser = await userService.findUserByStudentIdAndCitizenId(student_id, citizen_id);
   if (existingUser) {
     const error: CustomError = new Error('User already exists with this student ID and citizen ID.');
-    error.statusCode = 409;
-    throw error;
-    // console.error('User already exists:', error);
+    error.statusCode = 400;
+    console.error('User already exists:', error);
   }
 
   // hash the password
@@ -35,14 +34,16 @@ export const register = async (userData: UserRegistrationRequest) => {
 };
 
 // Login 
-export const login = async (student_id: string, citizen_id: string, password: string): Promise<{ token: string; user: User }> => {
+export const login = async (student_id: string, password: string): Promise<{ token: string; user: User }> => {
 
-  const user = await userService.findUserByStudentIdAndCitizenId(student_id, citizen_id);
-  if (!user) {
-    const error: CustomError = new Error('User not found. Student ID or Citizen ID is incorrect.');
+  const users = await userService.findUsersByStudentId(student_id);
+  if (users.length === 0) {
+    const error: CustomError = new Error('Invalid credentials.');
     error.statusCode = 401;
     throw error;
   }
+
+  const user = users[0]; 
 
   // check password
   const isMatch = await bcrypt.compare(password, user.password_hash);

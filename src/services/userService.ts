@@ -108,9 +108,9 @@ export const findUserByStudentIdAndCitizenId = async (
     );
     return result.rows[0];
   } catch (error) {
-     const customError: CustomError = new Error('User already exists with this student ID and citizen ID.');
-      customError.statusCode = 409;
-      throw customError;
+    const customError: CustomError = new Error('Failed to find user by student ID and citizen ID');
+    customError.statusCode = 500;
+    throw customError;
   }
 };
 
