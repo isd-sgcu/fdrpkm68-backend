@@ -136,7 +136,7 @@ export const updateUserPassword = async ( Userdata : ForgotPasswordReq): Promise
     );
 
     if (result.rows.length === 0) {
-      const error: CustomError = new Error('User not found or update failed');
+      const error: CustomError = new Error('User not found with the provided student ID and citizen ID.');
       error.statusCode = 404;
       throw error;
     }
