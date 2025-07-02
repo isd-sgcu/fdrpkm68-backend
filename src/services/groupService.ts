@@ -15,3 +15,19 @@ export const getGroupDataFromDB = async(groupID: string): Promise<(string | null
     throw customError;
   }
 }
+
+export const createGroup = async(groupID: string): Promise<string> => {
+  try {
+    const result = await query(
+      `INSERT INTO 
+      groups (group_id, submitted, selected_houses) 
+      VALUES ($1, FALSE, NULL)`,
+      [groupID]
+    );
+    return result.rows[0];
+  } catch (error) {
+    const customError: CustomError = new Error('Failed to create group.');
+    customError.statusCode = 500;
+    throw customError;
+  }
+}
