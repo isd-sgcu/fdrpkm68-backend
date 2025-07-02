@@ -24,6 +24,9 @@ CREATE TYPE faculty_id AS ENUM (
 CREATE TYPE role_type AS ENUM ('STAFF', 'FRESHMAN');
 CREATE TYPE event_type AS ENUM ('FIRSTDATE', 'RPKM', 'FRESHMENNIGHT');
 CREATE TYPE checkin_status_type AS ENUM ('PRE_REGISTER', 'EVENT_REGISTER');
+CREATE TYPE housesize_letter_type AS ENUM ('S', 'M', 'L', 'XL', 'XXL');
+CREATE TYPE group_role_type AS ENUM ('OWNER', 'MEMBER');
+
 
 -- Create "users" table
 CREATE TABLE users (
@@ -43,6 +46,7 @@ CREATE TABLE users (
     food_allergy TEXT DEFAULT NULL,
     drug_allergy TEXT DEFAULT NULL,
     illness TEXT DEFAULT NULL,
+    avatar_id SMALLINT DEFAULT 1 NOT NULL,
     role role_type DEFAULT 'FRESHMAN' NOT NULL,
     created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT now() NOT NULL,
     updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT now() NOT NULL,
@@ -62,3 +66,42 @@ CREATE TABLE "checkin" (
     FOREIGN KEY (user_student_id, user_citizen_id) REFERENCES users (student_id, citizen_id),
     UNIQUE(user_student_id, user_citizen_id, event)
 );
+
+
+-- Houses schema
+CREATE TABLE house_sizes (
+    size_letter housesize_letter_type PRIMARY KEY NOT NULL,
+    max_member INT NOT NULL
+);
+
+CREATE TABLE houses (
+    name_thai TEXT PRIMARY KEY NOT NULL,
+    name_english TEXT NOT NULL,
+    logo TEXT NOT NULL, -- TEXT as placeholder, not sure which data type for house picture
+    description_thai TEXT NOT NULL,
+    description_english TEXT NOT NULL,
+    size_letter housesize_letter_type NOT NULL,
+    member_count INT NOT NULL,
+    instagram TEXT NOT NULL,
+    house_id TEXT NOT NULL, -- here for "easier" retrieval of houses
+    CONSTRAINT fk_size_letter FOREIGN KEY (size_letter) REFERENCES house_sizes(size_letter)
+);
+
+
+-- Group schema
+CREATE TABLE "group" (
+    group_id TEXT PRIMARY KEY NOT NULL,
+    house_name_thai TEXT NOT NULL,
+    house_rank INT NOT NULL,
+    submitted BOOLEAN DEFAULT FALSE NOT NULL,
+    selected_houses TEXT[6], -- ordered: 1st, 2nd, ..., 5th, extra
+    CONSTRAINT fk_house_name_thai FOREIGN KEY (house_name_thai) REFERENCES houses(name_thai)
+);
+
+ALTER TABLE users
+ADD group_id TEXT NOT NULL,
+ADD group_role group_role_type NOT NULL,
+ADD CONSTRAINT fk_group_id FOREIGN KEY (group_id) REFERENCES "group"(group_id);
+
+
+

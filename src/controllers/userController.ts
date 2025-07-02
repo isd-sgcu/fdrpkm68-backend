@@ -28,6 +28,12 @@ export const getMyProfile = async (req: Request, res: Response, next: NextFuncti
       parent_name: user.parent_name,
       parent_phone_number: user.parent_phone_number,
       parent_relationship: user.parent_relationship,
+      food_allergy: user.food_allergy,
+      drug_allergy: user.drug_allergy,
+      illness: user.illness,
+      avatar_id: user.avatar_id,
+      group_role: user.group_role,
+      group_id: user.group_id,
       role: user.role,
     };
 
@@ -45,3 +51,4 @@ export const getMyProfile = async (req: Request, res: Response, next: NextFuncti
     });
   }
 };
+

@@ -4,16 +4,16 @@ import * as userService from './userService';
 import { config } from '../config';
 import { User, UserRegistrationRequest } from '../types/user'; 
 import { CustomError } from '../types/error'; 
-
+import { NextFunction } from 'express';
 // Register Logic
 export const register = async (userData: UserRegistrationRequest) => {
-  const { student_id, citizen_id, password} = userData;
+  const { student_id, citizen_id, password ,...rest} = userData;
 
   // check if user already exists
   const existingUser = await userService.findUserByStudentIdAndCitizenId(student_id, citizen_id);
   if (existingUser) {
     const error: CustomError = new Error('User already exists with this student ID and citizen ID.');
-    error.statusCode = 400;
+    error.statusCode = 409;
     console.error('User already exists:', error);
   }
 
@@ -27,26 +27,23 @@ export const register = async (userData: UserRegistrationRequest) => {
   const role = (userData as any).role || 'FRESHMAN'; //testing purposes naja
   const newUser : User = {...userData, password_hash, role, created_at: new Date(), updated_at: new Date()}
   const addedUser = await userService.createUser(newUser);
-  console.log('User created successfully:', addedUser);
+  // console.log('User created successfully:', addedUser);
   return addedUser;
 };
 
 // Login 
-export const login = async (student_id: string, password: string): Promise<{ token: string; user: User }> => {
+export const login = async (student_id: string, citizen_id:string ,password: string): Promise<{ token: string; user: User }> => {
 
-  const users = await userService.findUsersByStudentId(student_id);
-  if (users.length === 0) {
-    const error: CustomError = new Error('Invalid credentials.');
+  const user = await userService.findUserByStudentIdAndCitizenId(student_id,citizen_id);
+  if(!user){
+    const error: CustomError = new Error('User not found.Student ID or Citizen ID is incorrect.');
     error.statusCode = 401;
     throw error;
   }
-
-  const user = users[0]; 
-
   // check password
   const isMatch = await bcrypt.compare(password, user.password_hash);
   if (!isMatch) {
-    const error: CustomError = new Error('Invalid credentials.');
+    const error: CustomError = new Error('passwrod is incorrect. please try again.');
     error.statusCode = 401;
     throw error;
   }
@@ -57,7 +54,7 @@ export const login = async (student_id: string, password: string): Promise<{ tok
     citizen_id: user.citizen_id,
     role: user.role,
   };
-  const token = jwt.sign(payload, config.SECRET_JWT_KEY as string, {
+  const token = jwt.sign(payload, config.SECRET_JWT_KEY, {
     expiresIn: '1h', 
   });
 

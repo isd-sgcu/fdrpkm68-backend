@@ -23,7 +23,7 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
     }
     res.status(400).json({
       status: 'error',
-      message: error || 'Registration failed.',
+      message: error,
     });
   }
 };
@@ -31,8 +31,8 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
 // Login Controller
 export const loginUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { student_id, password } = req.body;
-    const { token, user } = await authService.login(student_id, password); 
+    const { student_id,citizen_id, password } = req.body;
+    const { token, user } = await authService.login(student_id, citizen_id, password); 
 
     res.status(200).json({
       status: 'success',
@@ -51,7 +51,38 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
     }
     res.status(400).json({
       status: 'error',
-      message: error || 'Login failed.',
+      message: error,
+    });
+  }
+};
+
+// Forgot Password Controller
+export const forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { student_id, citizen_id, new_password, confirm_new_password } = req.body;
+    const updatedUser = await userService.updateUserPassword({
+      student_id,
+      citizen_id,
+      new_password,
+      confirm_new_password,
+    });
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Password updated successfully.',
+      user: {
+        student_id: updatedUser.student_id,
+        citizen_id: updatedUser.citizen_id,
+        first_name: updatedUser.first_name,
+      },
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      return next(error); 
+    }
+    res.status(400).json({
+      status: 'error',
+      message: error,
     });
   }
 };
