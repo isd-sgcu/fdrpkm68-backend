@@ -4,7 +4,7 @@ import * as userService from './userService';
 import { config } from '../config';
 import { User, UserRegistrationRequest } from '../types/user'; 
 import { CustomError } from '../types/error'; 
-
+import { NextFunction } from 'express';
 // Register Logic
 export const register = async (userData: UserRegistrationRequest) => {
   const { student_id, citizen_id, password ,...rest} = userData;
@@ -54,7 +54,7 @@ export const login = async (student_id: string, citizen_id:string ,password: str
     citizen_id: user.citizen_id,
     role: user.role,
   };
-  const token = jwt.sign(payload, config.SECRET_JWT_KEY as string, {
+  const token = jwt.sign(payload, config.SECRET_JWT_KEY, {
     expiresIn: '1h', 
   });
 

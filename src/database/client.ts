@@ -7,7 +7,7 @@ const client = new Client({
   user: config.DB_USER,
   password: config.DB_PASSWORD,
   host: config.DB_HOST,
-  port: parseInt(config.DB_PORT as string, 10),
+  port: config.DB_PORT, 
   database: config.DB_NAME,
 })
 
