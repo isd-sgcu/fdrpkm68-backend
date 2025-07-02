@@ -5,7 +5,8 @@ import * as userService from '../services/userService';
 export const getMyProfile = async (req: Request, res: Response, next: NextFunction) => {
   try {
     if (!req.user) {
-      return res.status(401).json({ status: 'error', message: 'User not authenticated.' });
+      res.status(401).json({ status: 'error', message: 'User not authenticated.' });
+      return; 
     }
 
     const { student_id, citizen_id } = req.user;
@@ -32,8 +33,6 @@ export const getMyProfile = async (req: Request, res: Response, next: NextFuncti
       drug_allergy: user.drug_allergy,
       illness: user.illness,
       avatar_id: user.avatar_id,
-      group_role: user.group_role,
-      group_id: user.group_id,
       role: user.role,
     };
 
@@ -41,14 +40,15 @@ export const getMyProfile = async (req: Request, res: Response, next: NextFuncti
       status: 'success',
       user: userPublicData,
     });
+    return;
   } catch (error) {
     if (error instanceof Error) {
-      return next(error); 
+      return next(error);
     }
     res.status(500).json({
       status: 'error',
       message: 'An unexpected error occurred while fetching user profile.',
     });
+    return;
   }
 };
-
