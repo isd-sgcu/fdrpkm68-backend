@@ -88,10 +88,10 @@ CREATE TABLE houses (
 
 
 -- Group schema
-CREATE TABLE "group" (
+CREATE TABLE groups (
     group_id TEXT PRIMARY KEY NOT NULL,
-    house_name_thai TEXT NOT NULL,
-    house_rank INT NOT NULL,
+    house_name_thai TEXT,
+    house_rank INT,
     submitted BOOLEAN DEFAULT FALSE NOT NULL,
     selected_houses TEXT[6], -- ordered: 1st, 2nd, ..., 5th, extra
     CONSTRAINT fk_house_name_thai FOREIGN KEY (house_name_thai) REFERENCES houses(name_thai)
