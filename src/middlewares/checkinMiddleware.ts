@@ -1,23 +1,33 @@
 import { Request, Response, NextFunction } from 'express';
-import { EventType } from '../types/enum';
-import { validateCheckinRequest } from '../utils/validationUtils';
+import { validateCheckinInput } from '../utils/validationUtils';
 
-declare module 'express-serve-static-core' {
-	interface Request {
-		student_id: string;
-		citizen_id: string;
-		event: EventType;
+export const validateParamsMiddleware = (options: { eventRequired: boolean }) => (
+	req: Request,
+	res: Response,
+	next: NextFunction
+) => {
+	const { student_id, citizen_id, event } = req.params;
+
+	const validationError = validateCheckinInput(student_id, citizen_id, options.eventRequired, event);
+	if (validationError.length > 0) {
+		res.status(400).json({
+			error: 'Bad Request',
+			message: validationError,
+		});
+		return;
 	}
-}
 
-export const checkinMiddleware = (options: { eventRequired: boolean }) => (
+	next();
+};
+
+export const validateBodyMiddleware = (options: { eventRequired: boolean }) => (
 	req: Request,
 	res: Response,
 	next: NextFunction
 ) => {
 	const { student_id, citizen_id, event } = req.body;
 
-	const validationError = validateCheckinRequest(student_id, citizen_id, options.eventRequired, event);
+	const validationError = validateCheckinInput(student_id, citizen_id, options.eventRequired, event);
 	if (validationError.length > 0) {
 		res.status(400).json({
 			error: 'Bad Request',

@@ -22,6 +22,52 @@ export const getAllCheckin = async (req: Request, res: Response, next: NextFunct
 	}
 }
 
+// Get checkin data by UserId and Event
+export const getCheckin = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const { student_id, citizen_id, event } = req.params
+
+		// Invalid student_id or citizen_id
+		const user = await userService.findUserByStudentIdAndCitizenId(student_id, citizen_id);
+		if (!user) {
+			res.status(404).json({
+				error: 'Not Found',
+				message: 'Invalid student_id or citizen_id',
+			})
+			return
+		}
+		const checkin = await checkinService.getCheckinByUserIdAndEvent(
+			student_id, citizen_id, event as EventType
+		);
+		// Empty
+		if (!checkin) {
+			res.status(200).json({
+				status: 'Not-Register',
+			})
+			return
+		}
+		const checkinStatus =
+			checkin.status === CheckinStatusType.PRE_REGISTER ? 'Pre-Register' : 'Checkin';
+		res.status(200).json({
+			status: checkinStatus,
+			student_id,
+			citizen_id,
+			nickname: user.nickname,
+			first_name: user.first_name,
+			last_name: user.last_name,
+			lastCheckIn: checkin.updated_at
+		})
+	} catch (error) {
+		if (error instanceof Error) {
+			return next(error);
+		}
+		res.status(500).json({
+			error: 'Internal Server Error',
+			message: 'An unexpected error occurred while fetching all checkin data.',
+		});
+	}
+}
+
 // Create checkin event with status = 'PRE_REGISTER'
 export const createCheckin = async (req: Request, res: Response, next: NextFunction) => {
 	try {
@@ -36,12 +82,11 @@ export const createCheckin = async (req: Request, res: Response, next: NextFunct
 			})
 			return
 		}
-		// Taken
 		const checkin = await checkinService.getCheckinByUserIdAndEvent(student_id, citizen_id, event)
+		// Taken
 		if (checkin) {
 			const checkinStatus =
 				checkin.status === CheckinStatusType.PRE_REGISTER ? 'Pre-Register' : 'Checkin';
-
 			res.status(409).json({
 				error: 'Conflict',
 				status: checkin.status,

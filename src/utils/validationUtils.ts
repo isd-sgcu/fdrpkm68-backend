@@ -15,7 +15,7 @@ export const validateCitizenIdChecksum = (citizenId: string): boolean => {
   return checksum === lastDigit;
 };
 
-export const validateCheckinRequest = (
+export const validateCheckinInput = (
   student_id: string,
   citizen_id: string,
   eventRequired: boolean,
@@ -25,9 +25,13 @@ export const validateCheckinRequest = (
 
   if (!student_id || typeof student_id !== 'string')
     validationError.push('student_id: required');
+  else if (student_id.length !== 10 || !/^\d{10}$/.test(citizen_id))
+    validationError.push('student_id: invalid');
 
   if (!citizen_id || typeof citizen_id !== 'string')
     validationError.push('citizen_id: required');
+  else if (citizen_id.length !== 13 || !/^\d{13}$/.test(citizen_id))
+    validationError.push('citizen_id: invalid');
 
   if (eventRequired) {
     if (!event || typeof event !== 'string')
