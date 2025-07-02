@@ -36,6 +36,12 @@ export const getMyProfile = async (req: Request, res: Response, next: NextFuncti
       user: userPublicData,
     });
   } catch (error) {
-    next(error);
+    if (error instanceof Error) {
+      return next(error); 
+    }
+    res.status(500).json({
+      status: 'error',
+      message: 'An unexpected error occurred while fetching user profile.',
+    });
   }
 };

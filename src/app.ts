@@ -6,9 +6,11 @@ import { connectDB } from './database/client';
 import { connectRedis } from './cache/redisClient';
 import apiRoutes from './routes'; 
 import { errorHandler } from './middlewares/errorHandler';
+import { setupSwagger } from './docs/swagger';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+setupSwagger(app);
 
 // Middlewares
 app.use(cors());

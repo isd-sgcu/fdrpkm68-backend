@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import * as authService from '../services/authService';
 import * as userService from '../services/userService';
-
+import { errorHandler } from '../middlewares/errorHandler';
 // Register Controller
 export const registerUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -18,20 +18,21 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
       },
     });
   } catch (error) {
-    console.log('Error during registration:', error);
-    // res.status(error.statusCode || 500).json({
-    //   status: 'error',
-    //   message: error.message || 'An error occurred during registration.',
-    // });
-    // next(error); 
+    if (error instanceof Error) {
+      return next(error); 
+    }
+    res.status(400).json({
+      status: 'error',
+      message: error || 'Registration failed.',
+    });
   }
 };
 
 // Login Controller
 export const loginUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { student_id, password } = req.body;
-    const { token, user } = await authService.login(student_id, password); 
+    const { student_id, citizen_id ,password } = req.body;
+    const { token, user } = await authService.login(student_id, citizen_id,password); 
 
     res.status(200).json({
       status: 'success',
@@ -42,10 +43,15 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
         citizen_id: user.citizen_id,
         first_name: user.first_name,
         role: user.role,
-
       },
     });
   } catch (error) {
-    next(error); 
+    if (error instanceof Error) {
+      return next(error); 
+    }
+    res.status(400).json({
+      status: 'error',
+      message: error || 'Login failed.',
+    });
   }
 };
