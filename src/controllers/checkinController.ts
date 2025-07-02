@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import * as checkinService from '../services/checkinService';
 import * as userService from '../services/userService';
 import { CheckinStatusType, EventType } from '../types/enum';
+import { getCurrentEvent } from '../utils/checkinUtils';
 
 // Get all checkin data
 export const getAllCheckin = async (req: Request, res: Response, next: NextFunction) => {
@@ -15,40 +16,17 @@ export const getAllCheckin = async (req: Request, res: Response, next: NextFunct
 			return next(error);
 		}
 		res.status(500).json({
-			status: 'error',
-			message: 'An unexpected error occurred while fetching checkin.',
+			error: 'Internal Server Error',
+			message: 'An unexpected error occurred while fetching all checkin data.',
 		});
 	}
 }
 
 // Create checkin event with status = 'PRE_REGISTER'
 export const createCheckin = async (req: Request, res: Response, next: NextFunction) => {
-	interface CheckinCreateRequest {
-		student_id: string;
-		citizen_id: string;
-		event: string;
-	}
-
 	try {
-		const { student_id, citizen_id, event } = req.body as CheckinCreateRequest
-		const validationError: string[] = []
+		const { student_id, citizen_id, event } = req.body
 
-		if (!student_id || typeof student_id !== 'string')
-			validationError.push('student_id: required');
-
-		if (!citizen_id || typeof citizen_id !== 'string')
-			validationError.push('citizen_id: required');
-
-		if (!event || typeof event !== 'string' || !Object.values(EventType).includes(event as EventType))
-			validationError.push('event: required');
-
-		if (validationError.length > 0) {
-			res.status(400).json({
-				error: 'Bad Request',
-				message: validationError.join(', '),
-			})
-			return
-		}
 		// Invalid student_id or citizen_id
 		const user = await userService.findUserByStudentIdAndCitizenId(student_id, citizen_id);
 		if (!user) {
@@ -61,9 +39,13 @@ export const createCheckin = async (req: Request, res: Response, next: NextFunct
 		// Taken
 		const checkin = await checkinService.getCheckinByUserIdAndEvent(student_id, citizen_id, event)
 		if (checkin) {
+			const checkinStatus =
+				checkin.status === CheckinStatusType.PRE_REGISTER ? 'Pre-Register' : 'Checkin';
+
 			res.status(409).json({
 				error: 'Conflict',
-				message: `Checkin has already created event: ${event}`
+				status: checkin.status,
+				message: `User has already ${checkinStatus} event: ${event}`
 			})
 			return
 		}
@@ -71,45 +53,32 @@ export const createCheckin = async (req: Request, res: Response, next: NextFunct
 		await checkinService.createCheckin(student_id, citizen_id, event)
 
 		res.status(201).json({
-			message: 'Checkin created successfully',
+			status: CheckinStatusType.PRE_REGISTER,
+			message: 'Pre-Register created successfully',
 		})
 	} catch (error) {
 		if (error instanceof Error) {
 			return next(error);
 		}
 		res.status(500).json({
-			status: 'error',
-			message: 'An unexpected error occurred while fetching checkin.',
+			error: 'Internal Server Error',
+			message: 'An unexpected error occurred while create checkin.',
 		});
 	}
 }
 
 // Update checkin status from 'PRE_REGISTER' to 'EVENT_REGISTER'
 export const updateCheckinStatus = async (req: Request, res: Response, next: NextFunction) => {
-	interface CheckinUpdateRequest {
-		student_id: string;
-		citizen_id: string;
-		event: string;
-	}
-
 	try {
-		const { student_id, citizen_id, event } = req.body as CheckinUpdateRequest
-		const validationError: string[] = []
+		const { student_id, citizen_id } = req.body
 
-		if (!student_id || typeof student_id !== 'string')
-			validationError.push('student_id: required');
-
-		if (!citizen_id || typeof citizen_id !== 'string')
-			validationError.push('citizen_id: required');
-
-		if (!event || typeof event !== 'string' || !Object.values(EventType).includes(event as EventType))
-			validationError.push('event: required');
-
-		if (validationError.length > 0) {
-			res.status(400).json({
-				error: 'Bad Request',
-				message: validationError.join(', '),
-			})
+		// Get current event
+		const event = getCurrentEvent();
+		if (!event) {
+			res.status(404).json({
+				error: 'No Active Event',
+				message: 'No event is currently active',
+			});
 			return
 		}
 		// Invalid student_id or citizen_id
@@ -126,7 +95,7 @@ export const updateCheckinStatus = async (req: Request, res: Response, next: Nex
 		if (!checkin) {
 			res.status(404).json({
 				error: 'Not Found',
-				message: 'Checkin not found',
+				message: `User has not pre-register event: ${event}`,
 			})
 			return
 		}
@@ -134,6 +103,7 @@ export const updateCheckinStatus = async (req: Request, res: Response, next: Nex
 		if (checkin.status === CheckinStatusType.EVENT_REGISTER) {
 			res.status(409).json({
 				error: 'Conflict',
+				status: CheckinStatusType.EVENT_REGISTER,
 				message: `User has already checkin event: ${event}`,
 				lastCheckIn: checkin.updated_at
 			})
@@ -155,8 +125,8 @@ export const updateCheckinStatus = async (req: Request, res: Response, next: Nex
 			return next(error);
 		}
 		res.status(500).json({
-			status: 'error',
-			message: 'An unexpected error occurred while fetching checkin.',
+			error: 'Internal Server Error',
+			message: 'An unexpected error occurred while update checkin status.',
 		});
 	}
 }

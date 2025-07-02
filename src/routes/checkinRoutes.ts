@@ -1,9 +1,12 @@
 import { Router } from 'express';
-import * as checkinController from '../controllers/checkinController';
+import {
+	createCheckin, getAllCheckin, updateCheckinStatus
+} from '../controllers/checkinController';
+import { checkinMiddleware } from '../middlewares/checkinMiddleware';
 
 const router = Router();
-router.get('/', checkinController.getAllCheckin);
-router.post('/create', checkinController.createCheckin);
-router.post('/update', checkinController.updateCheckinStatus);
+router.get('/', getAllCheckin);
+router.post('/', checkinMiddleware({ eventRequired: false }), updateCheckinStatus);
+router.post('/register', checkinMiddleware({ eventRequired: true }), createCheckin);
 
 export default router;

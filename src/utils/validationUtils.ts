@@ -1,6 +1,8 @@
+import { EventType } from "../types/enum";
+
 export const validateCitizenIdChecksum = (citizenId: string): boolean => {
   if (!citizenId || citizenId.length !== 13 || !/^\d{13}$/.test(citizenId)) {
-    return false; 
+    return false;
   }
 
   let sum = 0;
@@ -12,3 +14,27 @@ export const validateCitizenIdChecksum = (citizenId: string): boolean => {
 
   return checksum === lastDigit;
 };
+
+export const validateCheckinRequest = (
+  student_id: string,
+  citizen_id: string,
+  eventRequired: boolean,
+  event?: string,
+): string => {
+  const validationError: string[] = [];
+
+  if (!student_id || typeof student_id !== 'string')
+    validationError.push('student_id: required');
+
+  if (!citizen_id || typeof citizen_id !== 'string')
+    validationError.push('citizen_id: required');
+
+  if (eventRequired) {
+    if (!event || typeof event !== 'string')
+      validationError.push('event: required');
+    else if (!Object.values(EventType).includes(event as EventType))
+      validationError.push('event: invalid');
+  }
+
+  return validationError.join(' ');
+}

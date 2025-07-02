@@ -1,7 +1,7 @@
 import { query } from '../database/client';
 import { CustomError } from '../types/error';
 import { Checkin } from '../types/checkin';
-import { CheckinStatusType } from '../types/enum';
+import { CheckinStatusType, EventType } from '../types/enum';
 
 // Get all checkin data
 export const getAllCheckin = async (): Promise<Checkin[]> => {
@@ -21,7 +21,7 @@ export const getAllCheckin = async (): Promise<Checkin[]> => {
 export const createCheckin = async (
   student_id: string,
   citizen_id: string,
-  event: string,
+  event: EventType,
 ) => {
   try {
     const result = await query(
@@ -44,7 +44,7 @@ export const createCheckin = async (
 export const getCheckinByUserIdAndEvent = async (
   student_id: string,
   citizen_id: string,
-  event: string,
+  event: EventType,
 ): Promise<Checkin | undefined> => {
   try {
     const result = await query(
@@ -69,7 +69,7 @@ export const getCheckinByUserIdAndEvent = async (
 export const updateCheckinStatus = async (
   student_id: string,
   citizen_id: string,
-  event: string,
+  event: EventType,
 ) => {
   try {
     const result = await query(
