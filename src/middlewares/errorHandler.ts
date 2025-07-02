@@ -11,12 +11,12 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  const statusCode = err.statusCode;
-  const message = err.message;
+  const statusCode = err.statusCode || 500;
+  const message = err.message || 'Internal Server Error';
 
   console.error(`Error ${statusCode}: ${message}`, err.stack);
 
-  res.status(statusCode as number).json({
+  res.status(statusCode).json({
     status: 'error',
     message: message,
     data: err.data, 

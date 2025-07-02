@@ -31,8 +31,8 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
 // Login Controller
 export const loginUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { student_id, citizen_id ,password } = req.body;
-    const { token, user } = await authService.login(student_id, citizen_id,password); 
+    const { student_id, password } = req.body;
+    const { token, user } = await authService.login(student_id, password); 
 
     res.status(200).json({
       status: 'success',
