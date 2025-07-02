@@ -14,7 +14,7 @@ export const register = async (userData: UserRegistrationRequest) => {
   if (existingUser) {
     const error: CustomError = new Error('User already exists with this student ID and citizen ID.');
     error.statusCode = 409;
-    console.error('User already exists:', error);
+    throw error;
   }
 
   // hash the password
