@@ -5,8 +5,8 @@ import { RoleType } from '../types/enum';
 
 const router = Router();
 
-const asyncHandler = (fn: any) => (req: any, res: any, next: any) =>
-  Promise.resolve(fn(req, res, next)).catch(next);
+// const asyncHandler = (fn: any) => (req: any, res: any, next: any) =>
+//   Promise.resolve(fn(req, res, next)).catch(next);
 
-router.get('/me', authMiddleware, roleMiddleware([RoleType.FRESHMAN, RoleType.STAFF]),asyncHandler(getMyProfile));
+router.get('/me', authMiddleware, roleMiddleware([RoleType.FRESHMAN, RoleType.STAFF]),getMyProfile);
 export default router;
