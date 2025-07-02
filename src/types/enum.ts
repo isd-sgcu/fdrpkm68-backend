@@ -41,3 +41,16 @@ export enum CheckinStatusType {
   PRE_REGISTER = 'PRE_REGISTER',
   EVENT_REGISTER = 'EVENT_REGISTER',
 }
+
+export enum HouseSizeType {
+  S = 'S',
+  M = 'M',
+  L = 'L',
+  XL = 'XL',
+  XXL = 'XXL'
+}
+
+export enum GroupRoleType {
+  owner = 'owner',
+  member = 'member'
+}
