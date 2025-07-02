@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import * as userService from './userService'; 
+import * as groupService from './groupService'; 
 import { config } from '../config';
 import { User, UserRegistrationRequest } from '../types/user'; 
 import { CustomError } from '../types/error'; 
@@ -23,9 +24,15 @@ export const register = async (userData: UserRegistrationRequest) => {
   // console.log('Salt Rounds:', salt);
   const password_hash = await bcrypt.hash(password, salt);
 
+  // create group for user
+  /*TODO: Placeholder, probably not in final product due to string being very long,
+  find a way to generate 6 character IDs or something. */
+  const newGroupID = crypto.randomUUID();
+  const newGroup = await groupService.createGroup(newGroupID);
+
   // create user for database
   const role = (userData as any).role || 'FRESHMAN'; //testing purposes naja
-  const newUser : User = {...userData, password_hash, role, created_at: new Date(), updated_at: new Date()}
+  const newUser : User = {...userData, password_hash, role, created_at: new Date(), updated_at: new Date(),group_id: newGroupID}
   const addedUser = await userService.createUser(newUser);
   // console.log('User created successfully:', addedUser);
   return addedUser;
