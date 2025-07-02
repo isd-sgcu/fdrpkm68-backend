@@ -1,6 +1,5 @@
 
 import { EventType, CheckinStatusType } from './enum'; 
-import { User } from './user'; 
 
 export interface Checkin {
   id: number; // SERIAL PRIMARY KEY 
