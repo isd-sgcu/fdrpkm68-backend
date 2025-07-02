@@ -73,11 +73,6 @@ CREATE TABLE "checkin" (
 
 
 -- Houses schema
-CREATE TABLE house_sizes (
-    size_letter housesize_letter_type PRIMARY KEY NOT NULL,
-    max_member INT NOT NULL
-);
-
 CREATE TABLE houses (
     house_id SERIAL PRIMARY KEY NOT NULL, -- here for "easier" retrieval of houses
     name_thai TEXT NOT NULL,
