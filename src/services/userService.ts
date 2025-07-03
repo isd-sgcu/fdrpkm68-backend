@@ -8,13 +8,6 @@ import { ForgotPasswordReq } from '../types/user';
 
 export const createUser = async (userData: User): Promise<User> => {
   try {
-    // checksum SSN
-    if (!validateCitizenIdChecksum(userData.citizen_id)) {
-      const error: CustomError = new Error('Invalid Citizen ID checksum.');
-      error.statusCode = 400;
-      throw error;
-    }
-
     const {
       student_id,
       citizen_id,
