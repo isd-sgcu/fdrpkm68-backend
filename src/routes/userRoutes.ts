@@ -34,9 +34,31 @@ const router = Router();
  *                 nickname:
  *                   type: string
  *                 academic_year:
- *                   type: integer
+ *                   type: string
  *                 faculty:
  *                   type: FacultyId
+ *                   enum:
+ *                      [
+ *                     SCIENCE,
+ *                     ENGINEER,
+ *                     MEDICINE,
+ *                     ARTS,
+ *                     EDUCATION,
+ *                     PSYCHOLOGY,
+ *                     DENTISTRY,
+ *                     LAW,
+ *                     COMMUNICATION_ARTS,
+ *                     NURSING,
+ *                     COMMERCE_AND_ACCOUNTANCY,
+ *                     PHARMACEUTICAL_SCIENCE,
+ *                     POLITICAL_SCIENCE,
+ *                     SPORTS_SCIENCE,
+ *                     FINE_AND_APPLIED_ARTS,
+ *                     ECONOMICS,
+ *                     ARCHITECTURE,
+ *                     ALLIED_HEALTH_SCIENCES,
+ *                     VETERINARY_SCIENCE
+ *                      ]
  *                 phone_number:
  *                   type: string
  *                 parent_name:
@@ -47,10 +69,13 @@ const router = Router();
  *                   type: string
  *                 food_allergy:
  *                   type: string
+ *                   nullable: true
  *                 drug_allergy:
  *                   type: string
+ *                   nullable: true
  *                 illness:
  *                   type: string
+ *                   nullable: true
  */
 router.get('/me', authMiddleware, roleMiddleware([RoleType.FRESHMAN, RoleType.STAFF]),getMyProfile);
 export default router;
