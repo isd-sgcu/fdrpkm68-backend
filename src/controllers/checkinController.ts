@@ -3,6 +3,7 @@ import * as checkinService from '../services/checkinService';
 import * as userService from '../services/userService';
 import { CheckinStatusType, EventType } from '../types/enum';
 import { getCurrentEvent } from '../utils/checkinUtils';
+import { getRedisClient } from '../cache/redisClient';
 
 // Get all checkin data
 export const getAllCheckin = async (req: Request, res: Response, next: NextFunction) => {
@@ -25,6 +26,13 @@ export const getCheckin = async (req: Request, res: Response, next: NextFunction
 	try {
 		const { student_id, citizen_id, event } = req.params
 
+		const cacheKey = `checkin:${student_id}:${citizen_id}:${event}`
+		const cachedCheckin = await getRedisClient().get(cacheKey)
+		if (cachedCheckin) {
+			res.status(200).json(JSON.parse(cachedCheckin))
+			return
+		}
+
 		// Invalid student_id or citizen_id
 		const user = await userService.findUserByStudentIdAndCitizenId(student_id, citizen_id);
 		if (!user) {
@@ -45,7 +53,8 @@ export const getCheckin = async (req: Request, res: Response, next: NextFunction
 			})
 			return
 		}
-		res.status(200).json({
+
+		const response = {
 			status: checkin.status,
 			student_id,
 			citizen_id,
@@ -53,7 +62,13 @@ export const getCheckin = async (req: Request, res: Response, next: NextFunction
 			first_name: user.first_name,
 			last_name: user.last_name,
 			lastCheckIn: checkin.updated_at
-		})
+		}
+
+		await getRedisClient().set(cacheKey, JSON.stringify(response), {
+			EX: 3600
+		});
+
+		res.status(200).json(response)
 	} catch (error) {
 		if (error instanceof Error) {
 			return next(error);
