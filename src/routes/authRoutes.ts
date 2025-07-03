@@ -33,6 +33,28 @@ const router = Router();
  *                 type: string
  *               faculty:
  *                 type: FacultyId
+ *                 enum:
+ *                   [
+ *                     SCIENCE,
+ *                     ENGINEER,
+ *                     MEDICINE,
+ *                     ARTS,
+ *                     EDUCATION,
+ *                     PSYCHOLOGY,
+ *                     DENTISTRY,
+ *                     LAW,
+ *                     COMMUNICATION_ARTS,
+ *                     NURSING,
+ *                     COMMERCE_AND_ACCOUNTANCY,
+ *                     PHARMACEUTICAL_SCIENCE,
+ *                     POLITICAL_SCIENCE,
+ *                     SPORTS_SCIENCE,
+ *                     FINE_AND_APPLIED_ARTS,
+ *                     ECONOMICS,
+ *                     ARCHITECTURE,
+ *                     ALLIED_HEALTH_SCIENCES,
+ *                     VETERINARY_SCIENCE
+ *                   ]
  *               password:
  *                 type: string
  *               phone_number:
@@ -71,12 +93,32 @@ const router = Router();
  *               - avatar_id
  *     responses:
  *       '201':
- *          description: User registered successfully.
+ *         description: User registered successfully.
  *       '409':
- *          description: User already exists with this student ID and citizen ID.
+ *         description: User already exists with this student ID and citizen ID.
  *       '400':
- *          description: Bad request
- * 
+ *         description: Invalid Input.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 invalidCitizenId:
+ *                   type: object
+ *                   properties:
+ *                     status:
+ *                       type: string
+ *                     message:
+ *                       type: string
+ *                 passwordNotStrong:
+ *                   type: object
+ *                   properties:
+ *                     status:
+ *                       type: string
+ *                     message:
+ *                       type: string
  */
 router.post('/register', registerUser);
 /**
@@ -107,9 +149,7 @@ router.post('/register', registerUser);
  *       '200':
  *         description: Login successful.
  *       '401':
- *         description: User not found.Student ID or Citizen ID is incorrect.
- *       '400':
- *         description: Bad request
+ *         description: passwrod is incorrect. please try again.
  */
 router.post('/login', loginUser);
 
