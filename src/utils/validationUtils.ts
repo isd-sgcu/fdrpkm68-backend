@@ -25,7 +25,7 @@ export const validateCheckinInput = (
 
   if (!student_id || typeof student_id !== 'string')
     validationError.push('student_id: required');
-  else if (student_id.length !== 10 || !/^\d{10}$/.test(citizen_id))
+  else if (student_id.length !== 10 || !/^\d{10}$/.test(student_id))
     validationError.push('student_id: invalid');
 
   if (!citizen_id || typeof citizen_id !== 'string')
