@@ -50,8 +50,8 @@ CREATE TABLE users (
     group_id UUID,
     group_role group_role_type DEFAULT 'OWNER',
     role role_type DEFAULT 'FRESHMAN' NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+    created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT now() NOT NULL,
+    updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT now() NOT NULL,
     PRIMARY KEY (student_id, citizen_id)
 );
 
