@@ -4,6 +4,7 @@ import { CustomError } from '../types/error';
 import { getRedisClient } from '../cache/redisClient';
 import bcrypt from 'bcryptjs';
 import { ForgotPasswordReq } from '../types/user';
+import { passwordStrengthValidator } from '../utils/validationUtils';
 
 
 export const createUser = async (userData: User): Promise<User> => {
@@ -163,6 +164,13 @@ export const findUserByStudentIdAndCitizenId = async (
 
 export const updateUserPassword = async ( Userdata : ForgotPasswordReq): Promise<User> => {
     const { student_id, citizen_id, new_password ,confirm_new_password} = Userdata;
+
+    // validate citizen ID checksum
+    if(!passwordStrengthValidator(new_password)){
+      const error: CustomError = new Error('Password must be at least 8 characters long and contain uppercase, lowercase and numbers.');
+      error.statusCode = 400;
+      throw error;
+    }
 
     if(new_password !== confirm_new_password) {
       const error: CustomError = new Error('New password and confirmation do not match.');
