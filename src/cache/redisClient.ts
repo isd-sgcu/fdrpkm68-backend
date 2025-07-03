@@ -1,16 +1,30 @@
-import Redis from 'ioredis';
+import { createClient , RedisClientType} from 'redis';
+import { config } from '../config/index';
 
-let redisClient: Redis;
+let client: RedisClientType;
 
 export const connectRedis = async () => {
-  try {
-    redisClient = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
-    redisClient.on('connect', () => console.log('Redis connected!'));
-    redisClient.on('error', (err) => console.error('Redis error:', err));
-  } catch (error) {
-    console.error('Error connecting to Redis:', error);
-    throw error;
+  if (client) {
+    return client; 
   }
+
+  client = createClient({
+    username: config.redis.REDIS_USER,
+    password: config.redis.REDIS_PASSWORD,
+    socket: {
+      host: config.redis.REDIS_HOST,
+      port: config.redis.REDIS_PORT,
+    }
+  });
+
+  client.on('error', (err) => console.error('Redis Client Error', err));
+  client.on('connect', () => console.log('Connected to Redis'));
+  client.on('ready', () => console.log('Redis Client is ready'));
+  await client.connect();
 };
 
-export const getRedisClient = () => redisClient;
+export const getRedisClient = () => client;
+
+
+
+
