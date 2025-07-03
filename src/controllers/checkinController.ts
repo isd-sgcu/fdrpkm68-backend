@@ -165,6 +165,9 @@ export const updateCheckinStatus = async (req: Request, res: Response, next: Nex
 
 		await checkinService.updateCheckinStatus(student_id, citizen_id, event)
 
+		const cacheKey = `checkin:${student_id}:${citizen_id}:${event}`
+		await getRedisClient().del(cacheKey)
+
 		res.status(200).json({
 			event: event,
 			student_id,
