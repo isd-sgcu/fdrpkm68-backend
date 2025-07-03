@@ -30,6 +30,40 @@ CREATE TYPE group_role_type AS ENUM ('OWNER', 'MEMBER');
 -- Create sequence for avatar IDs
 CREATE SEQUENCE avatar_seq MINVALUE 1 MAXVALUE 5 CYCLE;
 
+-- Houses schema
+CREATE TABLE houses (
+    house_id SERIAL PRIMARY KEY NOT NULL, -- here for "easier" retrieval of houses
+    name_thai TEXT NOT NULL,
+    name_english TEXT NOT NULL,
+    logo TEXT NOT NULL, -- TEXT as placeholder, not sure which data type for house picture
+    description_thai TEXT NOT NULL,
+    description_english TEXT NOT NULL,
+    size_letter housesize_letter_type NOT NULL,
+    member_count INT DEFAULT 0 NOT NULL, -- Current number of people selecting the house
+    max_member INT NOT NULL,
+    instagram TEXT NOT NULL
+);
+
+
+-- Group schema
+CREATE TABLE groups (
+    group_id UUID PRIMARY KEY NOT NULL,
+    submitted BOOLEAN DEFAULT FALSE NOT NULL,
+    house_rank_1 INT DEFAULT NULL, -- keep as house_id
+    house_rank_2 INT DEFAULT NULL,
+    house_rank_3 INT DEFAULT NULL,
+    house_rank_4 INT DEFAULT NULL,
+    house_rank_5 INT DEFAULT NULL,
+    house_rank_6 INT DEFAULT NULL,
+    CONSTRAINT fk_house_rank_1 FOREIGN KEY (house_rank_1) REFERENCES houses(house_id),
+    CONSTRAINT fk_house_rank_2 FOREIGN KEY (house_rank_2) REFERENCES houses(house_id),
+    CONSTRAINT fk_house_rank_3 FOREIGN KEY (house_rank_3) REFERENCES houses(house_id),
+    CONSTRAINT fk_house_rank_4 FOREIGN KEY (house_rank_4) REFERENCES houses(house_id),
+    CONSTRAINT fk_house_rank_5 FOREIGN KEY (house_rank_5) REFERENCES houses(house_id),
+    CONSTRAINT fk_house_rank_6 FOREIGN KEY (house_rank_6) REFERENCES houses(house_id)
+);
+
+
 -- Create "users" table
 CREATE TABLE users (
     student_id VARCHAR(10) NOT NULL,
@@ -55,6 +89,7 @@ CREATE TABLE users (
     created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT now() NOT NULL,
     updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT now() NOT NULL,
     PRIMARY KEY (student_id, citizen_id)
+    -- CONSTRAINT fk_group_id FOREIGN KEY (group_id) REFERENCES groups(group_id)
 );
 
 -- Create "checkin" table
@@ -69,40 +104,6 @@ CREATE TABLE "checkin" (
     
     FOREIGN KEY (user_student_id, user_citizen_id) REFERENCES users (student_id, citizen_id),
     UNIQUE(user_student_id, user_citizen_id, event)
-);
-
-
--- Houses schema
-CREATE TABLE houses (
-    house_id SERIAL PRIMARY KEY NOT NULL, -- here for "easier" retrieval of houses
-    name_thai TEXT NOT NULL,
-    name_english TEXT NOT NULL,
-    logo TEXT NOT NULL, -- TEXT as placeholder, not sure which data type for house picture
-    description_thai TEXT NOT NULL,
-    description_english TEXT NOT NULL,
-    size_letter housesize_letter_type NOT NULL,
-    member_count INT DEFAULT 0 NOT NULL, -- Current number of people selecting this house
-    max_member INT NOT NULL,
-    instagram TEXT NOT NULL
-);
-
-
--- Group schema
-CREATE TABLE groups (
-    group_id UUID PRIMARY KEY NOT NULL,
-    submitted BOOLEAN DEFAULT FALSE NOT NULL,
-    house_rank_1 INT DEFAULT NULL, -- keep as house_id
-    house_rank_2 INT DEFAULT NULL,
-    house_rank_3 INT DEFAULT NULL,
-    house_rank_4 INT DEFAULT NULL,
-    house_rank_5 INT DEFAULT NULL,
-    house_rank_6 INT DEFAULT NULL,
-    CONSTRAINT fk_house_rank_1 FOREIGN KEY (house_rank_1) REFERENCES houses(house_id),
-    CONSTRAINT fk_house_rank_2 FOREIGN KEY (house_rank_2) REFERENCES houses(house_id),
-    CONSTRAINT fk_house_rank_3 FOREIGN KEY (house_rank_3) REFERENCES houses(house_id),
-    CONSTRAINT fk_house_rank_4 FOREIGN KEY (house_rank_4) REFERENCES houses(house_id),
-    CONSTRAINT fk_house_rank_5 FOREIGN KEY (house_rank_5) REFERENCES houses(house_id),
-    CONSTRAINT fk_house_rank_6 FOREIGN KEY (house_rank_6) REFERENCES houses(house_id)
 );
 
 

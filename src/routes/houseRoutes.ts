@@ -1,13 +1,14 @@
 import { Router } from 'express';
-import { createHousesDraft, deleteAllHousesFromDraft, deleteOneHouseFromDraft, getAllHouses, getSelectedHouses, submitHousesDraft, upDateHousesDraft } from '../controllers/houseController';
+import { createAHouse, deleteAllHousesFromDraft, deleteOneHouseFromDraft, getAllHouses, getCurrentMemberCounts, getSelectedHousesIds, submitHousesDraft, upDateHousesDraft } from '../controllers/houseController';
 
 const router = Router()
 router.get('/getAllHouses', getAllHouses)
-router.get('/getSelectedHouses', getSelectedHouses)
-router.post('/createHousesDraft', createHousesDraft)
-router.patch('/upDateHousesDraft', upDateHousesDraft)
-router.post('/submitHousesDraft', submitHousesDraft)
-router.delete('/deleteOneHouseFromDraft', deleteOneHouseFromDraft)
-router.delete('/deleteAllHousesFromDraft', deleteAllHousesFromDraft)
+router.get('/getCurrentMemberCounts', getCurrentMemberCounts)
+router.get('/getSelectedHousesIds/:groupId', getSelectedHousesIds)
+router.patch('/upDateHousesDraft/:groupId', upDateHousesDraft)
+router.post('/submitHousesDraft/:groupId', submitHousesDraft)
+router.post('/createAHouse', createAHouse)
+router.delete('/deleteOneHouseFromDraft/:groupId', deleteOneHouseFromDraft)
+router.delete('/deleteAllHousesFromDraft/:groupId', deleteAllHousesFromDraft)
 
 export default router
