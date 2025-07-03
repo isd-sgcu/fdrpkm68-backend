@@ -7,9 +7,10 @@ import { connectRedis } from './cache/redisClient';
 import apiRoutes from './routes'; 
 import { errorHandler } from './middlewares/errorHandler';
 import { setupSwagger } from './docs/swagger';
+import { config } from './config';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = config.PORT || 3000; 
 setupSwagger(app);
 
 // Middlewares
@@ -25,8 +26,7 @@ async function startServer() {
   try {
     await connectDB();
     console.log('Connected to PostgreSQL');
-    // await connectRedis();
-    // console.log('Connected to Redis');
+    await connectRedis();
 
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);

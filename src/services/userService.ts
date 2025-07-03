@@ -1,20 +1,14 @@
 import { query } from '../database/client';
 import { User, UserRegistrationRequest } from '../types/user';
 import { CustomError } from '../types/error';
-import { validateCitizenIdChecksum } from '../utils/validationUtils'; 
+import { getRedisClient } from '../cache/redisClient';
 import bcrypt from 'bcryptjs';
 import { ForgotPasswordReq } from '../types/user';
+import { passwordStrengthValidator } from '../utils/validationUtils';
 
 
 export const createUser = async (userData: User): Promise<User> => {
   try {
-    // checksum SSN
-    if (!validateCitizenIdChecksum(userData.citizen_id)) {
-      const error: CustomError = new Error('Invalid Citizen ID checksum.');
-      error.statusCode = 400;
-      throw error;
-    }
-
     const {
       student_id,
       citizen_id,
@@ -65,20 +59,37 @@ export const createUser = async (userData: User): Promise<User> => {
     );
     // console.log('User created successfully:', result);
     return result.rows[0]; 
-  } catch (error: any) {
-    const customError: CustomError = new Error(error.message || 'Failed to create user');
-    customError.statusCode = error.statusCode || 500;
+  } catch (error) {
+    const customError: CustomError = new Error('Failed to create user');
+    customError.statusCode = 500;
     throw customError;
   }
 };
 
-export const findUsersByStudentId = async (student_id: string): Promise<User[]> => {
+export const findUsersByStudentId = async (student_id: string): Promise<User | null> => {
+  const cacheKey = `student:${student_id}`;
   try {
+    // Check if user is in cache
+    const cachedUser = await getRedisClient().get(cacheKey);
+    // Chache hit
+    if (cachedUser) {
+      // console.log(`Cache hit for student_id: ${student_id}`);
+      return JSON.parse(cachedUser);
+    }
+    // console.log(`Cache miss for student_id: ${student_id}`);
+    //miss 
     const result = await query(
       `SELECT * FROM users WHERE student_id = $1`,
       [student_id]
     );
-    return result.rows;
+    // Cache the user data
+    if (result.rows.length > 0) {
+      await getRedisClient().set(cacheKey, JSON.stringify(result.rows[0]), {
+        EX: 3600 
+      }); 
+    }
+    return result.rows[0] || null;
+
   } catch (error) {
     const customError: CustomError = new Error('Failed to find users by student ID');
     customError.statusCode = 500;
@@ -86,13 +97,28 @@ export const findUsersByStudentId = async (student_id: string): Promise<User[]> 
   }
 };
 
-export const findUserBySSN = async (citizen_id: string): Promise<User | undefined> => {
+export const findUserByCitizenId = async (citizen_id: string): Promise<User | null> => {
+  const cacheKey = `citizen:${citizen_id}`;
   try {
+    // Check if user is in cache
+    const cachedUser = await getRedisClient().get(cacheKey);
+    if (cachedUser) {
+      // console.log(`Cache hit for citizen_id: ${citizen_id}`);
+      return JSON.parse(cachedUser);
+    }
+    // console.log(`Cache miss for citizen_id: ${citizen_id}`);
+    //miss
     const result = await query(
       `SELECT * FROM users WHERE citizen_id = $1`,
       [citizen_id]
     );
-    return result.rows[0];
+    // Cache the user data
+    if (result.rows.length > 0) {
+      await getRedisClient().set(cacheKey, JSON.stringify(result.rows[0]), {
+        EX: 3600 
+      });
+    }
+    return result.rows[0] || null;
   } catch (error) {
     const customError: CustomError = new Error('Failed to find user by citizen ID');
     customError.statusCode = 500;
@@ -103,13 +129,32 @@ export const findUserBySSN = async (citizen_id: string): Promise<User | undefine
 export const findUserByStudentIdAndCitizenId = async (
   student_id: string,
   citizen_id: string
-): Promise<User | undefined> => {
+): Promise<User | null> => {
+  const cacheKey = `user:${student_id}:${citizen_id}`;
+
   try {
+    // Check if user is in cache
+    const cachedUser = await getRedisClient().get(cacheKey);
+    if (cachedUser) {
+      // console.log(`Cache hit for student_id: ${student_id}, citizen_id: ${citizen_id}`);
+      return JSON.parse(cachedUser);
+    }
+    // console.log(`Cache miss for student_id: ${student_id}, citizen_id: ${citizen_id}`);
+    //miss
+
     const result = await query(
       `SELECT * FROM users WHERE student_id = $1 AND citizen_id = $2`,
       [student_id, citizen_id]
     );
-    return result.rows[0];
+
+    if (result.rows.length > 0) {
+      // Cache the user data
+      await getRedisClient().set(cacheKey, JSON.stringify(result.rows[0]), {
+        EX: 3600 
+      });
+    }
+
+    return result.rows[0] || null;
   } catch (error) {
     const customError: CustomError = new Error('Failed to find user by student ID and citizen ID');
     customError.statusCode = 500;
@@ -119,6 +164,13 @@ export const findUserByStudentIdAndCitizenId = async (
 
 export const updateUserPassword = async ( Userdata : ForgotPasswordReq): Promise<User> => {
     const { student_id, citizen_id, new_password ,confirm_new_password} = Userdata;
+
+    // validate citizen ID checksum
+    if(!passwordStrengthValidator(new_password)){
+      const error: CustomError = new Error('Password must be at least 8 characters long and contain uppercase, lowercase and numbers.');
+      error.statusCode = 400;
+      throw error;
+    }
 
     if(new_password !== confirm_new_password) {
       const error: CustomError = new Error('New password and confirmation do not match.');
