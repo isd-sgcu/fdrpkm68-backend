@@ -26,15 +26,17 @@ export const createUser = async (userData: User): Promise<User> => {
       drug_allergy,
       illness,
       avatar_id,
-      role
+      role,
+      group_id
     } = userData;
 
     const result = await query(
       `INSERT INTO users (
         student_id, citizen_id, prefix, first_name, last_name, nickname,
         academic_year, faculty, password_hash, phone_number,
-        parent_name, parent_phone_number, parent_relationship, food_allergy, drug_allergy, illness, avatar_id, role
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16 ,$17,$18) RETURNING *`, 
+        parent_name, parent_phone_number, parent_relationship, food_allergy, drug_allergy, illness, avatar_id, role,
+        group_id, group_role
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16 ,$17,$18,$19,$20) RETURNING *`, 
       [
         student_id,
         citizen_id,
@@ -53,7 +55,9 @@ export const createUser = async (userData: User): Promise<User> => {
         drug_allergy,
         illness,
         avatar_id, 
-        role
+        role,
+        group_id,
+        'OWNER'
       ]
     );
     // console.log('User created successfully:', result);

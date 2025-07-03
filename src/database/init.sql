@@ -89,19 +89,17 @@ CREATE TABLE houses (
 
 
 -- Group schema
-CREATE TABLE "group" (
+CREATE TABLE groups (
     group_id TEXT PRIMARY KEY NOT NULL,
-    house_name_thai TEXT NOT NULL,
-    house_rank INT NOT NULL,
     submitted BOOLEAN DEFAULT FALSE NOT NULL,
-    selected_houses TEXT[6], -- ordered: 1st, 2nd, ..., 5th, extra
-    CONSTRAINT fk_house_name_thai FOREIGN KEY (house_name_thai) REFERENCES houses(name_thai)
+    selected_houses TEXT[6] DEFAULT ARRAY[NULL, NULL, NULL, NULL, NULL, NULL] NOT NULL, -- ordered: 1st, 2nd, ..., 5th, extra
+    CONSTRAINT selected_houses_length_6 CHECK (cardinality(selected_houses) = 6)
 );
 
 ALTER TABLE users
 ADD group_id TEXT NOT NULL,
 ADD group_role group_role_type NOT NULL,
-ADD CONSTRAINT fk_group_id FOREIGN KEY (group_id) REFERENCES "group"(group_id);
+ADD CONSTRAINT fk_group_id FOREIGN KEY (group_id) REFERENCES "groups"(group_id);
 
 
 
