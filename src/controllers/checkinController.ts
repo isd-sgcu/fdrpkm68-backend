@@ -8,9 +8,7 @@ import { getCurrentEvent } from '../utils/checkinUtils';
 export const getAllCheckin = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const checkin = await checkinService.getAllCheckin();
-		res.status(200).json({
-			checkin,
-		})
+		res.status(200).json(checkin)
 	} catch (error) {
 		if (error instanceof Error) {
 			return next(error);
@@ -30,8 +28,8 @@ export const getCheckin = async (req: Request, res: Response, next: NextFunction
 		// Invalid student_id or citizen_id
 		const user = await userService.findUserByStudentIdAndCitizenId(student_id, citizen_id);
 		if (!user) {
-			res.status(404).json({
-				error: 'Not Found',
+			res.status(400).json({
+				error: 'Bad Request',
 				message: 'Invalid student_id or citizen_id',
 			})
 			return
@@ -41,15 +39,14 @@ export const getCheckin = async (req: Request, res: Response, next: NextFunction
 		);
 		// Empty
 		if (!checkin) {
-			res.status(200).json({
-				status: 'Not-Register',
+			res.status(404).json({
+				error: 'Not Found',
+				message: `User has not pre-register event: ${event}`,
 			})
 			return
 		}
-		const checkinStatus =
-			checkin.status === CheckinStatusType.PRE_REGISTER ? 'Pre-Register' : 'Checkin';
 		res.status(200).json({
-			status: checkinStatus,
+			status: checkin.status,
 			student_id,
 			citizen_id,
 			nickname: user.nickname,
@@ -76,8 +73,8 @@ export const createCheckin = async (req: Request, res: Response, next: NextFunct
 		// Invalid student_id or citizen_id
 		const user = await userService.findUserByStudentIdAndCitizenId(student_id, citizen_id);
 		if (!user) {
-			res.status(404).json({
-				error: 'Not Found',
+			res.status(400).json({
+				error: 'Bad Request',
 				message: 'Invalid student_id or citizen_id',
 			})
 			return
@@ -85,12 +82,9 @@ export const createCheckin = async (req: Request, res: Response, next: NextFunct
 		const checkin = await checkinService.getCheckinByUserIdAndEvent(student_id, citizen_id, event)
 		// Taken
 		if (checkin) {
-			const checkinStatus =
-				checkin.status === CheckinStatusType.PRE_REGISTER ? 'Pre-Register' : 'Checkin';
 			res.status(409).json({
 				error: 'Conflict',
-				status: checkin.status,
-				message: `User has already ${checkinStatus} event: ${event}`
+				message: `User has already ${checkin.status} event: ${event}`
 			})
 			return
 		}
@@ -115,13 +109,13 @@ export const createCheckin = async (req: Request, res: Response, next: NextFunct
 // Update checkin status from 'PRE_REGISTER' to 'EVENT_REGISTER'
 export const updateCheckinStatus = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const { student_id, citizen_id } = req.body
+		const { student_id, citizen_id } = req.params
 
 		// Get current event
 		const event = getCurrentEvent();
 		if (!event) {
-			res.status(404).json({
-				error: 'No Active Event',
+			res.status(503).json({
+				error: 'Service Unavailable',
 				message: 'No event is currently active',
 			});
 			return
@@ -129,8 +123,8 @@ export const updateCheckinStatus = async (req: Request, res: Response, next: Nex
 		// Invalid student_id or citizen_id
 		const user = await userService.findUserByStudentIdAndCitizenId(student_id, citizen_id);
 		if (!user) {
-			res.status(404).json({
-				error: 'Not Found',
+			res.status(400).json({
+				error: 'Bad Request',
 				message: 'Invalid student_id or citizen_id',
 			})
 			return
@@ -148,7 +142,6 @@ export const updateCheckinStatus = async (req: Request, res: Response, next: Nex
 		if (checkin.status === CheckinStatusType.EVENT_REGISTER) {
 			res.status(409).json({
 				error: 'Conflict',
-				status: CheckinStatusType.EVENT_REGISTER,
 				message: `User has already checkin event: ${event}`,
 				lastCheckIn: checkin.updated_at
 			})
@@ -158,6 +151,7 @@ export const updateCheckinStatus = async (req: Request, res: Response, next: Nex
 		await checkinService.updateCheckinStatus(student_id, citizen_id, event)
 
 		res.status(200).json({
+			event: event,
 			student_id,
 			citizen_id,
 			nickname: user.nickname,

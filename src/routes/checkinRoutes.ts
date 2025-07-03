@@ -22,10 +22,10 @@ router.get(
 	validateParamsMiddleware({ eventRequired: true }),
 	getCheckin
 );
-router.post(
-	'/',
+router.patch(
+	'/:student_id/:citizen_id',
 	roleMiddleware([RoleType.STAFF]),
-	validateBodyMiddleware({ eventRequired: false }),
+	validateParamsMiddleware({ eventRequired: false }),
 	updateCheckinStatus
 );
 router.post(
