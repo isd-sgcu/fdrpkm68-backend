@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import { registerUser, loginUser ,forgotPassword} from '../controllers/authController';
+import { registerUser, loginUser, forgotPassword } from '../controllers/authController';
 
 const router = Router();
 /**
  * @openapi
- * api/auth/register:
+ * /api/auth/register:
  *   post:
  *     tags:
  *       - Auth
@@ -123,7 +123,7 @@ const router = Router();
 router.post('/register', registerUser);
 /**
  * @openapi
- * api/auth/login:
+ * /api/auth/login:
  *   post:
  *     tags:
  *       - Auth
@@ -155,7 +155,7 @@ router.post('/login', loginUser);
 
 /**
  * @openapi
- * api/auth/forgot-password:
+ * /api/auth/forgot-password:
  *   post:
  *     tags:
  *       - Auth

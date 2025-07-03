@@ -6,7 +6,7 @@ import { findUsersByStudentId } from '../controllers/userController';
 const router = Router();
 /**
  * @swagger
- * api/users/me:
+ * /api/users/me:
  *   get:
  *     summary: Get current user's profile
  *     tags: [User]
@@ -77,10 +77,10 @@ const router = Router();
  *                   type: string
  *                   nullable: true
  */
-router.get('/me', authMiddleware, roleMiddleware([RoleType.FRESHMAN, RoleType.STAFF]),getMyProfile);
+router.get('/me', authMiddleware, roleMiddleware([RoleType.FRESHMAN, RoleType.STAFF]), getMyProfile);
 /**
  * @swagger
- * api/users/{id}:
+ * /api/users/{id}:
  *   get:
  *     summary: Get student profile by ID
  *     tags: [User]
