@@ -12,3 +12,15 @@ export const validateCitizenIdChecksum = (citizenId: string): boolean => {
 
   return checksum === lastDigit;
 };
+
+export const passwordStrengthValidator = (password: string): boolean => {
+  if (!password || password.length < 8) {
+    return false; 
+  }
+
+  const hasUpperCase = /[A-Z]/.test(password);
+  const hasLowerCase = /[a-z]/.test(password);
+  const hasNumbers = /\d/.test(password);
+
+  return hasUpperCase && hasLowerCase && hasNumbers;
+}

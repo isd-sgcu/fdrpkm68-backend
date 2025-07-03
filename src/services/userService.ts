@@ -8,13 +8,6 @@ import { ForgotPasswordReq } from '../types/user';
 
 export const createUser = async (userData: User): Promise<User> => {
   try {
-    // checksum SSN
-    if (!validateCitizenIdChecksum(userData.citizen_id)) {
-      const error: CustomError = new Error('Invalid Citizen ID checksum.');
-      error.statusCode = 400;
-      throw error;
-    }
-
     const {
       student_id,
       citizen_id,
@@ -69,9 +62,9 @@ export const createUser = async (userData: User): Promise<User> => {
     );
     // console.log('User created successfully:', result);
     return result.rows[0]; 
-  } catch (error: any) {
-    const customError: CustomError = new Error(error.message || 'Failed to create user');
-    customError.statusCode = error.statusCode || 500;
+  } catch (error) {
+    const customError: CustomError = new Error('Failed to create user');
+    customError.statusCode = 500;
     throw customError;
   }
 };

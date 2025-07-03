@@ -1,18 +1,23 @@
 import { Request, Response, NextFunction } from 'express';
 import * as userService from '../services/userService';
+import { CustomError } from '../types/error';
 
 // Get My Profile Controller
 export const getMyProfile = async (req: Request, res: Response, next: NextFunction) => {
   try {
     if (!req.user) {
-      return res.status(401).json({ status: 'error', message: 'User not authenticated.' });
+      const error: CustomError = new Error('Authentication error: User ID not found.');
+      error.statusCode = 401;
+      throw error;
     }
 
     const { student_id, citizen_id } = req.user;
     const user = await userService.findUserByStudentIdAndCitizenId(student_id, citizen_id);
 
     if (!user) {
-      return res.status(404).json({ status: 'error', message: 'User not found.' });
+      const error: CustomError = new Error('User not found.');
+      error.statusCode = 404;
+      throw error;
     }
 
     const userPublicData = {
@@ -32,23 +37,22 @@ export const getMyProfile = async (req: Request, res: Response, next: NextFuncti
       drug_allergy: user.drug_allergy,
       illness: user.illness,
       avatar_id: user.avatar_id,
-      group_role: user.group_role,
-      group_id: user.group_id,
       role: user.role,
     };
 
     res.status(200).json({
-      status: 'success',
+      status: 'User profile retrieved successfully',
       user: userPublicData,
     });
+    return;
   } catch (error) {
     if (error instanceof Error) {
-      return next(error); 
+      return next(error);
     }
     res.status(500).json({
       status: 'error',
       message: 'An unexpected error occurred while fetching user profile.',
     });
+    return;
   }
 };
-

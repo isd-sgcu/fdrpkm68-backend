@@ -5,7 +5,7 @@ import * as groupService from './groupService';
 import { config } from '../config';
 import { User, UserRegistrationRequest } from '../types/user'; 
 import { CustomError } from '../types/error'; 
-import { NextFunction } from 'express';
+import { passwordStrengthValidator, validateCitizenIdChecksum } from '../utils/validationUtils';
 // Register Logic
 export const register = async (userData: UserRegistrationRequest) => {
   const { student_id, citizen_id, password ,...rest} = userData;
@@ -15,7 +15,19 @@ export const register = async (userData: UserRegistrationRequest) => {
   if (existingUser) {
     const error: CustomError = new Error('User already exists with this student ID and citizen ID.');
     error.statusCode = 409;
-    console.error('User already exists:', error);
+    throw error;
+  }
+  // validate citizen ID checksum
+    if (!validateCitizenIdChecksum(userData.citizen_id)) {
+      const error: CustomError = new Error('Invalid Citizen ID.');
+      error.statusCode = 400;
+      throw error;
+    }
+  // validate password strength
+  if(!passwordStrengthValidator(password)){
+    const error: CustomError = new Error('Password must be at least 8 characters long and contain uppercase, lowercase and numbers.');
+    error.statusCode = 400;
+    throw error;
   }
 
   // hash the password

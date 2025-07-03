@@ -15,26 +15,31 @@ declare module 'express-serve-static-core' {
 
 export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
+  // console.log('Authorization Header:', req.headers); 
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ status: 'error', message: 'No token provided or invalid format' });
+    res.status(401).json({ status: 'error', message: 'No token provided or invalid format' });
+    return; 
   }
 
   const token = authHeader.split(' ')[1];
 
   try {
-    const decoded = jwt.verify(token, config.SECRET_JWT_KEY as string) as {
+
+    const decoded = jwt.verify(token, config.SECRET_JWT_KEY) as { 
       student_id: string;
       citizen_id: string;
-      role:RoleType; 
+      role: RoleType;
     };
-    req.user = decoded; 
+    req.user = decoded;
     next();
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
-      return res.status(401).json({ status: 'error', message: 'Token expired' });
+      res.status(401).json({ status: 'error', message: 'Token expired' });
+      return;
     }
-    return res.status(401).json({ status: 'error', message: 'Failed to authenticate token' });
+    res.status(401).json({ status: 'error', message: 'Failed to authenticate token' });
+    return;
   }
 };
 
@@ -42,7 +47,8 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
 export const roleMiddleware = (allowedRoles: Array<RoleType>) => {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user || !allowedRoles.includes(req.user.role)) {
-      return res.status(403).json({ status: 'error', message: 'Access forbidden: Insufficient permissions' });
+      res.status(403).json({ status: 'error', message: 'Access forbidden: Insufficient permissions' });
+      return; 
     }
     next();
   };
