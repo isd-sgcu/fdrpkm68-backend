@@ -165,13 +165,14 @@ export const findUserByStudentIdAndCitizenId = async (
 export const updateUserPassword = async ( Userdata : ForgotPasswordReq): Promise<User> => {
     const { student_id, citizen_id, new_password ,confirm_new_password} = Userdata;
 
-    // validate citizen ID checksum
+    // validate pasword strength
     if(!passwordStrengthValidator(new_password)){
       const error: CustomError = new Error('Password must be at least 8 characters long and contain uppercase, lowercase and numbers.');
       error.statusCode = 400;
       throw error;
     }
 
+    // check if new password and confirm password match
     if(new_password !== confirm_new_password) {
       const error: CustomError = new Error('New password and confirmation do not match.');
       error.statusCode = 400;
