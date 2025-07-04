@@ -16,6 +16,9 @@ COPY . .
 # Build the application
 RUN npm run build
 
+# Verify the build output exists
+RUN ls -la dist/ && test -f dist/app.js
+
 # Remove dev dependencies after build
 RUN npm prune --production
 
