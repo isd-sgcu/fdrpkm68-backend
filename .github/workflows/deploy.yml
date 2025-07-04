@@ -1,0 +1,86 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches: [main, dev]
+
+env:
+  GCP_PROJECT_ID: freshmenfest2025
+  REGION: asia-southeast1
+
+jobs:
+  deploy-dev:
+    if: github.ref == 'refs/heads/dev'
+    runs-on: ubuntu-latest
+    env:
+      SERVICE_NAME: freshmenfest2025-dev-api
+      DATABASE_URL: ${{ secrets.DEV_DATABASE_URL }}
+      SECRET_JWT_KEY: ${{ secrets.DEV_SECRET_JWT_KEY }}
+      REDIS_URL: ${{ secrets.DEV_REDIS_URL }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker to use gcloud
+        run: gcloud auth configure-docker
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }} .
+          docker push gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy ${{ env.SERVICE_NAME }} \
+            --image gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }} \
+            --platform managed \
+            --region ${{ env.REGION }} \
+            --allow-unauthenticated \
+            --port 8080 \
+            --set-env-vars="DATABASE_URL=${{ env.DATABASE_URL }},SECRET_JWT_KEY=${{ env.SECRET_JWT_KEY }},REDIS_URL=${{ env.REDIS_URL }},NODE_ENV=development"
+
+  deploy-prod:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      SERVICE_NAME: freshmenfest2025-api
+      DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+      SECRET_JWT_KEY: ${{ secrets.PROD_SECRET_JWT_KEY }}
+      REDIS_URL: ${{ secrets.PROD_REDIS_URL }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker to use gcloud
+        run: gcloud auth configure-docker
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }} .
+          docker push gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy ${{ env.SERVICE_NAME }} \
+            --image gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }} \
+            --platform managed \
+            --region ${{ env.REGION }} \
+            --allow-unauthenticated \
+            --port 8080 \
+            --set-env-vars="DATABASE_URL=${{ env.DATABASE_URL }},SECRET_JWT_KEY=${{ env.SECRET_JWT_KEY }},REDIS_URL=${{ env.REDIS_URL }},NODE_ENV=production"
