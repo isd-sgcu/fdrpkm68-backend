@@ -77,7 +77,7 @@ const router = Router();
  *                   type: string
  *                   nullable: true
  */
-router.get('/me', authMiddleware, roleMiddleware([RoleType.FRESHMAN, RoleType.STAFF]), getMyProfile);
+router.get('/profile', authMiddleware, roleMiddleware([RoleType.FRESHMAN, RoleType.STAFF]), getMyProfile);
 /**
  * @swagger
  * /api/users/{id}:
