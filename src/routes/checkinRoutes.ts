@@ -18,7 +18,7 @@ router.use(authMiddleware);
  *   - name: Checkin
  *     description: Register for event
  * 
- * /api/checkin:
+ * /checkin:
  *   get:
  *     summary: Get all checkin record
  *     description: This can only be done by role STAFF user
@@ -62,7 +62,7 @@ router.get(
 );
 /**
  * @swagger
- * /api/checkin/{student_id}/{citizen_id}/{event}:
+ * /checkin/{student_id}/{citizen_id}/{event}:
  *   get:
  *     summary: Get checkin record by userID and event
  *     description: This can only be done by logged in user
@@ -125,7 +125,7 @@ router.get(
 );
 /**
  * @swagger
- * /api/checkin/{student_id}/{citizen_id}:
+ * /checkin/{student_id}/{citizen_id}:
  *   patch:
  *     summary: Update checkin status to EVENT_REGISTER
  *     description: This can only be done by role STAFF user
@@ -201,7 +201,7 @@ router.patch(
 );
 /**
  * @swagger
- * /api/checkin/register:
+ * /checkin/register:
  *   post:
  *     summary: Create checkin record
  *     description: This can only be done by role STAFF user
