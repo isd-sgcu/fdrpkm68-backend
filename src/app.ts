@@ -46,8 +46,7 @@ async function startServer() {
     
     const isDummyRedis = !process.env.REDIS_URL || 
                         process.env.REDIS_URL.includes('placeholder') ||
-                        process.env.REDIS_URL.includes('dummy') ||
-                        process.env.REDIS_URL.includes('localhost');
+                        process.env.REDIS_URL.includes('dummy');
 
     if (isDummyDB) {
       console.log('⚠️  Database disabled - using dummy connection');
