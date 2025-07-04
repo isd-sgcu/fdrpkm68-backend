@@ -165,6 +165,14 @@ export const findUserByStudentIdAndCitizenId = async (
 export const updateUserPassword = async ( Userdata : ForgotPasswordReq): Promise<User> => {
     const { student_id, citizen_id, new_password ,confirm_new_password} = Userdata;
 
+    // check if user exists
+    const user = await findUserByStudentIdAndCitizenId(student_id, citizen_id);
+    if (!user) {
+      const error: CustomError = new Error('User not found.');
+      error.statusCode = 404;
+      throw error;
+    }
+
     // validate pasword strength
     if(!passwordStrengthValidator(new_password)){
       const error: CustomError = new Error('Password must be at least 8 characters long and contain uppercase, lowercase and numbers.');
@@ -181,18 +189,20 @@ export const updateUserPassword = async ( Userdata : ForgotPasswordReq): Promise
 
     // hash the new password
     const salt = await bcrypt.genSalt(10);
-    const password_hash = await bcrypt.hash(new_password, salt);
+    const newPassword_hash = await bcrypt.hash(new_password, salt);
 
     const result = await query(
       `UPDATE users SET password_hash = $1, updated_at = NOW() WHERE student_id = $2 AND citizen_id = $3 RETURNING *`,
-      [password_hash, student_id, citizen_id]
+      [newPassword_hash, student_id, citizen_id]
     );
 
-    if (result.rows.length === 0) {
-      const error: CustomError = new Error('User not found with the provided student ID and citizen ID.');
-      error.statusCode = 404;
-      throw error;
-    }
+    // invalidate related cache
+    const studentCacheKey = `student:${student_id}`;
+    const citizenCacheKey = `citizen:${citizen_id}`;
+    const userCacheKey = `user:${student_id}:${citizen_id}`;
+    await getRedisClient().del(studentCacheKey);
+    await getRedisClient().del(citizenCacheKey);
+    await getRedisClient().del(userCacheKey);
 
     return result.rows[0];
 }
