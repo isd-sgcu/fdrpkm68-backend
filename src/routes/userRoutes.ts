@@ -163,7 +163,7 @@ router.get('/profile', authMiddleware, roleMiddleware([RoleType.FRESHMAN, RoleTy
 router.get(
     '/:id',
     authMiddleware,
-    roleMiddleware([RoleType.FRESHMAN]),
+    roleMiddleware([RoleType.STAFF]),
     findUsersByStudentId
 );
 
