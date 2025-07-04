@@ -38,28 +38,34 @@ export const getSelectedHousesIDsFromDB = async(group_id: string): Promise<(stri
     return arr
 }
 
-export const updateGroupHouseOnDB = async(group_id: string, new_house_name: string, rank: number): Promise<Boolean> => {
+export const addOneGroupHouseOnDB = async(group_id: string, new_house_id: Number, rank: number): Promise<string> => {
     rank = rank + 1 // Array index in SQL starts with 1
-    const add_member = await query(
-        `SELECT @capacity = 
-        UPDATE houses
-        SET member_count = member_count + 1
-        WHERE name_thai = $1`,
-        [new_house_name]
-    )
+    const validColumns = ['houses.house_rank_1', 'houses.house_rank_2', 'houses.house_rank_3', 'houses.house_rank_4', 'houses.house_rank_5', 'houses.house_rank_6']
+    let house_rank_column = `house_rank_${rank}`
+
     const result = await query(
         `UPDATE groups
-        SET selected_houses[$1] = $2
-        WHERE group_id = $3
-        AND NOT EXISTS (
-            SELECT 1
-            FROM unnest(selected_houses) WITH ORDINALITY AS t(house, idx)
-            WHERE t.house = $2 AND t.idx <> $1
-        )
-        AND EXISTS (SELECT 1 FROM houses WHERE name_thai = $2)`,
-        [rank, new_house_name, group_id]
+        SET groups.${house_rank_column} = $1, houses.member_count = houses.member_count + 1
+        FROM houses
+        WHERE groups.group_id = $2 AND houses.house_id = $1
+        AND NOT ($1 = ANY( array_remove(ARRAY[${validColumns.join(', ')}], NULL) ))
+        AND houses.member_count < houses.max_member`,
+        [new_house_id, group_id, rank]
     )
-    return result.rowCount === 1
+    if(result.rowCount === 0){
+        return `Either ${new_house_id} is already chosen in one of the ranks, or it's already full, or something else went wrong.`
+    }
+
+    // const add_member = await query(
+    //     `UPDATE houses
+    //     SET member_count = member_count + 1
+    //     WHERE house_id = $1 AND member_count < max_member`,
+    //     [new_house_id, group_id, rank]
+    // )
+    // if(add_member.rowCount === 0){
+    //     return `Either house with id ${new_house_id} is already full, or it doesn't exists.`
+    // }
+    return ''
 }
 
 export const deleteOneGroupHouseOnDB = async(group_id: string, rank_to_delete: number): Promise<Boolean> => {

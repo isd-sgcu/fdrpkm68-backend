@@ -4,18 +4,6 @@ import { House } from '../types/house';
 import { CustomError } from '../types/error';
 import { group } from 'console';
 
-export const createAHouse = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const name_thai = req.body.name_thai
-        const name_english = req.body.name_english
-        const logo = req.body.logo
-        const description_thai = req.body.description_thai
-    }
-    catch (error){
-
-    }
-}
-
 // send all houses info (full House objects, not just house names) to frontend
 export const getAllHouses = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -70,12 +58,12 @@ export const getSelectedHousesIds = async (req: Request, res: Response, next: Ne
 export const upDateHousesDraft = async (req: Request, res: Response, next: NextFunction) => {
     const group_id = req.params.groupId
     try {
-        const new_house_name = req.body.new_house_name
+        const new_house_id = req.body.new_house_id
         const rank = req.body.rank
-        if(!new_house_name){
+        if(!new_house_id){
             res.status(400).json({
                 status: 'error',
-                message: "Cannot set a house to null. Use /deleteOneHouseFromDraft/:groupId to delete a house off the group's list of selected houses."
+                message: "Cannot set a house to null or non-integer types. Use /deleteOneHouseFromDraft/:groupId to delete a house off the group's list of selected houses."
             })
             return
         }
@@ -86,17 +74,17 @@ export const upDateHousesDraft = async (req: Request, res: Response, next: NextF
             })
             return
         }
-        const result = await houseService.updateGroupHouseOnDB(group_id, new_house_name, rank)
-        if(!result){
+        const errorMsg = await houseService.addOneGroupHouseOnDB(group_id, new_house_id, rank)
+        if(errorMsg.trim().length !== 0){
             res.status(400).json({
                 status: 'error',
-                message: `Either ${new_house_name} already exists in group's list of selected houses, or something else went wrong.`
+                message: errorMsg
             })
             return
         }
         res.status(200).json({
             status: 'success',
-            message: `Successfully updated house rank ${rank+1} of group with id ${group_id} to ${new_house_name}.`
+            message: `Successfully updated house rank ${rank+1} of group with id ${group_id} to house id ${new_house_id}.`
         })
     }
     catch (error) {
