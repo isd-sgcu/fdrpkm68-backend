@@ -42,11 +42,15 @@ async function startServer() {
     // Check if we have real database/Redis URLs
     const isDummyDB = !process.env.DATABASE_URL || 
                      process.env.DATABASE_URL.includes('placeholder') ||
-                     process.env.DATABASE_URL.includes('dummy');
+                     process.env.DATABASE_URL.includes('dummy') ||
+                     process.env.DATABASE_URL.includes('dev-host') ||
+                     process.env.DATABASE_URL.includes('user:password');
     
     const isDummyRedis = !process.env.REDIS_URL || 
                         process.env.REDIS_URL.includes('placeholder') ||
-                        process.env.REDIS_URL.includes('dummy');
+                        process.env.REDIS_URL.includes('dummy') ||
+                        process.env.REDIS_URL.includes('dev-redis-host') ||
+                        process.env.REDIS_URL.includes('user:password');
 
     if (isDummyDB) {
       console.log('⚠️  Database disabled - using dummy connection');
