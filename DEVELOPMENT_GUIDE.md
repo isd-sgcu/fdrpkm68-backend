@@ -141,22 +141,6 @@ ENV PORT=8080
 
 ---
 
-## 🩺 Health Check Endpoint
-
-**REQUIRED**: The `/health` endpoint is mandatory for load balancer health checks:
-
-```typescript
-app.get('/health', (_req: Request, res: Response) => {
-  res.json({
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
-  });
-});
-```
-
----
-
 ## 📝 Development Workflow
 
 ### Adding New Routes
