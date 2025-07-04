@@ -4,7 +4,7 @@ import { registerUser, loginUser, forgotPassword } from '../controllers/authCont
 const router = Router();
 /**
  * @openapi
- * /api/auth/register:
+ * /auth/register:
  *   post:
  *     tags:
  *       - Auth
@@ -123,7 +123,7 @@ const router = Router();
 router.post('/register', registerUser);
 /**
  * @openapi
- * /api/auth/login:
+ * /auth/login:
  *   post:
  *     tags:
  *       - Auth
@@ -155,7 +155,7 @@ router.post('/login', loginUser);
 
 /**
  * @openapi
- * /api/auth/forgot-password:
+ * /auth/forgot-password:
  *   post:
  *     tags:
  *       - Auth
