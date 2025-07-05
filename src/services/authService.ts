@@ -7,7 +7,7 @@ import { CustomError } from '../types/error';
 import { passwordStrengthValidator, validateCitizenIdChecksum } from '../utils/validationUtils';
 // Register Logic
 export const register = async (userData: UserRegistrationRequest) => {
-  const { student_id, citizen_id, password ,...rest} = userData;
+  const { student_id, citizen_id, password , avatar_id} = userData;
 
   // check if user already exists
   const existingUser = await userService.findUserByStudentIdAndCitizenId(student_id, citizen_id);
@@ -37,7 +37,7 @@ export const register = async (userData: UserRegistrationRequest) => {
 
   // crerate user for database
   const role = (userData as any).role || 'FRESHMAN'; //testing purposes naja
-  const newUser : User = {...userData, password_hash, role, created_at: new Date(), updated_at: new Date()}
+  const newUser : User = {...userData, password_hash, role,avatar_id, created_at: new Date(), updated_at: new Date()}
   const addedUser = await userService.createUser(newUser);
   // console.log('User created successfully:', addedUser);
   return addedUser;
@@ -46,6 +46,7 @@ export const register = async (userData: UserRegistrationRequest) => {
 // Login 
 export const login = async (student_id: string, citizen_id:string ,password: string): Promise<{ token: string; user: User }> => {
 
+  // check if user exists
   const user = await userService.findUserByStudentIdAndCitizenId(student_id,citizen_id);
   if(!user){
     const error: CustomError = new Error('User not found.Student ID or Citizen ID is incorrect.');
