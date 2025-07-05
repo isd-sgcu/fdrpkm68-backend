@@ -4,10 +4,10 @@ import { House } from '../types/house';
 import { CustomError } from '../types/error';
 import { group } from 'console';
 
-// send all houses info (full House objects, not just house names) to frontend
+
 export const getAllHouses = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const houses = await houseService.getAllHousesFromDB() // House[]
+        const houses = await houseService.getAllHousesFromDB()
         res.status(200).json({
             status: 'success',
             houses: houses
@@ -37,7 +37,6 @@ export const getCurrentMemberCounts = async (req: Request, res: Response, next: 
     }
 }
 
-// retrieve user's selected house(s)
 export const getSelectedHousesIds = async (req: Request, res: Response, next: NextFunction) => {
     const group_id = req.params.groupId
     try {
