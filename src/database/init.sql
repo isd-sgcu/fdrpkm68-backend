@@ -27,6 +27,9 @@ CREATE TYPE checkin_status_type AS ENUM ('PRE_REGISTER', 'EVENT_REGISTER');
 CREATE TYPE housesize_letter_type AS ENUM ('S', 'M', 'L', 'XL', 'XXL');
 CREATE TYPE group_role_type AS ENUM ('OWNER', 'MEMBER');
 
+-- Create sequence for avatar IDs
+-- This sequence will cycle through numbers 1 to 12, representing avatar IDs
+CREATE SEQUENCE avatar_seq MINVALUE 1 MAXVALUE 12 CYCLE;
 
 -- Create "users" table
 CREATE TABLE users (
@@ -46,7 +49,7 @@ CREATE TABLE users (
     food_allergy TEXT DEFAULT NULL,
     drug_allergy TEXT DEFAULT NULL,
     illness TEXT DEFAULT NULL,
-    avatar_id SMALLINT DEFAULT 1 NOT NULL,
+    avatar_id SMALLINT DEFAULT DEFAULT  nextval('avatar_seq') NOT NULL,
     group_id UUID,
     group_role group_role_type DEFAULT 'OWNER',
     role role_type DEFAULT 'FRESHMAN' NOT NULL,
