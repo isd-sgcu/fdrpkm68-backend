@@ -28,8 +28,7 @@ CREATE TYPE housesize_letter_type AS ENUM ('S', 'M', 'L', 'XL', 'XXL');
 CREATE TYPE group_role_type AS ENUM ('OWNER', 'MEMBER');
 
 -- Create sequence for avatar IDs
--- This sequence will cycle through numbers 1 to 12, representing avatar IDs
-CREATE SEQUENCE avatar_seq MINVALUE 1 MAXVALUE 12 CYCLE;
+CREATE SEQUENCE avatar_seq MINVALUE 1 MAXVALUE 5 CYCLE;
 
 -- Create "users" table
 CREATE TABLE users (
