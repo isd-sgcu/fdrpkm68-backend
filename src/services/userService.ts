@@ -1,10 +1,10 @@
 import { query } from '../database/client';
-import { User, UserRegistrationRequest } from '../types/user';
+import { User } from '../types/user';
 import { CustomError } from '../types/error';
-import { getRedisClient } from '../cache/redisClient';
 import bcrypt from 'bcryptjs';
 import { ForgotPasswordReq } from '../types/user';
 import { passwordStrengthValidator } from '../utils/validationUtils';
+import { getCache, setCache , clearCache} from '../utils/CacheUtils';
 
 
 export const createUser = async (userData: User): Promise<User> => {
@@ -58,6 +58,14 @@ export const createUser = async (userData: User): Promise<User> => {
         role
       ]
     );
+
+    // Invalidate related cache
+    const cacheKey = [
+      `student:${student_id}`,
+      `citizen:${citizen_id}`,
+      `user:${student_id}:${citizen_id}`
+    ];
+    await clearCache(cacheKey);
     // console.log('User created successfully:', result);
     return result.rows[0]; 
   } catch (error) {
@@ -71,7 +79,7 @@ export const findUsersByStudentId = async (student_id: string): Promise<User | n
   const cacheKey = `student:${student_id}`;
   try {
     // Check if user is in cache
-    const cachedUser = await getRedisClient().get(cacheKey);
+    const cachedUser = await getCache(cacheKey);
     // Chache hit
     if (cachedUser) {
       // console.log(`Cache hit for student_id: ${student_id}`);
@@ -85,9 +93,7 @@ export const findUsersByStudentId = async (student_id: string): Promise<User | n
     );
     // Cache the user data
     if (result.rows.length > 0) {
-      await getRedisClient().set(cacheKey, JSON.stringify(result.rows[0]), {
-        EX: 3600 
-      }); 
+      await setCache(cacheKey, JSON.stringify(result.rows[0]));
     }
     return result.rows[0] || null;
 
@@ -102,7 +108,7 @@ export const findUserByCitizenId = async (citizen_id: string): Promise<User | nu
   const cacheKey = `citizen:${citizen_id}`;
   try {
     // Check if user is in cache
-    const cachedUser = await getRedisClient().get(cacheKey);
+    const cachedUser = await getCache(cacheKey);
     if (cachedUser) {
       // console.log(`Cache hit for citizen_id: ${citizen_id}`);
       return JSON.parse(cachedUser);
@@ -115,9 +121,7 @@ export const findUserByCitizenId = async (citizen_id: string): Promise<User | nu
     );
     // Cache the user data
     if (result.rows.length > 0) {
-      await getRedisClient().set(cacheKey, JSON.stringify(result.rows[0]), {
-        EX: 3600 
-      });
+      await setCache(cacheKey, JSON.stringify(result.rows[0]));
     }
     return result.rows[0] || null;
   } catch (error) {
@@ -135,7 +139,7 @@ export const findUserByStudentIdAndCitizenId = async (
 
   try {
     // Check if user is in cache
-    const cachedUser = await getRedisClient().get(cacheKey);
+    const cachedUser = await getCache(cacheKey);
     if (cachedUser) {
       // console.log(`Cache hit for student_id: ${student_id}, citizen_id: ${citizen_id}`);
       return JSON.parse(cachedUser);
@@ -150,9 +154,7 @@ export const findUserByStudentIdAndCitizenId = async (
 
     if (result.rows.length > 0) {
       // Cache the user data
-      await getRedisClient().set(cacheKey, JSON.stringify(result.rows[0]), {
-        EX: 3600 
-      });
+      await setCache(cacheKey, JSON.stringify(result.rows[0]));
     }
 
     return result.rows[0] || null;
@@ -198,12 +200,12 @@ export const updateUserPassword = async ( Userdata : ForgotPasswordReq): Promise
     );
 
     // invalidate related cache
-    const studentCacheKey = `student:${student_id}`;
-    const citizenCacheKey = `citizen:${citizen_id}`;
-    const userCacheKey = `user:${student_id}:${citizen_id}`;
-    await getRedisClient().del(studentCacheKey);
-    await getRedisClient().del(citizenCacheKey);
-    await getRedisClient().del(userCacheKey);
+    const cacheKey = [
+      `student:${student_id}`,
+      `citizen:${citizen_id}`,
+      `user:${student_id}:${citizen_id}`
+    ];
+    await clearCache(cacheKey);
 
     return result.rows[0];
 }
