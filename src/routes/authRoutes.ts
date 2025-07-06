@@ -90,7 +90,6 @@ const router = Router();
  *               - parent_name
  *               - parent_phone_number
  *               - parent_relationship
- *               - avatar_id
  *     responses:
  *       '201':
  *         description: User registered successfully.
