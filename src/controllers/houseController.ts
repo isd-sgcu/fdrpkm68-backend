@@ -1,8 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import * as houseService from '../services/houseService'
-import { House } from '../types/house';
-import { CustomError } from '../types/error';
-import { group } from 'console';
 
 
 export const getAllHouses = async (req: Request, res: Response, next: NextFunction) => {
@@ -37,7 +34,7 @@ export const getCurrentMemberCounts = async (req: Request, res: Response, next: 
     }
 }
 
-export const getSelectedHousesIds = async (req: Request, res: Response, next: NextFunction) => {
+export const getGroupSelectedHousesIds = async (req: Request, res: Response, next: NextFunction) => {
     const group_id = req.params.groupId
     try {
         const selected_houses = await houseService.getSelectedHousesIDsFromDB(group_id)
@@ -48,13 +45,13 @@ export const getSelectedHousesIds = async (req: Request, res: Response, next: Ne
     }
     catch (error) {
         res.status(500).json({
-            status: 'error',
-            message: `Fetching names of houses selected by group with id ${group_id} failed.`
+            status: 'error', 
+            message: `Error occured while fetching IDs of houses selected by group with id ${group_id}: ${error}`
         })
     }
 }
 
-export const upDateHousesDraft = async (req: Request, res: Response, next: NextFunction) => {
+export const upDateGroupHouses = async (req: Request, res: Response, next: NextFunction) => {
     const group_id = req.params.groupId
     try {
         const new_house_id = req.body.new_house_id
@@ -62,7 +59,7 @@ export const upDateHousesDraft = async (req: Request, res: Response, next: NextF
         if(!new_house_id){
             res.status(400).json({
                 status: 'error',
-                message: "Cannot set a house to null or non-integer types. Use /deleteOneHouseFromDraft/:groupId to delete a house off the group's list of selected houses."
+                message: "Cannot set a house to null or non-integer types. Use deleteOne/:groupId to delete a house off the group's selected houses."
             })
             return
         }
@@ -94,7 +91,7 @@ export const upDateHousesDraft = async (req: Request, res: Response, next: NextF
     }
 }
 
-export const deleteOneHouseFromDraft = async (req: Request, res: Response, next: NextFunction) => {
+export const deleteOneHouseFromGroup = async (req: Request, res: Response, next: NextFunction) => {
     const group_id = req.params.groupId
     try {
         const rank_to_delete = req.body.rank_to_delete
@@ -126,7 +123,7 @@ export const deleteOneHouseFromDraft = async (req: Request, res: Response, next:
     }
 }
 
-export const deleteAllHousesFromDraft = async (req: Request, res: Response, next: NextFunction) => {
+export const deleteAllHousesFromGroup = async (req: Request, res: Response, next: NextFunction) => {
     const group_id = req.params.groupId
     try {
         const result = await houseService.deleteAllGroupHousesOnDB(group_id)
@@ -150,7 +147,7 @@ export const deleteAllHousesFromDraft = async (req: Request, res: Response, next
     }
 }
 
-export const submitHousesDraft = async (req: Request, res: Response, next: NextFunction) => {
+export const submitGroupHouses = async (req: Request, res: Response, next: NextFunction) => {
     const group_id = req.params.groupId
     try {
         const result = await houseService.submitGroupHousesToDB(group_id)

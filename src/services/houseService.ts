@@ -107,7 +107,7 @@ export const deleteOneGroupHouseOnDB = async(group_id: string, rank_to_delete: n
     if(check_submitted.rows[0].submitted){
         return false
     }
-    
+
     rank_to_delete = rank_to_delete + 1
     const house_rank_column = `house_rank_${rank_to_delete}`
     const decrement_member = await query(
