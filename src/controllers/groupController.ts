@@ -7,7 +7,6 @@ export const getGroupData = async (req: Request, res: Response, next: NextFuncti
     try {
         const groupID = req.params.id;
         const houses = await groupService.getGroupDataFromDB(groupID)
-        console.log(houses);
         res.status(200).json({
             status: 'success',
             houses: houses
