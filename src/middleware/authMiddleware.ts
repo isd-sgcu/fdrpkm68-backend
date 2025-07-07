@@ -1,4 +1,4 @@
-import { AppErorr } from "@/types/error/AppError";
+import { AppError } from "@/types/error/AppError";
 import { verifyJwt } from "@/utils/jwt";
 import type { Request, Response, NextFunction } from "express";
 
