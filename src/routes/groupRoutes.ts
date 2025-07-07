@@ -17,6 +17,7 @@ router.use(authMiddleware);
  *  post:
  *    summary: Create a new group for a user, if the user meets certain conditions.
  *    description: Creates a new group for a user, if the user is NOT in ANY group (ANY group includes a 1-person group.)
+ *    tags: [Groups]
  *    security:
  *      - bearerAuth: []
  *    responses:
@@ -46,8 +47,24 @@ router.use(authMiddleware);
  */
 router.post("/createOwnGroup", createOwnGroup);
 
+/**
+ * @swagger
+ * /groups/{id}:
+ *  get:
+ *    summary: Gets info of a group.
+ *    tags: [Groups]
+ *    security:
+ *      - bearerAuth: []
+ *    responses:
+ *      200:
+ *        description: Data fetched successfully.
+ *      500:
+ *        description: Internal Server Error.
+ */
 router.get("/:id", getGroupData);
+
 router.post("/join/:id", joinGroup);
+
 router.post("/leave", leaveGroup);
 
 export default router;
