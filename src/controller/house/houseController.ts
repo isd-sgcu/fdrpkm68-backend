@@ -1,21 +1,17 @@
 import { Request, Response } from "express";
-import { GetAllHousesUseCase } from "../../usecase/house/getAllHousesUseCase";
-import { GetHouseByIdUseCase } from "../../usecase/house/getHouseByIdUseCase";
 import { UUID } from "@/types/common";
+import { HouseUseCase } from "../../usecase/house/houseUsecase";
 
 export class HouseController {
-  private getAllHousesUseCase: GetAllHousesUseCase;
-  private getHouseByIdUseCase: GetHouseByIdUseCase;
-
+  private houseUserCase: HouseUseCase;
   constructor() {
-    this.getAllHousesUseCase = new GetAllHousesUseCase();
-    this.getHouseByIdUseCase = new GetHouseByIdUseCase();
+    this.houseUserCase = new HouseUseCase();
   }
 
   // Get all houses
   async getAllHouses(req: Request, res: Response): Promise<void> {
     try {
-      const houses = await this.getAllHousesUseCase.execute();
+      const houses = await this.houseUserCase.getAllHouses();
       res.status(200).json({
         success: true,
         data: houses,
@@ -51,7 +47,7 @@ export class HouseController {
         return;
       }
 
-      const house = await this.getHouseByIdUseCase.execute(houseId);
+      const house = await this.houseUserCase.getHouseById(houseId);
 
       if (!house) {
         res.status(404).json({
