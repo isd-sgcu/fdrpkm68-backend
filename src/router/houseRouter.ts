@@ -1,5 +1,6 @@
 import { BaseRouter } from "@/router/baseRouter";
 import { HouseController } from "@/controller/house/houseController";
+import { authMiddleware } from "../middleware/authMiddleware";
 
 export class HouseRouter extends BaseRouter {
   private houseController!: HouseController;
@@ -13,6 +14,8 @@ export class HouseRouter extends BaseRouter {
   }
 
   private setupRoutes(): void {
+    this.router.use(authMiddleware);
+
     // GET /api/houses - Get all houses
     this.router.get(
       "/",
