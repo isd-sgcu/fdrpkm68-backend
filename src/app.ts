@@ -12,7 +12,7 @@ app.use(bodyParser.json());
 
 const routerManager = new RouterManager();
 
-app.use("/api/v1", routerManager.getRouter());
+app.use("/", routerManager.getRouter());
 
 app.get("/healthz", (_req: Request, res: Response) => {
   res.json({
