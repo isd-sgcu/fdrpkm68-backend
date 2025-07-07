@@ -51,6 +51,6 @@ export enum HouseSizeType {
 }
 
 export enum GroupRoleType {
-  owner = 'owner',
-  member = 'member'
+  owner = 'OWNER',
+  member = 'MEMBER'
 }
