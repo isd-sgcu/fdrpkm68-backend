@@ -2,10 +2,10 @@ import type { User } from "@prisma/client";
 
 import { UserRepository } from "@/repository/user/userRepository";
 
-import { hashPassword, comparePassword } from "@/util/password";
-import { signJwt } from "@/util/jwt";
+import { hashPassword, comparePassword } from "@/utils/password";
+import { signJwt } from "@/utils/jwt";
 
-import {
+import type {
   ForgotPasswordRequest,
   LoginRequest,
   RegisterRequest,
@@ -53,6 +53,7 @@ export class AuthUsecase {
       throw new AppError("Invalid password", 401);
     }
     return signJwt({
+      id: user.id,
       studentId: user.studentId,
       citizenId: user.citizenId,
     });

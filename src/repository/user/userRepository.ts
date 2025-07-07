@@ -2,9 +2,17 @@ import { User } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 
+import { GroupRepository } from "@/repository/group/groupRepository";
+
 import { RegisterRequest } from "@/types/auth/POST";
 
 export class UserRepository {
+  private groupRepository: GroupRepository;
+
+  constructor() {
+    this.groupRepository = new GroupRepository();
+  }
+
   async create(body: RegisterRequest): Promise<User> {
     const user = await prisma.user.create({
       data: {
@@ -27,6 +35,10 @@ export class UserRepository {
         role: body.role,
       },
     });
+
+    // TODO: UNCOMMENT THIS WHEN GROUP FEATURE IS READY
+    // This will create a group for the user after registration :)
+    // await this.groupRepository.createGroupForUser(user.id);
 
     return user;
   }

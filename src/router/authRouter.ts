@@ -1,9 +1,9 @@
 import { BaseRouter } from "./baseRouter";
-import { AuthController } from "../controller/auth/authController";
+import { AuthController } from "@/controller/auth/authController";
 import { authMiddleware } from "@/middleware/authMiddleware";
 
 export class AuthRouter extends BaseRouter {
-  private authController!: AuthController;
+  private authController: AuthController;
 
   constructor() {
     super({
