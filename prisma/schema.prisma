@@ -53,16 +53,6 @@ model Checkin {
     @@map("checkin")
 }
 
-model HouseSize {
-    id         String              @id @default(uuid()) @map("id") @db.Uuid
-    sizeLetter HouseSizeLetterType @unique @map("size_letter")
-    maxMember  Int                 @map("max_member")
-
-    houses House[] @relation("HouseSizeHouses")
-
-    @@map("house_sizes")
-}
-
 model House {
     id                 String @id @default(uuid()) @map("id") @db.Uuid
     nameThai           String @map("name_th")
@@ -70,34 +60,33 @@ model House {
     logo               String
     descriptionThai    String @map("description_th")
     descriptionEnglish String @map("description_en")
-    sizeLetterId       String @map("size_letter_id") @db.Uuid
+    sizeLetter         String @map("size_letter")
     capacity           Int    @map("capacity")
     instagram          String
     facebook           String
     tiktok             String
 
-    houseSize   HouseSize @relation("HouseSizeHouses", fields: [sizeLetterId], references: [id])
-    groupsRank1 Group[]   @relation("GroupHouseRank1")
-    groupsRank2 Group[]   @relation("GroupHouseRank2")
-    groupsRank3 Group[]   @relation("GroupHouseRank3")
-    groupsRank4 Group[]   @relation("GroupHouseRank4")
-    groupsRank5 Group[]   @relation("GroupHouseRank5")
-    groupsSub   Group[]   @relation("GroupHouseSub")
+    groupsRank1 Group[] @relation("GroupHouseRank1")
+    groupsRank2 Group[] @relation("GroupHouseRank2")
+    groupsRank3 Group[] @relation("GroupHouseRank3")
+    groupsRank4 Group[] @relation("GroupHouseRank4")
+    groupsRank5 Group[] @relation("GroupHouseRank5")
+    groupsSub   Group[] @relation("GroupHouseSub")
 
     @@map("houses")
 }
 
 model Group {
-    id          String  @id @default(uuid()) @map("id") @db.Uuid
-    isConfirmed Boolean @default(false) @map("is_confirmed")
-    inviteCode  String  @unique @map("invite_code")
-    memberCount Int     @default(0) @map("member_count")
-    houseRank1  String? @map("house_rank_1") @db.Uuid
-    houseRank2  String? @map("house_rank_2") @db.Uuid
-    houseRank3  String? @map("house_rank_3") @db.Uuid
-    houseRank4  String? @map("house_rank_4") @db.Uuid
-    houseRank5  String? @map("house_rank_5") @db.Uuid
-    houseRank6  String? @map("house_rank_6") @db.Uuid
+    id           String  @id @default(uuid()) @map("id") @db.Uuid
+    isConfirmed  Boolean @default(false) @map("is_confirmed")
+    inviteCode   String  @unique @map("invite_code")
+    memberCount  Int     @default(0) @map("member_count")
+    houseRank1   String? @map("house_rank_1") @db.Uuid
+    houseRank2   String? @map("house_rank_2") @db.Uuid
+    houseRank3   String? @map("house_rank_3") @db.Uuid
+    houseRank4   String? @map("house_rank_4") @db.Uuid
+    houseRank5   String? @map("house_rank_5") @db.Uuid
+    houseRankSub String? @map("house_rank_sub") @db.Uuid
 
     users    User[] @relation("UserGroup")
     house1   House? @relation("GroupHouseRank1", fields: [houseRank1], references: [id])
@@ -105,7 +94,7 @@ model Group {
     house3   House? @relation("GroupHouseRank3", fields: [houseRank3], references: [id])
     house4   House? @relation("GroupHouseRank4", fields: [houseRank4], references: [id])
     house5   House? @relation("GroupHouseRank5", fields: [houseRank5], references: [id])
-    houseSub House? @relation("GroupHouseSub", fields: [houseRank6], references: [id])
+    houseSub House? @relation("GroupHouseSub", fields: [houseRankSub], references: [id])
 
     @@map("groups")
 }
