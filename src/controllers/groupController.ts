@@ -127,16 +127,14 @@ export const joinGroup = async (req: Request, res: Response, next: NextFunction)
       return;
     }
 
-    // to join a new group as a group owner, the original group (group to leave)
-    // must only consist of one member (a.k.a. the owner)
-
+    // to join a new group as a group owner, the owner of the group must leave their group
     // if user's current is group is null (i.e., not in a group), this check can be skipped.
     if (user.group_id){
       const originalGroup = (await groupService.getGroupDataFromDB(user.group_id))[0];
-      if (user.group_role === GroupRoleType.owner && (originalGroup as any).group_member_count > 1){
+      if (user.group_role === GroupRoleType.owner){
         res.status(400).json({
         status: 'error',
-        message: 'User is an owner of a group with other members.'
+        message: 'User is an owner of a group.'
       });
       return;
       }    
@@ -159,5 +157,73 @@ export const joinGroup = async (req: Request, res: Response, next: NextFunction)
         res.status(500).json({
             status: 'error',
             message: 'An error occurred while joining group.'
+        })
+    }}
+
+export const leaveGroup = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      if (!req?.user?.student_id || !req?.user?.citizen_id){
+        res.status(401).json({
+          status: 'error',
+          message: 'Unauthorized.'
+        })
+        return;
+      }
+
+
+      
+      
+      const cacheKey = `user:${req?.user?.student_id}:${req?.user?.citizen_id}`;
+      await clearCache([cacheKey]);
+      
+    const user = await userService.findUserByStudentIdAndCitizenId(req.user.student_id,req.user.citizen_id);
+    
+    if (!user) {
+      res.status(404).json({
+        status: 'error',
+        message: 'User not found.'
+      })
+      return;
+    }
+
+    // if user's group is NULL (i.e., no group), there is no need to leave anyway.
+    if (!user.group_id){
+      res.status(400).json({
+        status: 'error',
+        message: 'User does not have a group.'
+      })
+      return;
+    }
+
+    const originalGroup = (await groupService.getGroupDataFromDB(user.group_id))[0];
+
+    // to be able to leave a group as an owner, the group must have no one else present.
+    if (user.group_role === GroupRoleType.owner && (originalGroup as any).group_member_count > 1){
+      res.status(400).json({
+        status: 'error',
+        message: 'User is the owner of the group with other members present.'
+      })
+      return;
+    }
+
+    if (user.group_role === GroupRoleType.owner && (originalGroup as any).group_member_count === 1){
+      await groupService.leaveGroupAsOwner(user);
+    } else {
+      await groupService.leaveGroupAsMember(user);
+    }
+
+    res.status(201).json({
+      status: 'success',
+      message: 'Successfully left group.',
+    })
+
+
+
+
+      }
+    catch (error){
+        res.status(500).json({
+            status: 'error',
+            message: 'An error occurred while leaving group.'
         })
     }}
