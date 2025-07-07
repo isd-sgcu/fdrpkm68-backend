@@ -9,3 +9,4 @@ coverage/
 *.log
 DEVOPS_DEPLOYMENT_GUIDE.md
 devopsnotes.md
+/requirements
