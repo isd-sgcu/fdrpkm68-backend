@@ -262,7 +262,13 @@ export class GroupRepository {
     }
   }
 
-  async getGroupMembers(groupId: string): Promise<User[]> {
+  async getGroupMembers(groupId: string): Promise<Array<{
+    id: string;
+    studentId: string;
+    firstName: string;
+    lastName: string;
+    nickname: string;
+  }>> {
     try {
       return await prisma.user.findMany({
         where: { groupId },

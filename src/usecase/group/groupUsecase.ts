@@ -277,13 +277,22 @@ export class GroupUsecase {
           houseRankSub: userGroup.houseRankSub,
         };
 
+        const normalizedPreferences = {
+          houseRank1: preferences.houseRank1 ?? null,
+          houseRank2: preferences.houseRank2 ?? null,
+          houseRank3: preferences.houseRank3 ?? null,
+          houseRank4: preferences.houseRank4 ?? null,
+          houseRank5: preferences.houseRank5 ?? null,
+          houseRankSub: preferences.houseRankSub ?? null,
+        };
+
         await this.houseRepository.updateChosenCountsForPreferenceChange(
           currentPreferences,
-          preferences,
+          normalizedPreferences,
           tx
         );
 
-        return await this.groupRepository.updateHousePreferences(userGroup.id, preferences);
+        return await this.groupRepository.updateHousePreferences(userGroup.id, normalizedPreferences);
       });
     } catch (error) {
       console.error("Error setting house preferences:", error);
