@@ -58,3 +58,27 @@ export const joinGroup = async(groupID:string,user:User): Promise<string> => { t
   }
 }
   
+
+export const leaveGroup = async(user:User,groupID?:string ): Promise<string> => { try {
+
+    // if `groupID` is not specified, infer it from the `user` object.
+    if (!groupID){
+      groupID = user.group_id;
+    }
+
+  
+    // decrement `group_member_count` by 1
+    await query(`UPDATE groups SET group_member_count = group_member_count - 1 WHERE group_id = $1`,[groupID]); 
+  
+    // UPDATE the group_id, then set role to a member.
+    const result = await query(`UPDATE users SET group_id = NULL, group_role = 'OWNER' WHERE student_id = $2 AND citizen_id = $3`, 
+      [user.student_id,user.citizen_id]
+    );
+    
+    return result.rows[0];
+  } catch (error) {
+    const customError: CustomError = new Error('Failed to leave group.');
+    customError.statusCode = 500;
+    throw customError;
+  }
+}
