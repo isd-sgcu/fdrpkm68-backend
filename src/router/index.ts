@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { AuthRouter } from "./authRouter";
-import { GroupRouter, HouseRouter } from "./groupRouter";
+import { GroupRouter } from "./groupRouter";
+import { HouseRouter } from "./houseRouter";
 
 export class RouterManager {
   private router: Router;

@@ -1,6 +1,6 @@
+import { authMiddleware } from "../middleware/authMiddleware";
 import { BaseRouter } from "./baseRouter";
 import { GroupController } from "@/controller/group/groupController";
-import { mockAuthMiddleware } from "@/middleware/mockAuth";
 
 export class GroupRouter extends BaseRouter {
   private groupController: GroupController;
@@ -14,7 +14,7 @@ export class GroupRouter extends BaseRouter {
   }
 
   private setupRoutes(): void {
-    this.router.use(mockAuthMiddleware);
+    this.router.use(authMiddleware);
 
     this.router.get(
       "/",
