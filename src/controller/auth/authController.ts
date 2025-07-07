@@ -10,21 +10,80 @@ export class AuthController {
     this.authUseCase = new AuthUsecase();
   }
 
-  async register(req: Request, res: Response): Promise<Response> {
+  async register(req: Request, res: Response): Promise<void> {
     try {
       const user = await this.authUseCase.register(req.body as RegisterRequest);
-      return res.status(201).json({ user });
+      res.status(201).json({ user });
+      return;
     } catch (error: unknown) {
       if (error instanceof AppErorr) {
-        return res.status(error.statusCode).json({
+        res.status(error.statusCode).json({
           message: error.message,
         });
+        return;
       }
 
       console.error("Unexpected error:", error);
-      return res.status(500).json({
+      res.status(500).json({
         message: "Internal server error",
       });
     }
+  }
+
+  async login(req: Request, res: Response): Promise<void> {
+    try {
+      const token = await this.authUseCase.login(req.body);
+      res.cookie("token", token, {
+        // httpOnly: true,
+        maxAge: 2 * 24 * 60 * 60 * 1000,
+      });
+      res.status(200).json({ token });
+    } catch (error: unknown) {
+      if (error instanceof AppErorr) {
+        res.status(error.statusCode).json({
+          message: error.message,
+        });
+        return;
+      }
+
+      console.error("Unexpected error:", error);
+      res.status(500).json({
+        message: "Internal server error",
+      });
+    }
+  }
+
+  async forgotPassword(req: Request, res: Response): Promise<void> {
+    try {
+      const status = await this.authUseCase.forgotPassword(req.body);
+      if (status) {
+        res.status(200).json({
+          message: "Your password has been reset.",
+        });
+      }
+    } catch (error: unknown) {
+      if (error instanceof AppErorr) {
+        res.status(error.statusCode).json({
+          message: error.message,
+        });
+        return;
+      }
+
+      console.error("Unexpected error:", error);
+      res.status(500).json({
+        message: "Internal server error",
+      });
+    }
+  }
+
+  async logout(req: Request, res: Response): Promise<void> {
+    res.clearCookie("token", {
+      // httpOnly: true,
+      // sameSite: "strict",
+    });
+
+    res.status(200).json({
+      message: "Logged out successfully",
+    });
   }
 }

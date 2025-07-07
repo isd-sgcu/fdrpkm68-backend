@@ -1,9 +1,15 @@
 import type { User } from "@prisma/client";
-import bcrypt from "bcrypt";
 
 import { UserRepository } from "@/repository/user/userRepository";
 
-import { RegisterRequest } from "@/types/auth/POST";
+import { hashPassword, comparePassword } from "@/util/password";
+import { signJwt } from "@/util/jwt";
+
+import {
+  ForgotPasswordRequest,
+  LoginRequest,
+  RegisterRequest,
+} from "@/types/auth/POST";
 import { AppErorr } from "@/types/error/AppError";
 
 export class AuthUsecase {
@@ -27,12 +33,51 @@ export class AuthUsecase {
         400
       );
     }
-    const hashedPassword = await bcrypt.hash(body.password, 10);
-    body.password = hashedPassword;
+    body.password = await hashPassword(body.password);
     const user: User = await this.userRepository.create(body);
 
     const { password: _, ...userWithoutPassword } = user;
     return userWithoutPassword;
+  }
+
+  async login(body: LoginRequest) {
+    const user = await this.userRepository.getUserByCredentials(
+      body.studentId,
+      body.citizenId
+    );
+    if (!user) {
+      throw new AppErorr("Invalid student ID or citizen ID", 401);
+    }
+    const isPasswordValid = await comparePassword(body.password, user.password);
+    if (!isPasswordValid) {
+      throw new AppErorr("Invalid password", 401);
+    }
+    return signJwt({
+      studentId: user.studentId,
+      citizenId: user.citizenId,
+    });
+  }
+
+  async forgotPassword(body: ForgotPasswordRequest) {
+    if (this.validateForgotPasswordRequest(body) === false) {
+      throw new AppErorr("Invalid forgot password request", 400);
+    }
+    const user = await this.userRepository.getUserByCredentials(
+      body.studentId,
+      body.citizenId
+    );
+    if (!user) {
+      throw new AppErorr("Invalid student ID or citizen ID", 401);
+    }
+    body.newPassword = await hashPassword(body.newPassword);
+    const updatedUser = await this.userRepository.changePassword(
+      user.id,
+      body.newPassword
+    );
+    if (!updatedUser) {
+      throw new AppErorr("Failed to update password", 500);
+    }
+    return true;
   }
 
   private validateRegisterRequest(body: RegisterRequest): boolean {
@@ -42,6 +87,47 @@ export class AuthUsecase {
     if (!/^\d+$/.test(body.studentId) || !/^\d+$/.test(body.citizenId)) {
       return false;
     }
-    return false;
+    if (
+      !/[A-Z]/.test(body.password) ||
+      !/[a-z]/.test(body.password) ||
+      !/\d/.test(body.password) ||
+      body.password.length < 8 ||
+      body.password.length > 20
+    ) {
+      return false;
+    }
+    const validPrefixes = ["MR", "MS", "Other"];
+    if (!validPrefixes.includes(body.prefix)) {
+      return false;
+    }
+    if (
+      !/^(0\d{9})$/.test(body.phoneNumber) ||
+      body.phoneNumber.length !== 10 ||
+      !/^(0\d{9})$/.test(body.parentPhoneNumber) ||
+      body.parentPhoneNumber.length !== 10
+    ) {
+      return false;
+    }
+    const validRoles = ["STAFF", "FRESHMAN"];
+    if (!validRoles.includes(body.role)) {
+      return false;
+    }
+    return true;
+  }
+
+  private validateForgotPasswordRequest(body: ForgotPasswordRequest): boolean {
+    if (body.studentId.length !== 10 || body.citizenId.length !== 13) {
+      return false;
+    }
+    if (
+      !/[A-Z]/.test(body.newPassword) ||
+      !/[a-z]/.test(body.newPassword) ||
+      !/\d/.test(body.newPassword) ||
+      body.newPassword.length < 8 ||
+      body.newPassword.length > 20
+    ) {
+      return false;
+    }
+    return true;
   }
 }

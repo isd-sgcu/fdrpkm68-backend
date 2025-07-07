@@ -1,15 +1,12 @@
-import { PrismaClient, User } from "@prisma/client";
+import { User } from "@prisma/client";
+
+import { prisma } from "@/lib/prisma";
+
 import { RegisterRequest } from "@/types/auth/POST";
 
 export class UserRepository {
-  private prisma: PrismaClient;
-
-  constructor() {
-    this.prisma = new PrismaClient();
-  }
-
   async create(body: RegisterRequest): Promise<User> {
-    const user = await this.prisma.user.create({
+    const user = await prisma.user.create({
       data: {
         studentId: body.studentId,
         citizenId: body.citizenId,
@@ -34,8 +31,38 @@ export class UserRepository {
     return user;
   }
 
+  async getUserByCredentials(
+    studentId: string,
+    citizenId: string
+  ): Promise<User | null> {
+    const user = await prisma.user.findFirst({
+      where: {
+        AND: [{ studentId: studentId }, { citizenId: citizenId }],
+      },
+    });
+    if (!user) {
+      return null;
+    }
+    return user;
+  }
+
+  async changePassword(id: string, newPassword: string): Promise<User | null> {
+    const user = await prisma.user.update({
+      where: {
+        id: id,
+      },
+      data: {
+        password: newPassword,
+      },
+    });
+    if (!user) {
+      return null;
+    }
+    return user;
+  }
+
   async findExists(studentId: string, citizenId: string): Promise<boolean> {
-    const userFromStudentId = await this.prisma.user.findFirst({
+    const userFromStudentId = await prisma.user.findFirst({
       where: {
         studentId: studentId,
       },
@@ -43,7 +70,7 @@ export class UserRepository {
     if (userFromStudentId) {
       return true;
     }
-    const userFromCitizenId = await this.prisma.user.findFirst({
+    const userFromCitizenId = await prisma.user.findFirst({
       where: {
         citizenId: citizenId,
       },
