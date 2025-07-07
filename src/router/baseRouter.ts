@@ -20,8 +20,6 @@ export class BaseRouter {
     }
 
     this.router.use(this.requestLogger);
-
-    this.initializeRoutes();
   }
 
   private requestLogger = (req: Request, res: Response, next: NextFunction) => {
@@ -30,8 +28,6 @@ export class BaseRouter {
     );
     next();
   };
-
-  protected initializeRoutes(): void {}
 
   public getRouter(): Router {
     return this.router;

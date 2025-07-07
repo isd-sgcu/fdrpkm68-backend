@@ -12,8 +12,6 @@ export class AuthRouter extends BaseRouter {
     this.setupRoutes();
   }
 
-  protected initializeRoutes(): void {}
-
   private setupRoutes(): void {
     this.router.post(
       "/login",
