@@ -1,29 +1,35 @@
 import { Request, Response } from "express";
+import { AuthUsecase } from "@/usecase/auth/authUsecase";
 
 export class AuthController {
+  private authUseCase: AuthUsecase;
+
+  constructor() {
+    this.authUseCase = new AuthUsecase();
+  }
+
   async login(req: Request, res: Response): Promise<void> {
     try {
-      const { email, password } = req.body;
+      const { studentId, password } = req.body;
 
-      if (!email || !password) {
+      if (!studentId || !password) {
         res.status(400).json({
           success: false,
-          error: "Email and password are required",
+          error: "studentId and password are required",
           timestamp: new Date().toISOString(),
         });
         return;
       }
+
+      const { user, token } = await this.authUseCase.login({
+        studentId,
+        password,
+      });
+
       res.status(200).json({
         success: true,
         message: "Login successful",
-        data: {
-          user: {
-            id: "user-123",
-            email: email,
-            name: "Mock User",
-          },
-          token: "mock-jwt-token",
-        },
+        data: { user, token },
         timestamp: new Date().toISOString(),
       });
     } catch (error) {

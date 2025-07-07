@@ -23,22 +23,25 @@ export interface RegisterRequest {
   name: string;
 }
 
-export interface RegisterResponse {
-  success: boolean;
-  message: string;
-  data: {
-    user: {
-      id: string;
-      email: string;
-      name: string;
-    };
-    token: string;
-  };
-  timestamp: string;
-}
-
 export interface LogoutResponse {
   success: boolean;
   message: string;
   timestamp: string;
+}
+
+export interface CreateUserRequest {
+  email: string;
+  name: string;
+  password: string;
+}
+
+export interface StudentLoginCredentials {
+  studentId: string;
+  password: string;
+}
+
+export interface AuthToken {
+  token: string;
+  expiresAt: string;
+  userId: string;
 }
