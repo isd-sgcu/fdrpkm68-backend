@@ -8,48 +8,48 @@ datasource db {
 }
 
 model User {
-    id                 String        @id @default(uuid()) @map("id") @db.Uuid
-    studentId          String        @unique @map("student_id") @db.VarChar(10)
-    citizenId          String        @map("citizen_id") @db.VarChar(13)
+    id                 String     @id @default(uuid()) @map("id") @db.Uuid
+    studentId          String     @map("student_id")
+    citizenId          String     @map("citizen_id")
     prefix             PrefixType
-    firstName          String        @map("first_name")
-    lastName           String        @map("last_name")
+    firstName          String     @map("first_name")
+    lastName           String     @map("last_name")
     nickname           String
-    academicYear       Int           @map("academic_year")
-    faculty            FacultyId
-    password           String        @map("password")
-    phoneNumber        String        @map("phone_number")
-    parentName         String        @map("parent_name")
-    parentPhoneNumber  String        @map("parent_phone_number")
-    parentRelationship String        @map("parent_relationship")
-    foodAllergy        String?       @map("food_allergy")
-    drugAllergy        String?       @map("drug_allergy")
+    academicYear       Int        @map("academic_year")
+    faculty            String
+    password           String     @map("password")
+    phoneNumber        String     @map("phone_number")
+    parentName         String     @map("parent_name")
+    parentPhoneNumber  String     @map("parent_phone_number")
+    parentRelationship String     @map("parent_relationship")
+    foodAllergy        String?    @map("food_allergy")
+    drugAllergy        String?    @map("drug_allergy")
     illness            String?
-    avatarId           Int           @default(1) @map("avatar_id") @db.SmallInt
-    groupId            String?       @map("group_id") @db.Uuid
-    groupRole          GroupRoleType @default(OWNER) @map("group_role")
-    role               RoleType      @default(FRESHMAN)
-    createdAt          DateTime      @default(now()) @map("created_at") @db.Timestamp(6)
-    updatedAt          DateTime      @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+    avatarId           Int        @default(1) @map("avatar_id") @db.SmallInt
+    groupId            String?    @map("group_id") @db.Uuid
+    role               RoleType   @default(FRESHMAN)
+    createdAt          DateTime   @default(now()) @map("created_at") @db.Timestamp(6)
+    updatedAt          DateTime   @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
 
-    group    Group?    @relation("UserGroup", fields: [groupId], references: [id])
-    checkins Checkin[] @relation("UserCheckins")
+    group      Group?    @relation("UserGroup", fields: [groupId], references: [id])
+    ownedGroup Group?    @relation("GroupOwner")
+    checkins   Checkin[] @relation("UserCheckins")
 
     @@unique([studentId, citizenId])
     @@map("users")
 }
 
 model Checkin {
-    id            String            @id @default(uuid()) @map("id") @db.Uuid
-    userStudentId String            @map("user_student_id") @db.VarChar(10)
-    event         EventType
-    status        CheckinStatusType
-    createdAt     DateTime          @default(now()) @map("created_at") @db.Timestamp(6)
-    updatedAt     DateTime          @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+    id        String            @id @default(uuid()) @map("id") @db.Uuid
+    userId    String            @map("user_id") @db.Uuid
+    event     EventType
+    status    CheckinStatusType
+    createdAt DateTime          @default(now()) @map("created_at") @db.Timestamp(6)
+    updatedAt DateTime          @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
 
-    user User @relation("UserCheckins", fields: [userStudentId], references: [studentId])
+    user User @relation("UserCheckins", fields: [userId], references: [id])
 
-    @@unique([userStudentId, event])
+    @@unique([userId, event])
     @@map("checkin")
 }
 
@@ -57,7 +57,6 @@ model House {
     id                 String @id @default(uuid()) @map("id") @db.Uuid
     nameThai           String @map("name_th")
     nameEnglish        String @map("name_en")
-    logo               String
     descriptionThai    String @map("description_th")
     descriptionEnglish String @map("description_en")
     sizeLetter         String @map("size_letter")
@@ -78,6 +77,7 @@ model House {
 
 model Group {
     id           String  @id @default(uuid()) @map("id") @db.Uuid
+    ownerId      String  @unique @map("owner_id") @db.Uuid
     isConfirmed  Boolean @default(false) @map("is_confirmed")
     inviteCode   String  @unique @map("invite_code")
     memberCount  Int     @default(0) @map("member_count")
@@ -88,6 +88,7 @@ model Group {
     houseRank5   String? @map("house_rank_5") @db.Uuid
     houseRankSub String? @map("house_rank_sub") @db.Uuid
 
+    owner    User   @relation("GroupOwner", fields: [ownerId], references: [id])
     users    User[] @relation("UserGroup")
     house1   House? @relation("GroupHouseRank1", fields: [houseRank1], references: [id])
     house2   House? @relation("GroupHouseRank2", fields: [houseRank2], references: [id])
@@ -105,30 +106,6 @@ enum PrefixType {
     OTHER
 
     @@map("prefix_type")
-}
-
-enum FacultyId {
-    SCIENCE
-    ENGINEER
-    MEDICINE
-    ARTS
-    EDUCATION
-    PSYCHOLOGY
-    DENTISTRY
-    LAW
-    COMMUNICATION_ARTS
-    NURSING
-    COMMERCE_AND_ACCOUNTANCY
-    PHARMACEUTICAL_SCIENCE
-    POLITICAL_SCIENCE
-    SPORTS_SCIENCE
-    FINE_AND_APPLIED_ARTS
-    ECONOMICS
-    ARCHITECTURE
-    ALLIED_HEALTH_SCIENCES
-    VETERINARY_SCIENCE
-
-    @@map("faculty_id")
 }
 
 enum RoleType {
