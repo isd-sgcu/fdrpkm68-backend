@@ -212,7 +212,7 @@ export const leaveGroup = async (req: Request, res: Response, next: NextFunction
       await groupService.leaveGroupAsMember(user);
     }
 
-    res.status(201).json({
+    res.status(200).json({
       status: 'success',
       message: 'Successfully left group.',
     })
