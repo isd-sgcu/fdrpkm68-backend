@@ -3,15 +3,15 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-   "scripts": {
-    "start": "node dist/app.js",        
-    "dev": "nodemon --exec ts-node src/app.ts", 
-    "build": "tsc",                     
-    "lint": "eslint src --ext .ts",  
-    "lint:fix": "eslint src --ext .ts --fix", 
-    "db:migrate": "ts-node src/database/migrations/run-migrations.ts", 
-    "db:seed": "ts-node src/database/seeds/run-seeds.ts",    
-    "swagger:gen": "ts-node src/docs/generate-swagger-docs.ts" 
+  "scripts": {
+    "start": "node dist/app.js",
+    "dev": "nodemon --exec ts-node -r tsconfig-paths/register src/app.ts",
+    "build": "tsc",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "swagger:gen": "ts-node -r tsconfig-paths/register src/docs/generate-swagger-docs.ts"
   },
   "repository": {
     "type": "git",
@@ -26,6 +26,8 @@
   },
   "homepage": "https://github.com/isd-sgcu/fdrpkm68-backend#readme",
   "dependencies": {
+    "@prisma/client": "^6.11.1",
+    "@types/body-parser": "^1.19.6",
     "@types/node": "^24.0.7",
     "bcryptjs": "^3.0.2",
     "body-parser": "^2.2.0",
@@ -35,6 +37,7 @@
     "ioredis": "^5.6.1",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.16.3",
+    "prisma": "^6.11.1",
     "qrcode": "^1.5.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
@@ -47,6 +50,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/pg": "^8.15.4",
     "@types/qrcode": "^1.5.5",
-    "nodemon": "^3.1.10"
+    "nodemon": "^3.1.10",
+    "tsconfig-paths": "^4.2.0"
   }
 }

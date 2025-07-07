@@ -1,0 +1,177 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    studentId          String        @map("student_id") @db.VarChar(10)
+    citizenId          String        @map("citizen_id") @db.VarChar(13)
+    prefix             PrefixType
+    firstName          String        @map("first_name")
+    lastName           String        @map("last_name")
+    nickname           String
+    academicYear       Int           @map("academic_year")
+    faculty            FacultyId
+    password           String        @map("password")
+    phoneNumber        String        @map("phone_number")
+    parentName         String        @map("parent_name")
+    parentPhoneNumber  String        @map("parent_phone_number")
+    parentRelationship String        @map("parent_relationship")
+    foodAllergy        String?       @map("food_allergy")
+    drugAllergy        String?       @map("drug_allergy")
+    illness            String?
+    avatarId           Int           @default(1) @map("avatar_id") @db.SmallInt
+    groupId            String?       @map("group_id") @db.Uuid
+    groupRole          GroupRoleType @default(OWNER) @map("group_role")
+    role               RoleType      @default(FRESHMAN)
+    createdAt          DateTime      @default(now()) @map("created_at") @db.Timestamp(6)
+    updatedAt          DateTime      @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+
+    group    Group?    @relation("UserGroup", fields: [groupId], references: [groupId])
+    checkins Checkin[] @relation("UserCheckins")
+
+    @@id([studentId])
+    @@map("users")
+}
+
+model Checkin {
+    id            Int               @id @default(autoincrement())
+    userStudentId String            @map("user_student_id") @db.VarChar(10)
+    event         EventType
+    status        CheckinStatusType
+    createdAt     DateTime          @default(now()) @map("created_at") @db.Timestamp(6)
+    updatedAt     DateTime          @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+
+    user User @relation("UserCheckins", fields: [userStudentId], references: [studentId])
+
+    @@unique([userStudentId, event])
+    @@map("checkin")
+}
+
+model HouseSize {
+    sizeLetter HouseSizeLetterType @id @map("size_letter")
+    maxMember  Int                 @map("max_member")
+
+    houses House[] @relation("HouseSizeHouses")
+
+    @@map("house_sizes")
+}
+
+model House {
+    houseId            Int                 @id @default(autoincrement()) @map("house_id")
+    nameThai           String              @map("name_th")
+    nameEnglish        String              @map("name_en")
+    logo               String
+    descriptionThai    String              @map("description_th")
+    descriptionEnglish String              @map("description_en")
+    sizeLetter         HouseSizeLetterType @map("size_letter")
+    memberCount        Int                 @default(0) @map("member_count")
+    maxMember          Int                 @map("max_member")
+    instagram          String
+
+    houseSize   HouseSize @relation("HouseSizeHouses", fields: [sizeLetter], references: [sizeLetter])
+    groupsRank1 Group[]   @relation("GroupHouseRank1")
+    groupsRank2 Group[]   @relation("GroupHouseRank2")
+    groupsRank3 Group[]   @relation("GroupHouseRank3")
+    groupsRank4 Group[]   @relation("GroupHouseRank4")
+    groupsRank5 Group[]   @relation("GroupHouseRank5")
+    groupsSub   Group[]   @relation("GroupHouseSub")
+
+    @@map("houses")
+}
+
+model Group {
+    groupId    String  @id @default(uuid()) @map("group_id") @db.Uuid
+    submitted  Boolean @default(false)
+    houseRank1 Int?    @map("house_rank_1")
+    houseRank2 Int?    @map("house_rank_2")
+    houseRank3 Int?    @map("house_rank_3")
+    houseRank4 Int?    @map("house_rank_4")
+    houseRank5 Int?    @map("house_rank_5")
+    houseRank6 Int?    @map("house_rank_6")
+
+    users    User[] @relation("UserGroup")
+    house1   House? @relation("GroupHouseRank1", fields: [houseRank1], references: [houseId])
+    house2   House? @relation("GroupHouseRank2", fields: [houseRank2], references: [houseId])
+    house3   House? @relation("GroupHouseRank3", fields: [houseRank3], references: [houseId])
+    house4   House? @relation("GroupHouseRank4", fields: [houseRank4], references: [houseId])
+    house5   House? @relation("GroupHouseRank5", fields: [houseRank5], references: [houseId])
+    houseSub House? @relation("GroupHouseSub", fields: [houseRank6], references: [houseId])
+
+    @@map("groups")
+}
+
+enum PrefixType {
+    MR
+    MS
+    OTHER
+
+    @@map("prefix_type")
+}
+
+enum FacultyId {
+    SCIENCE
+    ENGINEER
+    MEDICINE
+    ARTS
+    EDUCATION
+    PSYCHOLOGY
+    DENTISTRY
+    LAW
+    COMMUNICATION_ARTS
+    NURSING
+    COMMERCE_AND_ACCOUNTANCY
+    PHARMACEUTICAL_SCIENCE
+    POLITICAL_SCIENCE
+    SPORTS_SCIENCE
+    FINE_AND_APPLIED_ARTS
+    ECONOMICS
+    ARCHITECTURE
+    ALLIED_HEALTH_SCIENCES
+    VETERINARY_SCIENCE
+
+    @@map("faculty_id")
+}
+
+enum RoleType {
+    STAFF
+    FRESHMAN
+
+    @@map("role_type")
+}
+
+enum EventType {
+    FIRSTDATE
+    RPKM
+    FRESHMENNIGHT
+
+    @@map("event_type")
+}
+
+enum CheckinStatusType {
+    PRE_REGISTER
+    EVENT_REGISTER
+
+    @@map("checkin_status_type")
+}
+
+enum HouseSizeLetterType {
+    S
+    M
+    L
+    XL
+    XXL
+
+    @@map("housesize_letter_type")
+}
+
+enum GroupRoleType {
+    OWNER
+    MEMBER
+
+    @@map("group_role_type")
+}
