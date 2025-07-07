@@ -21,7 +21,7 @@ export const createOwnUserGroup = async(groupID: string, user: User): Promise<st
   try {
 
     // TODO: maybe split these up?
-    await query(`UPDATE users SET group_id = $1 WHERE student_id = $2 AND citizen_id = $3`, 
+    await query(`UPDATE users SET group_id = $1, group_role = 'OWNER' WHERE student_id = $2 AND citizen_id = $3`, 
       [groupID,user.student_id,user.citizen_id]
     );
     
@@ -38,3 +38,23 @@ export const createOwnUserGroup = async(groupID: string, user: User): Promise<st
     throw customError;
   }
 }
+
+export const joinGroup = async(groupID:string,user:User): Promise<string> => { try {
+
+  
+    // increment `group_member_count` by 1
+    await query(`UPDATE groups SET group_member_count = group_member_count + 1 WHERE group_id = $1`,[groupID]); 
+  
+    // UPDATE the group_id, then set role to a member.
+    const result = await query(`UPDATE users SET group_id = $1, group_role = 'MEMBER' WHERE student_id = $2 AND citizen_id = $3`, 
+      [groupID,user.student_id,user.citizen_id]
+    );
+    
+    return result.rows[0];
+  } catch (error) {
+    const customError: CustomError = new Error('Failed to create group.');
+    customError.statusCode = 500;
+    throw customError;
+  }
+}
+  
