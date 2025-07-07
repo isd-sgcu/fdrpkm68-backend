@@ -10,12 +10,20 @@ export const register = async (userData: UserRegistrationRequest) => {
   const { student_id, citizen_id, password , avatar_id} = userData;
 
   // check if user already exists
-  const existingUser = await userService.findUserByStudentIdAndCitizenId(student_id, citizen_id);
-  if (existingUser) {
-    const error: CustomError = new Error('User already exists with this student ID and citizen ID.');
+  const existingUserSSN = await userService.findUserByCitizenId(citizen_id);
+  if (existingUserSSN) {
+    const error: CustomError = new Error('User already exists with this citizen ID.');
     error.statusCode = 409;
     throw error;
   }
+
+  const existingUserID = await userService.findUsersByStudentId(student_id);
+  if (existingUserID) {
+    const error: CustomError = new Error('User already exists with this student ID.');
+    error.statusCode = 409;
+    throw error;
+  }
+
   // validate citizen ID checksum
     if (!validateCitizenIdChecksum(userData.citizen_id)) {
       const error: CustomError = new Error('Invalid Citizen ID.');
