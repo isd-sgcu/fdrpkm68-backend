@@ -60,6 +60,7 @@ model House {
     descriptionThai    String @map("description_th")
     descriptionEnglish String @map("description_en")
     sizeLetter         String @map("size_letter")
+    chosenCount        Int    @default(0) @map("chosen_count")
     capacity           Int    @map("capacity")
     instagram          String
     facebook           String
