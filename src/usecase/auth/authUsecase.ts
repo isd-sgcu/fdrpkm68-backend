@@ -1,33 +1,47 @@
-import { AuthRepository } from "@/repository/auth/authRepository";
-import { User } from "@prisma/client";
-import { StudentLoginCredentials } from "@/types/auth/POST";
+import type { User } from "@prisma/client";
+import bcrypt from "bcrypt";
+
+import { UserRepository } from "@/repository/user/userRepository";
+
+import { RegisterRequest } from "@/types/auth/POST";
+import { AppErorr } from "@/types/error/AppError";
 
 export class AuthUsecase {
-  private authRepository: AuthRepository;
+  private userRepository: UserRepository;
 
   constructor() {
-    this.authRepository = new AuthRepository();
+    this.userRepository = new UserRepository();
   }
 
-  async login(credentials: StudentLoginCredentials): Promise<{
-    user: User;
-    token: string;
-  }> {
-    try {
-      const user = await this.authRepository.verifyCredentials(credentials);
-      if (!user) {
-        throw new Error("User not found");
-      }
-
-      const token = "HELLO";
-
-      return {
-        user,
-        token,
-      };
-    } catch (error) {
-      console.error("Login use case error:", error);
-      throw new Error("Login failed");
+  async register(body: RegisterRequest) {
+    if (this.validateRegisterRequest(body) === false) {
+      throw new AppErorr("Invalid registration request", 400);
     }
+    const existingUser = await this.userRepository.findExists(
+      body.studentId,
+      body.citizenId
+    );
+    if (existingUser) {
+      throw new AppErorr(
+        "User with this student ID or citizen ID already exists",
+        400
+      );
+    }
+    const hashedPassword = await bcrypt.hash(body.password, 10);
+    body.password = hashedPassword;
+    const user: User = await this.userRepository.create(body);
+
+    const { password: _, ...userWithoutPassword } = user;
+    return userWithoutPassword;
+  }
+
+  private validateRegisterRequest(body: RegisterRequest): boolean {
+    if (body.studentId.length !== 10 || body.citizenId.length !== 13) {
+      return false;
+    }
+    if (!/^\d+$/.test(body.studentId) || !/^\d+$/.test(body.citizenId)) {
+      return false;
+    }
+    return false;
   }
 }

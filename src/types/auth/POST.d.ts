@@ -1,3 +1,6 @@
+import { FacultyId, PrefixType, RoleType } from "@prisma/client";
+import type { UUID } from "crypto";
+
 export interface LoginRequest {
   email: string;
   password: string;
@@ -18,9 +21,23 @@ export interface LoginResponse {
 }
 
 export interface RegisterRequest {
-  email: string;
+  studentId: string;
+  citizenId: string;
+  prefix: PrefixType;
+  firstName: string;
+  lastName: string;
+  nickname: string;
+  academicYear: number;
+  faculty: FacultyId;
   password: string;
-  name: string;
+  phoneNumber: string;
+  parentName: string;
+  parentPhoneNumber: string;
+  parentRelationship: string;
+  foodAllergy?: string;
+  drugAllergy?: string;
+  illness?: string;
+  role: RoleType;
 }
 
 export interface LogoutResponse {
