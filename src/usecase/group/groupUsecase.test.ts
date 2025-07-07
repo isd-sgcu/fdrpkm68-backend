@@ -38,6 +38,12 @@ describe("GroupUsecase", () => {
         inviteCode: "ABC123",
         memberCount: 1,
         isConfirmed: false,
+        houseRank1: null,
+        houseRank2: null,
+        houseRank3: null,
+        houseRank4: null,
+        houseRank5: null,
+        houseRankSub: null,
       };
 
       mockGroupRepository.findUserGroup.mockResolvedValue(null);
@@ -46,8 +52,12 @@ describe("GroupUsecase", () => {
       const result = await groupUsecase.createGroupForUser("user-1");
 
       expect(result).toEqual(mockGroup);
+      expect(result.ownerId).toBe("user-1");
+      expect(result.memberCount).toBe(1);
+      expect(result.isConfirmed).toBe(false);
       expect(mockGroupRepository.findUserGroup).toHaveBeenCalledWith("user-1");
       expect(mockGroupRepository.createGroupForUser).toHaveBeenCalledWith("user-1");
+      expect(mockGroupRepository.removeUserFromGroup).not.toHaveBeenCalled();
     });
 
     it("should throw error if user already owns a group", async () => {
@@ -68,6 +78,10 @@ describe("GroupUsecase", () => {
 
       await expect(groupUsecase.createGroupForUser("user-1"))
         .rejects.toThrow("User already owns a group");
+        
+      expect(mockGroupRepository.findUserGroup).toHaveBeenCalledWith("user-1");
+      expect(mockGroupRepository.createGroupForUser).not.toHaveBeenCalled();
+      expect(mockGroupRepository.removeUserFromGroup).not.toHaveBeenCalled();
     });
 
     it("should remove user from existing group before creating new one", async () => {
@@ -90,6 +104,12 @@ describe("GroupUsecase", () => {
         inviteCode: "XYZ789",
         memberCount: 1,
         isConfirmed: false,
+        houseRank1: null,
+        houseRank2: null,
+        houseRank3: null,
+        houseRank4: null,
+        houseRank5: null,
+        houseRankSub: null,
       };
 
       mockGroupRepository.findUserGroup.mockResolvedValue(existingGroup as any);
@@ -99,8 +119,39 @@ describe("GroupUsecase", () => {
       const result = await groupUsecase.createGroupForUser("user-1");
 
       expect(result).toEqual(newGroup);
+      expect(result.ownerId).toBe("user-1");
+      expect(mockGroupRepository.findUserGroup).toHaveBeenCalledWith("user-1");
       expect(mockGroupRepository.removeUserFromGroup).toHaveBeenCalledWith("user-1", "group-1");
       expect(mockGroupRepository.createGroupForUser).toHaveBeenCalledWith("user-1");
+      
+      // Verify call order
+      const calls = jest.mocked(mockGroupRepository.removeUserFromGroup).mock.calls;
+      const createCalls = jest.mocked(mockGroupRepository.createGroupForUser).mock.calls;
+      expect(calls.length).toBe(1);
+      expect(createCalls.length).toBe(1);
+    });
+
+    it("should handle database errors gracefully", async () => {
+      const dbError = new Error("Database connection failed");
+      mockGroupRepository.findUserGroup.mockRejectedValue(dbError);
+
+      await expect(groupUsecase.createGroupForUser("user-1")).rejects.toThrow("Database connection failed");
+      
+      expect(mockGroupRepository.findUserGroup).toHaveBeenCalledWith("user-1");
+      expect(mockGroupRepository.createGroupForUser).not.toHaveBeenCalled();
+      expect(mockGroupRepository.removeUserFromGroup).not.toHaveBeenCalled();
+    });
+
+    it("should handle create group repository failure", async () => {
+      const createError = new Error("Failed to create group");
+      mockGroupRepository.findUserGroup.mockResolvedValue(null);
+      mockGroupRepository.createGroupForUser.mockRejectedValue(createError);
+
+      await expect(groupUsecase.createGroupForUser("user-1")).rejects.toThrow("Failed to create group");
+      
+      expect(mockGroupRepository.findUserGroup).toHaveBeenCalledWith("user-1");
+      expect(mockGroupRepository.createGroupForUser).toHaveBeenCalledWith("user-1");
+      expect(mockGroupRepository.removeUserFromGroup).not.toHaveBeenCalled();
     });
   });
 
@@ -112,6 +163,12 @@ describe("GroupUsecase", () => {
         inviteCode: "ABC123",
         memberCount: 2,
         isConfirmed: false,
+        houseRank1: null,
+        houseRank2: null,
+        houseRank3: null,
+        houseRank4: null,
+        houseRank5: null,
+        houseRankSub: null,
       };
 
       (InviteCodeGenerator.isValidFormat as jest.Mock).mockReturnValue(true);
@@ -123,7 +180,13 @@ describe("GroupUsecase", () => {
 
       expect(InviteCodeGenerator.isValidFormat).toHaveBeenCalledWith("ABC123");
       expect(mockGroupRepository.findGroupByInviteCode).toHaveBeenCalledWith("ABC123");
+      expect(mockGroupRepository.findUserGroup).toHaveBeenCalledWith("user-1");
       expect(mockGroupRepository.addUserToGroup).toHaveBeenCalledWith("user-1", "group-1");
+      
+      // Verify validation checks were called
+      expect(InviteCodeGenerator.isValidFormat).toHaveBeenCalledTimes(1);
+      expect(mockGroupRepository.findGroupByInviteCode).toHaveBeenCalledTimes(1);
+      expect(mockGroupRepository.findUserGroup).toHaveBeenCalledTimes(1);
     });
 
     it("should throw error for invalid invite code format", async () => {
@@ -131,6 +194,10 @@ describe("GroupUsecase", () => {
 
       await expect(groupUsecase.joinGroup("user-1", "invalid"))
         .rejects.toThrow("Invalid invite code format");
+        
+      expect(InviteCodeGenerator.isValidFormat).toHaveBeenCalledWith("invalid");
+      expect(mockGroupRepository.findGroupByInviteCode).not.toHaveBeenCalled();
+      expect(mockGroupRepository.addUserToGroup).not.toHaveBeenCalled();
     });
 
     it("should throw error if invite code doesn't exist", async () => {
@@ -139,6 +206,11 @@ describe("GroupUsecase", () => {
 
       await expect(groupUsecase.joinGroup("user-1", "ABC123"))
         .rejects.toThrow("Invalid invite code");
+        
+      expect(InviteCodeGenerator.isValidFormat).toHaveBeenCalledWith("ABC123");
+      expect(mockGroupRepository.findGroupByInviteCode).toHaveBeenCalledWith("ABC123");
+      expect(mockGroupRepository.findUserGroup).not.toHaveBeenCalled();
+      expect(mockGroupRepository.addUserToGroup).not.toHaveBeenCalled();
     });
 
     it("should throw error if group is confirmed", async () => {
@@ -148,6 +220,12 @@ describe("GroupUsecase", () => {
         inviteCode: "ABC123",
         memberCount: 2,
         isConfirmed: true, // Confirmed group
+        houseRank1: null,
+        houseRank2: null,
+        houseRank3: null,
+        houseRank4: null,
+        houseRank5: null,
+        houseRankSub: null,
       };
 
       (InviteCodeGenerator.isValidFormat as jest.Mock).mockReturnValue(true);
@@ -155,6 +233,11 @@ describe("GroupUsecase", () => {
 
       await expect(groupUsecase.joinGroup("user-1", "ABC123"))
         .rejects.toThrow("Cannot join a confirmed group");
+        
+      expect(InviteCodeGenerator.isValidFormat).toHaveBeenCalledWith("ABC123");
+      expect(mockGroupRepository.findGroupByInviteCode).toHaveBeenCalledWith("ABC123");
+      expect(mockGroupRepository.findUserGroup).not.toHaveBeenCalled();
+      expect(mockGroupRepository.addUserToGroup).not.toHaveBeenCalled();
     });
 
     it("should throw error if group is at capacity", async () => {
@@ -164,6 +247,12 @@ describe("GroupUsecase", () => {
         inviteCode: "ABC123",
         memberCount: 3, // At capacity
         isConfirmed: false,
+        houseRank1: null,
+        houseRank2: null,
+        houseRank3: null,
+        houseRank4: null,
+        houseRank5: null,
+        houseRankSub: null,
       };
 
       (InviteCodeGenerator.isValidFormat as jest.Mock).mockReturnValue(true);
@@ -180,6 +269,12 @@ describe("GroupUsecase", () => {
         inviteCode: "ABC123",
         memberCount: 2,
         isConfirmed: false,
+        houseRank1: null,
+        houseRank2: null,
+        houseRank3: null,
+        houseRank4: null,
+        houseRank5: null,
+        houseRankSub: null,
       };
 
       const currentGroup = {
@@ -202,6 +297,12 @@ describe("GroupUsecase", () => {
         inviteCode: "ABC123",
         memberCount: 1,
         isConfirmed: false,
+        houseRank1: null,
+        houseRank2: null,
+        houseRank3: null,
+        houseRank4: null,
+        houseRank5: null,
+        houseRankSub: null,
       };
 
       (InviteCodeGenerator.isValidFormat as jest.Mock).mockReturnValue(true);
@@ -233,7 +334,7 @@ describe("GroupUsecase", () => {
 
       // Mock prisma transaction
       const { prisma } = require("@/lib/prisma");
-      prisma.$transaction.mockImplementation((callback) => callback({}));
+      prisma.$transaction.mockImplementation((callback: any) => callback({}));
 
       await groupUsecase.leaveGroup("user-1");
 
@@ -310,7 +411,7 @@ describe("GroupUsecase", () => {
 
       // Mock prisma transaction
       const { prisma } = require("@/lib/prisma");
-      prisma.$transaction.mockImplementation((callback) => callback({}));
+      prisma.$transaction.mockImplementation((callback: any) => callback({}));
 
       await groupUsecase.kickMember("user-1", "user-2");
 

@@ -1,4 +1,4 @@
-import { AppErorr } from "@/types/error/AppError";
+import { AppError } from "@/types/error/AppError";
 import { verifyJwt } from "@/util/jwt";
 import type { Request, Response, NextFunction } from "express";
 
@@ -19,7 +19,7 @@ export function authMiddleware(
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    throw new AppErorr("Unauthorized: No token provided", 401);
+    throw new AppError("Unauthorized: No token provided", 401);
   }
 
   const token = authHeader.split(" ")[1];
@@ -29,6 +29,6 @@ export function authMiddleware(
     req.user = decoded;
     next();
   } catch (error) {
-    throw new AppErorr("Unauthorized: Invalid token", 401);
+    throw new AppError("Unauthorized: Invalid token", 401);
   }
 }

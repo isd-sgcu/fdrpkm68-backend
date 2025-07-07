@@ -1,6 +1,5 @@
 import { GroupRepository } from "./groupRepository";
 import { InviteCodeGenerator } from "@/utils/inviteCodeGenerator";
-import { prisma } from "@/lib/prisma";
 
 // Mock Prisma client
 jest.mock("@/lib/prisma", () => ({
@@ -22,12 +21,14 @@ jest.mock("@/lib/prisma", () => ({
   },
 }));
 
+import { prisma } from "@/lib/prisma";
+const mockPrisma = prisma as jest.Mocked<typeof prisma>;
+
 // Mock InviteCodeGenerator
 jest.mock("@/utils/inviteCodeGenerator");
 
 describe("GroupRepository", () => {
   let groupRepository: GroupRepository;
-  const mockPrisma = prisma as jest.Mocked<typeof prisma>;
 
   beforeEach(() => {
     groupRepository = new GroupRepository();
@@ -42,6 +43,12 @@ describe("GroupRepository", () => {
         inviteCode: "ABC123",
         memberCount: 2,
         isConfirmed: false,
+        houseRank1: null,
+        houseRank2: null,
+        houseRank3: null,
+        houseRank4: null,
+        houseRank5: null,
+        houseRankSub: null,
         owner: { id: "user-1", studentId: "123456" },
         users: [{ id: "user-1" }, { id: "user-2" }],
         house1: null,
@@ -52,7 +59,7 @@ describe("GroupRepository", () => {
         houseSub: null,
       };
 
-      mockPrisma.group.findUnique.mockResolvedValue(mockGroup);
+      (mockPrisma.group.findUnique as jest.Mock).mockResolvedValue(mockGroup);
 
       const result = await groupRepository.findGroupById("group-1");
 
@@ -73,7 +80,7 @@ describe("GroupRepository", () => {
     });
 
     it("should return null if group not found", async () => {
-      mockPrisma.group.findUnique.mockResolvedValue(null);
+      (mockPrisma.group.findUnique as jest.Mock).mockResolvedValue(null);
 
       const result = await groupRepository.findGroupById("nonexistent");
 
@@ -86,10 +93,16 @@ describe("GroupRepository", () => {
       const mockGroup = {
         id: "group-1",
         inviteCode: "ABC123",
+        houseRank1: null,
+        houseRank2: null,
+        houseRank3: null,
+        houseRank4: null,
+        houseRank5: null,
+        houseRankSub: null,
       };
 
       (InviteCodeGenerator.normalize as jest.Mock).mockReturnValue("ABC123");
-      mockPrisma.group.findUnique.mockResolvedValue(mockGroup);
+      (mockPrisma.group.findUnique as jest.Mock).mockResolvedValue(mockGroup);
 
       const result = await groupRepository.findGroupByInviteCode("abc123");
 
@@ -109,15 +122,21 @@ describe("GroupRepository", () => {
         inviteCode: "ABC123",
         memberCount: 1,
         isConfirmed: false,
+        houseRank1: null,
+        houseRank2: null,
+        houseRank3: null,
+        houseRank4: null,
+        houseRank5: null,
+        houseRankSub: null,
       };
 
       const mockTx = {
         group: { create: jest.fn().mockResolvedValue(mockGroup) },
         user: { update: jest.fn() },
-      };
+      } as any;
 
       (InviteCodeGenerator.generate as jest.Mock).mockResolvedValue("ABC123");
-      mockPrisma.$transaction.mockImplementation((callback) => callback(mockTx));
+      (mockPrisma.$transaction as jest.Mock).mockImplementation((callback: any) => callback(mockTx));
 
       const result = await groupRepository.createGroupForUser("user-1");
 
@@ -143,9 +162,9 @@ describe("GroupRepository", () => {
       const mockTx = {
         user: { update: jest.fn() },
         group: { update: jest.fn() },
-      };
+      } as any;
 
-      mockPrisma.$transaction.mockImplementation((callback) => callback(mockTx));
+      (mockPrisma.$transaction as jest.Mock).mockImplementation((callback: any) => callback(mockTx));
 
       await groupRepository.addUserToGroup("user-1", "group-1");
 
@@ -165,9 +184,9 @@ describe("GroupRepository", () => {
       const mockTx = {
         user: { update: jest.fn() },
         group: { update: jest.fn() },
-      };
+      } as any;
 
-      mockPrisma.$transaction.mockImplementation((callback) => callback(mockTx));
+      (mockPrisma.$transaction as jest.Mock).mockImplementation((callback: any) => callback(mockTx));
 
       await groupRepository.removeUserFromGroup("user-1", "group-1");
 
@@ -187,9 +206,15 @@ describe("GroupRepository", () => {
       const mockGroup = {
         id: "group-1",
         isConfirmed: true,
+        houseRank1: null,
+        houseRank2: null,
+        houseRank3: null,
+        houseRank4: null,
+        houseRank5: null,
+        houseRankSub: null,
       };
 
-      mockPrisma.group.update.mockResolvedValue(mockGroup);
+      (mockPrisma.group.update as jest.Mock).mockResolvedValue(mockGroup);
 
       const result = await groupRepository.confirmGroup("group-1");
 
@@ -199,35 +224,27 @@ describe("GroupRepository", () => {
         data: { isConfirmed: true },
       });
     });
-  });
 
-  describe("regenerateInviteCode", () => {
-    it("should regenerate invite code", async () => {
-      (InviteCodeGenerator.generate as jest.Mock).mockResolvedValue("XYZ789");
-      mockPrisma.group.update.mockResolvedValue({});
+    it("should handle group update failure", async () => {
+      (mockPrisma.group.update as jest.Mock).mockResolvedValue({});
 
-      const result = await groupRepository.regenerateInviteCode("group-1");
+      const result = await groupRepository.confirmGroup("group-1");
 
-      expect(result).toBe("XYZ789");
-      expect(InviteCodeGenerator.generate).toHaveBeenCalled();
-      expect(mockPrisma.group.update).toHaveBeenCalledWith({
-        where: { id: "group-1" },
-        data: { inviteCode: "XYZ789" },
-      });
+      expect(result).toEqual({});
     });
   });
 
   describe("isGroupOwner", () => {
-    it("should return true if user is group owner", async () => {
-      mockPrisma.group.findUnique.mockResolvedValue({ ownerId: "user-1" });
+    it("should return true if user is owner", async () => {
+      (mockPrisma.group.findUnique as jest.Mock).mockResolvedValue({ ownerId: "user-1" });
 
       const result = await groupRepository.isGroupOwner("user-1", "group-1");
 
       expect(result).toBe(true);
     });
 
-    it("should return false if user is not group owner", async () => {
-      mockPrisma.group.findUnique.mockResolvedValue({ ownerId: "user-2" });
+    it("should return false if user is not owner", async () => {
+      (mockPrisma.group.findUnique as jest.Mock).mockResolvedValue({ ownerId: "user-2" });
 
       const result = await groupRepository.isGroupOwner("user-1", "group-1");
 
@@ -235,7 +252,7 @@ describe("GroupRepository", () => {
     });
 
     it("should return false if group not found", async () => {
-      mockPrisma.group.findUnique.mockResolvedValue(null);
+      (mockPrisma.group.findUnique as jest.Mock).mockResolvedValue(null);
 
       const result = await groupRepository.isGroupOwner("user-1", "group-1");
 

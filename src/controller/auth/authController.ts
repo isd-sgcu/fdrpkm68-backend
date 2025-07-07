@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { AuthUsecase } from "@/usecase/auth/authUsecase";
 import type { RegisterRequest } from "@/types/auth/POST";
-import { AppErorr } from "@/types/error/AppError";
+import { AppError } from "@/types/error/AppError";
 
 export class AuthController {
   private authUseCase: AuthUsecase;
@@ -16,7 +16,7 @@ export class AuthController {
       res.status(201).json({ user });
       return;
     } catch (error: unknown) {
-      if (error instanceof AppErorr) {
+      if (error instanceof AppError) {
         res.status(error.statusCode).json({
           message: error.message,
         });
@@ -38,7 +38,7 @@ export class AuthController {
       });
       res.status(200).json({ token });
     } catch (error: unknown) {
-      if (error instanceof AppErorr) {
+      if (error instanceof AppError) {
         res.status(error.statusCode).json({
           message: error.message,
         });
@@ -61,7 +61,7 @@ export class AuthController {
         });
       }
     } catch (error: unknown) {
-      if (error instanceof AppErorr) {
+      if (error instanceof AppError) {
         res.status(error.statusCode).json({
           message: error.message,
         });

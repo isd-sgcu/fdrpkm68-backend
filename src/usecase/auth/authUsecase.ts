@@ -10,7 +10,7 @@ import {
   LoginRequest,
   RegisterRequest,
 } from "@/types/auth/POST";
-import { AppErorr } from "@/types/error/AppError";
+import { AppError } from "@/types/error/AppError";
 
 export class AuthUsecase {
   private userRepository: UserRepository;
@@ -21,14 +21,14 @@ export class AuthUsecase {
 
   async register(body: RegisterRequest) {
     if (this.validateRegisterRequest(body) === false) {
-      throw new AppErorr("Invalid registration request", 400);
+      throw new AppError("Invalid registration request", 400);
     }
     const existingUser = await this.userRepository.findExists(
       body.studentId,
       body.citizenId
     );
     if (existingUser) {
-      throw new AppErorr(
+      throw new AppError(
         "User with this student ID or citizen ID already exists",
         400
       );
@@ -46,11 +46,11 @@ export class AuthUsecase {
       body.citizenId
     );
     if (!user) {
-      throw new AppErorr("Invalid student ID or citizen ID", 401);
+      throw new AppError("Invalid student ID or citizen ID", 401);
     }
     const isPasswordValid = await comparePassword(body.password, user.password);
     if (!isPasswordValid) {
-      throw new AppErorr("Invalid password", 401);
+      throw new AppError("Invalid password", 401);
     }
     return signJwt({
       studentId: user.studentId,
@@ -60,14 +60,14 @@ export class AuthUsecase {
 
   async forgotPassword(body: ForgotPasswordRequest) {
     if (this.validateForgotPasswordRequest(body) === false) {
-      throw new AppErorr("Invalid forgot password request", 400);
+      throw new AppError("Invalid forgot password request", 400);
     }
     const user = await this.userRepository.getUserByCredentials(
       body.studentId,
       body.citizenId
     );
     if (!user) {
-      throw new AppErorr("Invalid student ID or citizen ID", 401);
+      throw new AppError("Invalid student ID or citizen ID", 401);
     }
     body.newPassword = await hashPassword(body.newPassword);
     const updatedUser = await this.userRepository.changePassword(
@@ -75,7 +75,7 @@ export class AuthUsecase {
       body.newPassword
     );
     if (!updatedUser) {
-      throw new AppErorr("Failed to update password", 500);
+      throw new AppError("Failed to update password", 500);
     }
     return true;
   }

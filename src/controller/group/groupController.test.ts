@@ -5,10 +5,19 @@ import { GroupUsecase } from "@/usecase/group/groupUsecase";
 // Mock GroupUsecase
 jest.mock("@/usecase/group/groupUsecase");
 
+// Mock UUIDValidator
+jest.mock("@/utils/uuidValidator", () => ({
+  UUIDValidator: {
+    validate: jest.fn(),
+    isValid: jest.fn().mockReturnValue(true),
+  },
+}));
+
 interface AuthenticatedRequest extends Request {
   user?: {
     id: string;
     studentId: string;
+    citizenId: string;
   };
 }
 
@@ -26,7 +35,7 @@ describe("GroupController", () => {
     (groupController as any).groupUsecase = mockGroupUsecase;
 
     mockRequest = {
-      user: { id: "user-1", studentId: "123456" },
+      user: { id: "user-1", studentId: "123456", citizenId: "1234567890123" },
       body: {},
       headers: {},
     };
@@ -47,6 +56,12 @@ describe("GroupController", () => {
         inviteCode: "ABC123",
         memberCount: 2,
         isConfirmed: false,
+        houseRank1: null,
+        houseRank2: null,
+        houseRank3: null,
+        houseRank4: null,
+        houseRank5: null,
+        houseRankSub: null,
         owner: { id: "user-1", studentId: "123456" },
         users: [{ id: "user-1" }, { id: "user-2" }],
         house1: null,
@@ -55,20 +70,29 @@ describe("GroupController", () => {
         house4: null,
         house5: null,
         houseSub: null,
-      };
+      } as any;
 
       mockGroupUsecase.getUserGroup.mockResolvedValue(mockGroup);
 
       await groupController.getGroup(mockRequest as AuthenticatedRequest, mockResponse as Response);
 
       expect(mockGroupUsecase.getUserGroup).toHaveBeenCalledWith("user-1");
+      expect(mockGroupUsecase.getUserGroup).toHaveBeenCalledTimes(1);
       expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.status).toHaveBeenCalledTimes(1);
       expect(mockResponse.json).toHaveBeenCalledWith({
         success: true,
         message: "Group retrieved successfully",
         data: mockGroup,
         timestamp: expect.any(String),
       });
+      expect(mockResponse.json).toHaveBeenCalledTimes(1);
+      
+      // Verify timestamp is valid ISO string
+      const mockJsonCalls = (mockResponse.json as jest.Mock).mock.calls;
+      expect(mockJsonCalls).toHaveLength(1);
+      const responseData = mockJsonCalls[0][0];
+      expect(responseData.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
     });
 
     it("should return 404 when user has no group", async () => {
@@ -76,12 +100,22 @@ describe("GroupController", () => {
 
       await groupController.getGroup(mockRequest as AuthenticatedRequest, mockResponse as Response);
 
+      expect(mockGroupUsecase.getUserGroup).toHaveBeenCalledWith("user-1");
+      expect(mockGroupUsecase.getUserGroup).toHaveBeenCalledTimes(1);
       expect(mockResponse.status).toHaveBeenCalledWith(404);
+      expect(mockResponse.status).toHaveBeenCalledTimes(1);
       expect(mockResponse.json).toHaveBeenCalledWith({
         success: false,
         error: "User is not in any group",
         timestamp: expect.any(String),
       });
+      expect(mockResponse.json).toHaveBeenCalledTimes(1);
+      
+      // Verify timestamp is valid ISO string
+      const mockJsonCalls = (mockResponse.json as jest.Mock).mock.calls;
+      expect(mockJsonCalls).toHaveLength(1);
+      const responseData = mockJsonCalls[0][0];
+      expect(responseData.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
     });
 
     it("should return 401 when user is not authenticated", async () => {
@@ -119,6 +153,12 @@ describe("GroupController", () => {
         inviteCode: "ABC123",
         memberCount: 1,
         isConfirmed: false,
+        houseRank1: null,
+        houseRank2: null,
+        houseRank3: null,
+        houseRank4: null,
+        houseRank5: null,
+        houseRankSub: null,
       };
 
       mockGroupUsecase.createGroup.mockResolvedValue(mockGroup);
