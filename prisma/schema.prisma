@@ -36,6 +36,8 @@ model User {
     checkins   Checkin[] @relation("UserCheckins")
 
     @@unique([studentId, citizenId])
+    @@index([groupId])
+    @@index([studentId])
     @@map("users")
 }
 
@@ -73,6 +75,8 @@ model House {
     groupsRank5 Group[] @relation("GroupHouseRank5")
     groupsSub   Group[] @relation("GroupHouseSub")
 
+    @@index([chosenCount])
+    @@index([capacity])
     @@map("houses")
 }
 
@@ -98,6 +102,10 @@ model Group {
     house5   House? @relation("GroupHouseRank5", fields: [houseRank5], references: [id])
     houseSub House? @relation("GroupHouseSub", fields: [houseRankSub], references: [id])
 
+    @@index([inviteCode])
+    @@index([isConfirmed])
+    @@index([memberCount])
+    @@index([ownerId])
     @@map("groups")
 }
 
