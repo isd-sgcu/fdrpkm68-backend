@@ -1,0 +1,82 @@
+import { Request, Response } from "express";
+import { GetAllHousesUseCase } from "../../usecase/house/getAllHousesUseCase";
+import { GetHouseByIdUseCase } from "../../usecase/house/getHouseByIdUseCase";
+import { UUID } from "@/types/common";
+
+export class HouseController {
+  private getAllHousesUseCase: GetAllHousesUseCase;
+  private getHouseByIdUseCase: GetHouseByIdUseCase;
+
+  constructor() {
+    this.getAllHousesUseCase = new GetAllHousesUseCase();
+    this.getHouseByIdUseCase = new GetHouseByIdUseCase();
+  }
+
+  // Get all houses
+  async getAllHouses(req: Request, res: Response): Promise<void> {
+    try {
+      const houses = await this.getAllHousesUseCase.execute();
+      res.status(200).json({
+        success: true,
+        data: houses,
+        message: "Houses retrieved successfully",
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error("Get all houses error:", error);
+      res.status(500).json({
+        success: false,
+        error: "Internal server error",
+        message: "Failed to retrieve houses",
+        timestamp: new Date().toISOString(),
+      });
+    }
+  }
+
+  // Get house by ID
+  async getHouseById(req: Request, res: Response): Promise<void> {
+    try {
+      const houseId: UUID = req.params.id;
+
+      // Basic UUID format validation
+      const uuidRegex =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(houseId)) {
+        res.status(400).json({
+          success: false,
+          error: "Invalid house ID",
+          message: "House ID must be a valid UUID",
+          timestamp: new Date().toISOString(),
+        });
+        return;
+      }
+
+      const house = await this.getHouseByIdUseCase.execute(houseId);
+
+      if (!house) {
+        res.status(404).json({
+          success: false,
+          error: "House not found",
+          message: `House with ID ${houseId} not found`,
+          timestamp: new Date().toISOString(),
+        });
+        return;
+      }
+
+      res.status(200).json({
+        success: true,
+        data: house,
+        message: "House retrieved successfully",
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error("Get house by ID error:", error);
+      res.status(500).json({
+        success: false,
+        error: "Internal server error",
+        message: "Failed to retrieve house",
+        timestamp: new Date().toISOString(),
+      });
+    }
+  }
+}
