@@ -6,7 +6,7 @@ import { findUsersByStudentId } from '../controllers/userController';
 const router = Router();
 /**
  * @swagger
- * /api/users/me:
+ * /users/me:
  *   get:
  *     summary: Get current user's profile
  *     tags: [User]
@@ -77,10 +77,10 @@ const router = Router();
  *                   type: string
  *                   nullable: true
  */
-router.get('/me', authMiddleware, roleMiddleware([RoleType.FRESHMAN, RoleType.STAFF]), getMyProfile);
+router.get('/profile', authMiddleware, roleMiddleware([RoleType.FRESHMAN, RoleType.STAFF]), getMyProfile);
 /**
  * @swagger
- * /api/users/{id}:
+ * /users/{id}:
  *   get:
  *     summary: Get student profile by ID
  *     tags: [User]
@@ -163,7 +163,7 @@ router.get('/me', authMiddleware, roleMiddleware([RoleType.FRESHMAN, RoleType.ST
 router.get(
     '/:id',
     authMiddleware,
-    roleMiddleware([RoleType.FRESHMAN]),
+    roleMiddleware([RoleType.STAFF]),
     findUsersByStudentId
 );
 

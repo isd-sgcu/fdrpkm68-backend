@@ -27,6 +27,8 @@ CREATE TYPE checkin_status_type AS ENUM ('PRE_REGISTER', 'EVENT_REGISTER');
 CREATE TYPE housesize_letter_type AS ENUM ('S', 'M', 'L', 'XL', 'XXL');
 CREATE TYPE group_role_type AS ENUM ('OWNER', 'MEMBER');
 
+-- Create sequence for avatar IDs
+CREATE SEQUENCE avatar_seq MINVALUE 1 MAXVALUE 5 CYCLE;
 
 -- Create "users" table
 CREATE TABLE users (
@@ -46,7 +48,7 @@ CREATE TABLE users (
     food_allergy TEXT DEFAULT NULL,
     drug_allergy TEXT DEFAULT NULL,
     illness TEXT DEFAULT NULL,
-    avatar_id SMALLINT DEFAULT 1 NOT NULL,
+    avatar_id SMALLINT DEFAULT DEFAULT  nextval('avatar_seq') NOT NULL,
     group_id UUID,
     group_role group_role_type DEFAULT 'OWNER',
     role role_type DEFAULT 'FRESHMAN' NOT NULL,
@@ -69,24 +71,20 @@ CREATE TABLE "checkin" (
     UNIQUE(user_student_id, user_citizen_id, event)
 );
 
-
 -- Houses schema
-CREATE TABLE house_sizes (
-    size_letter housesize_letter_type PRIMARY KEY NOT NULL,
-    max_member INT NOT NULL
-);
-
 CREATE TABLE houses (
     house_id SERIAL PRIMARY KEY NOT NULL, -- here for "easier" retrieval of houses
     name_thai TEXT NOT NULL,
     name_english TEXT NOT NULL,
-    logo TEXT NOT NULL, -- TEXT as placeholder, not sure which data type for house picture
     description_thai TEXT NOT NULL,
     description_english TEXT NOT NULL,
     size_letter housesize_letter_type NOT NULL,
-    member_count INT DEFAULT 0 NOT NULL, -- Current number of people selecting this house
+    member_count INT DEFAULT 0 NOT NULL, -- Current number of people selecting the house
     max_member INT NOT NULL,
-    instagram TEXT NOT NULL
+    instagram TEXT,
+    facebook TEXT,
+    tiktok TEXT,
+    CONSTRAINT capacity_constraint CHECK(member_count <= max_member)
 );
 
 
@@ -94,6 +92,7 @@ CREATE TABLE houses (
 CREATE TABLE groups (
     group_id UUID PRIMARY KEY NOT NULL,
     submitted BOOLEAN DEFAULT FALSE NOT NULL,
+    group_member_count INT DEFAULT 1 NOT NULL,
     house_rank_1 INT DEFAULT NULL, -- keep as house_id
     house_rank_2 INT DEFAULT NULL,
     house_rank_3 INT DEFAULT NULL,
@@ -105,7 +104,8 @@ CREATE TABLE groups (
     CONSTRAINT fk_house_rank_3 FOREIGN KEY (house_rank_3) REFERENCES houses(house_id),
     CONSTRAINT fk_house_rank_4 FOREIGN KEY (house_rank_4) REFERENCES houses(house_id),
     CONSTRAINT fk_house_rank_5 FOREIGN KEY (house_rank_5) REFERENCES houses(house_id),
-    CONSTRAINT fk_house_rank_6 FOREIGN KEY (house_rank_6) REFERENCES houses(house_id)
+    CONSTRAINT fk_house_rank_6 FOREIGN KEY (house_rank_6) REFERENCES houses(house_id),
+    CONSTRAINT group_size_constraint CHECK(group_member_count >= 1 AND group_member_count <= 4)
 );
 
 

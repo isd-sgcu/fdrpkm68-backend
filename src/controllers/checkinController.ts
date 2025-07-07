@@ -5,7 +5,7 @@ import { CheckinStatusType, EventType } from '../types/enum';
 import { getCurrentEvent } from '../utils/checkinUtils';
 import { getRedisClient } from '../cache/redisClient';
 
-// Get all checkin data
+// Get all checkin record
 export const getAllCheckin = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const checkin = await checkinService.getAllCheckin();
@@ -21,7 +21,7 @@ export const getAllCheckin = async (req: Request, res: Response, next: NextFunct
 	}
 }
 
-// Get checkin data by UserId and Event
+// Get checkin record by userID and event
 export const getCheckin = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { student_id, citizen_id, event } = req.params
@@ -49,7 +49,7 @@ export const getCheckin = async (req: Request, res: Response, next: NextFunction
 		if (!checkin) {
 			res.status(404).json({
 				error: 'Not Found',
-				message: `User has not pre-register event: ${event}`,
+				message: `User has not pre-register`,
 			})
 			return
 		}
@@ -80,7 +80,7 @@ export const getCheckin = async (req: Request, res: Response, next: NextFunction
 	}
 }
 
-// Create checkin event with status = 'PRE_REGISTER'
+// Pre-register user for event
 export const createCheckin = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { student_id, citizen_id, event } = req.body
@@ -99,7 +99,8 @@ export const createCheckin = async (req: Request, res: Response, next: NextFunct
 		if (checkin) {
 			res.status(409).json({
 				error: 'Conflict',
-				message: `User has already ${checkin.status} event: ${event}`
+				message: `User has already ${checkin.status === CheckinStatusType.PRE_REGISTER ? 'pre-register' : 'checkin'}`,
+				status: checkin.status,
 			})
 			return
 		}
@@ -108,7 +109,7 @@ export const createCheckin = async (req: Request, res: Response, next: NextFunct
 
 		res.status(201).json({
 			status: CheckinStatusType.PRE_REGISTER,
-			message: 'Pre-Register created successfully',
+			message: 'Pre-register created successfully',
 		})
 	} catch (error) {
 		if (error instanceof Error) {
@@ -121,7 +122,7 @@ export const createCheckin = async (req: Request, res: Response, next: NextFunct
 	}
 }
 
-// Update checkin status from 'PRE_REGISTER' to 'EVENT_REGISTER'
+// Checkin user for event
 export const updateCheckinStatus = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { student_id, citizen_id } = req.params
@@ -149,7 +150,8 @@ export const updateCheckinStatus = async (req: Request, res: Response, next: Nex
 		if (!checkin) {
 			res.status(404).json({
 				error: 'Not Found',
-				message: `User has not pre-register event: ${event}`,
+				message: `User has not pre-register`,
+				event
 			})
 			return
 		}
@@ -157,8 +159,10 @@ export const updateCheckinStatus = async (req: Request, res: Response, next: Nex
 		if (checkin.status === CheckinStatusType.EVENT_REGISTER) {
 			res.status(409).json({
 				error: 'Conflict',
-				message: `User has already checkin event: ${event}`,
-				lastCheckIn: checkin.updated_at
+				message: `User has already checkin`,
+				status: checkin.status,
+				event,
+				lastCheckIn: checkin.updated_at,
 			})
 			return
 		}
@@ -169,7 +173,8 @@ export const updateCheckinStatus = async (req: Request, res: Response, next: Nex
 		await getRedisClient().del(cacheKey)
 
 		res.status(200).json({
-			event: event,
+			status: CheckinStatusType.EVENT_REGISTER,
+			event,
 			student_id,
 			citizen_id,
 			nickname: user.nickname,

@@ -14,14 +14,10 @@ router.use(authMiddleware);
 
 /**
  * @swagger
- * tags:
- *   - name: Checkin
- *     description: Register for event
- * 
- * /api/checkin:
+ * /checkin:
  *   get:
- *     summary: Get all checkin record
- *     description: This can only be done by role STAFF user
+ *     summary: Get all checkin record.
+ *     description: Get all checkin record. Can only be done by STAFF role.
  *     tags: [Checkin]
  *     security:
  *       - bearerAuth: []
@@ -62,10 +58,10 @@ router.get(
 );
 /**
  * @swagger
- * /api/checkin/{student_id}/{citizen_id}/{event}:
+ * /checkin/{student_id}/{citizen_id}/{event}:
  *   get:
- *     summary: Get checkin record by userID and event
- *     description: This can only be done by logged in user
+ *     summary: Get checkin record by userID and event.
+ *     description: Get checkin record by student_it, citizen_id and event. Can only be done by logged in user.
  *     parameters:
  *       - name: student_id
  *         in: path
@@ -116,7 +112,7 @@ router.get(
  *       400:
  *         description: Invalid student_id or citizen_id
  *       404:
- *         description: Checkin not found
+ *         description: User has not pre-register
  */
 router.get(
 	'/:student_id/:citizen_id/:event',
@@ -125,10 +121,10 @@ router.get(
 );
 /**
  * @swagger
- * /api/checkin/{student_id}/{citizen_id}:
+ * /checkin/{student_id}/{citizen_id}:
  *   patch:
- *     summary: Update checkin status to EVENT_REGISTER
- *     description: This can only be done by role STAFF user
+ *     summary: Checkin user for event.
+ *     description: Update user checkin status to EVENT_REGISTER. Can only be done by STAFF role.
  *     parameters:
  *       - name: student_id
  *         in: path
@@ -153,6 +149,10 @@ router.get(
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: string
+ *                   enum: [EVENT_REGISTER]
+ *                   example: EVENT_REGISTER
  *                 event:
  *                   type: string
  *                   enum: [FIRSTDATE, RPKM, FRESHMENNIGHT]
@@ -173,9 +173,9 @@ router.get(
  *       400:
  *         description: Invalid student_id or citizen_id
  *       404:
- *         description: Checkin not found
+ *         description: User has not pre-register
  *       409:
- *         description: User has already checkin (status = EVENT_REGISTER)
+ *         description: User has already checkin
  *         content:
  *           application/json:
  *             schema:
@@ -186,12 +186,20 @@ router.get(
  *                   example: Conflict
  *                 message:
  *                   type: string
- *                   example: 'User has already checkin event: ${event}'
+ *                   example: 'User has already checkin'
+ *                 status:
+ *                   type: string
+ *                   enum: [EVENT_REGISTER]
+ *                   example: EVENT_REGISTER
+ *                 event:
+ *                   type: string
+ *                   enum: [FIRSTDATE, RPKM, FRESHMENNIGHT]
+ *                   example: FIRSTDATE
  *                 lastCheckIn:
  *                   type: string
  *                   format: date-time
  *       503:
- *         description: No active event
+ *         description: No event is currently active
  */
 router.patch(
 	'/:student_id/:citizen_id',
@@ -201,10 +209,10 @@ router.patch(
 );
 /**
  * @swagger
- * /api/checkin/register:
+ * /checkin:
  *   post:
- *     summary: Create checkin record
- *     description: This can only be done by role STAFF user
+ *     summary: Pre-register user for event.
+ *     description: Create user checkin with status PRE_REGISTER. Can only be done by STAFF role.
  *     requestBody:
  *       required: true
  *       content:
@@ -225,7 +233,7 @@ router.patch(
  *       - bearerAuth: []
  *     responses:
  *       201:
- *         description: Checkin created successfully
+ *         description: Pre-register created successfully
  *         content:
  *           application/json:
  *             schema:
@@ -233,17 +241,33 @@ router.patch(
  *               properties:
  *                 status:
  *                   type: string
+ *                   enum: [PRE_REGISTER]
  *                   example: PRE_REGISTER
  *                 message:
  *                   type: string
- *                   example: Pre-Register created successfully
+ *                   example: Pre-register created successfully
  *       400:
  *         description: Invalid student_id or citizen_id
  *       409:
- *         description: Checkin has already exist
+ *         description: User has already pre-register or checkin
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Conflict
+ *                 message:
+ *                   type: string
+ *                   example: User has already pre-register
+ *                 status:
+ *                   type: string
+ *                   enum: [PRE_REGISTER, EVENT_REGISTER]
+ *                   example: PRE_REGISTER
  */
 router.post(
-	'/register',
+	'/',
 	roleMiddleware([RoleType.STAFF]),
 	validateBodyMiddleware({ eventRequired: true }),
 	createCheckin

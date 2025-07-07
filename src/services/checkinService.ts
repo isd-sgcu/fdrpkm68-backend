@@ -3,7 +3,7 @@ import { CustomError } from '../types/error';
 import { Checkin } from '../types/checkin';
 import { CheckinStatusType, EventType } from '../types/enum';
 
-// Get all checkin data
+// Get all checkin record
 export const getAllCheckin = async (): Promise<Checkin[]> => {
   try {
     const result = await query(`SELECT * FROM checkin`);
@@ -17,7 +17,7 @@ export const getAllCheckin = async (): Promise<Checkin[]> => {
   }
 };
 
-// Create checkin with status = 'PRE_REGISTER'
+// Create user checkin with status PRE_REGISTER
 export const createCheckin = async (
   student_id: string,
   citizen_id: string,
@@ -40,7 +40,7 @@ export const createCheckin = async (
   }
 };
 
-// Get checkin by userId and event
+// Get checkin record by student_id, citizen_id and event
 export const getCheckinByUserIdAndEvent = async (
   student_id: string,
   citizen_id: string,
@@ -65,7 +65,7 @@ export const getCheckinByUserIdAndEvent = async (
   }
 }
 
-// Update checkin status from 'PRE_REGISTER' to 'EVENT_REGISTER'
+// Update user checkin status to EVENT_REGISTER
 export const updateCheckinStatus = async (
   student_id: string,
   citizen_id: string,
