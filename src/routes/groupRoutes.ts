@@ -99,6 +99,37 @@ router.get("/:id", getGroupData);
  */
 router.post("/join/:id", joinGroup);
 
+/**
+ * @swagger
+ * /groups/leave:
+ *  post:
+ *    summary: Leaves (and possibly deletes) a group for a user, if the user meets certain conditions.
+ *    description: Leaves the user's current group, if the user is not a group owner with a member count of higher than 1. Additionally, if the user is a group owner with a member count of 1, the group is also deleted entirely.
+ *    tags: [Groups]
+ *    security:
+ *      - bearerAuth: []
+ *    responses:
+ *      200:
+ *        description: Group left successfully.
+ *        content:
+ *          application/json:
+ *           schema:
+ *           type: object
+ *           properties:
+ *             status:
+ *              type: string
+ *              example: success
+ *           message:
+ *              type: string
+ *      400:
+ *         description: Bad request, user did not leave group, probably because user does not meet the conditions or user has no group already.
+ *      401:
+ *         description: Unauthorized, probably because user is not logged in/invalid credentials.
+ *      404:
+ *        description: User not found.
+ *      500:
+ *        description: Internal Server Error.
+ */
 router.post("/leave", leaveGroup);
 
 export default router;
