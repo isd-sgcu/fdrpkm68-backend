@@ -35,6 +35,7 @@ model User {
     group    Group?    @relation("UserGroup", fields: [groupId], references: [id])
     checkins Checkin[] @relation("UserCheckins")
 
+    @@unique([studentId, citizenId])
     @@map("users")
 }
 
