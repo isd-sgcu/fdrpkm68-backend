@@ -47,7 +47,7 @@ CREATE TABLE "users" (
 -- CreateTable
 CREATE TABLE "checkin" (
     "id" UUID NOT NULL,
-    "user_student_id" TEXT NOT NULL,
+    "user_id" UUID NOT NULL,
     "event" "event_type" NOT NULL,
     "status" "checkin_status_type" NOT NULL,
     "created_at" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -90,13 +90,10 @@ CREATE TABLE "groups" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "users_student_id_key" ON "users"("student_id");
-
--- CreateIndex
 CREATE UNIQUE INDEX "users_student_id_citizen_id_key" ON "users"("student_id", "citizen_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "checkin_user_student_id_event_key" ON "checkin"("user_student_id", "event");
+CREATE UNIQUE INDEX "checkin_user_id_event_key" ON "checkin"("user_id", "event");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "groups_owner_id_key" ON "groups"("owner_id");
@@ -108,7 +105,7 @@ CREATE UNIQUE INDEX "groups_invite_code_key" ON "groups"("invite_code");
 ALTER TABLE "users" ADD CONSTRAINT "users_group_id_fkey" FOREIGN KEY ("group_id") REFERENCES "groups"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "checkin" ADD CONSTRAINT "checkin_user_student_id_fkey" FOREIGN KEY ("user_student_id") REFERENCES "users"("student_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "checkin" ADD CONSTRAINT "checkin_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "groups" ADD CONSTRAINT "groups_owner_id_fkey" FOREIGN KEY ("owner_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
