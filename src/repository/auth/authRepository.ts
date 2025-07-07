@@ -5,8 +5,8 @@ import { prisma } from "@/lib/prisma";
 export class AuthRepository {
   async findUserByStudentId(studentId: string): Promise<User | null> {
     try {
-      const user = await prisma.user.findFirst({
-        where: { studentId },
+      const user = await prisma.user.findUnique({
+        where: { id: studentId },
       });
 
       if (!user) return null;

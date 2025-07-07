@@ -3,16 +3,19 @@ import { prisma } from "@/lib/prisma";
 import { InviteCodeGenerator } from "@/utils/inviteCodeGenerator";
 
 export class GroupRepository {
-  async findGroupById(groupId: string): Promise<Group & {
-    owner: User;
-    users: User[];
-    house1: House | null;
-    house2: House | null;
-    house3: House | null;
-    house4: House | null;
-    house5: House | null;
-    houseSub: House | null;
-  } | null> {
+  async findGroupById(groupId: string): Promise<
+    | (Group & {
+        owner: User;
+        users: User[];
+        house1: House | null;
+        house2: House | null;
+        house3: House | null;
+        house4: House | null;
+        house5: House | null;
+        houseSub: House | null;
+      })
+    | null
+  > {
     try {
       return await prisma.group.findUnique({
         where: { id: groupId },
@@ -45,16 +48,19 @@ export class GroupRepository {
     }
   }
 
-  async findUserGroup(userId: string): Promise<Group & {
-    owner: User;
-    users: User[];
-    house1: House | null;
-    house2: House | null;
-    house3: House | null;
-    house4: House | null;
-    house5: House | null;
-    houseSub: House | null;
-  } | null> {
+  async findUserGroup(userId: string): Promise<
+    | (Group & {
+        owner: User;
+        users: User[];
+        house1: House | null;
+        house2: House | null;
+        house3: House | null;
+        house4: House | null;
+        house5: House | null;
+        houseSub: House | null;
+      })
+    | null
+  > {
     try {
       const ownedGroup = await prisma.group.findUnique({
         where: { ownerId: userId },
@@ -185,7 +191,7 @@ export class GroupRepository {
   async regenerateInviteCode(groupId: string): Promise<string> {
     try {
       const newInviteCode = await InviteCodeGenerator.generate();
-      
+
       await prisma.group.update({
         where: { id: groupId },
         data: { inviteCode: newInviteCode },
@@ -262,13 +268,15 @@ export class GroupRepository {
     }
   }
 
-  async getGroupMembers(groupId: string): Promise<Array<{
-    id: string;
-    studentId: string;
-    firstName: string;
-    lastName: string;
-    nickname: string;
-  }>> {
+  async getGroupMembers(groupId: string): Promise<
+    Array<{
+      id: string;
+      studentId: string;
+      firstName: string;
+      lastName: string;
+      nickname: string;
+    }>
+  > {
     try {
       return await prisma.user.findMany({
         where: { groupId },
