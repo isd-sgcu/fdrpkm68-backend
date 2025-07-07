@@ -1,16 +1,11 @@
-import { PrismaClient, User } from "@prisma/client";
+import { User } from "@prisma/client";
 import { StudentLoginCredentials } from "@/types/auth/POST";
+import { prisma } from "@/lib/prisma";
 
 export class AuthRepository {
-  private prisma: PrismaClient;
-
-  constructor() {
-    this.prisma = new PrismaClient();
-  }
-
   async findUserByStudentId(studentId: string): Promise<User | null> {
     try {
-      const user = await this.prisma.user.findUnique({
+      const user = await prisma.user.findUnique({
         where: { studentId },
       });
 
@@ -40,9 +35,5 @@ export class AuthRepository {
       console.error("Error verifying credentials:", error);
       throw new Error("Failed to verify credentials");
     }
-  }
-
-  async disconnect(): Promise<void> {
-    await this.prisma.$disconnect();
   }
 }
