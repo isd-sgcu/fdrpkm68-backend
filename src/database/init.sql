@@ -48,7 +48,7 @@ CREATE TABLE users (
     food_allergy TEXT DEFAULT NULL,
     drug_allergy TEXT DEFAULT NULL,
     illness TEXT DEFAULT NULL,
-    avatar_id SMALLINT DEFAULT DEFAULT  nextval('avatar_seq') NOT NULL,
+    avatar_id SMALLINT DEFAULT nextval('avatar_seq') NOT NULL,
     group_id UUID,
     group_role group_role_type DEFAULT 'OWNER',
     role role_type DEFAULT 'FRESHMAN' NOT NULL,
