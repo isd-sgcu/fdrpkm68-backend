@@ -34,7 +34,6 @@ export class AuthController {
     try {
       const token = await this.authUseCase.login(req.body);
       res.cookie("token", token, {
-        // httpOnly: true,
         maxAge: 2 * 24 * 60 * 60 * 1000,
       });
       res.status(200).json({ token });
@@ -77,10 +76,7 @@ export class AuthController {
   }
 
   async logout(req: Request, res: Response): Promise<void> {
-    res.clearCookie("token", {
-      // httpOnly: true,
-      // sameSite: "strict",
-    });
+    res.clearCookie("token", {});
 
     res.status(200).json({
       message: "Logged out successfully",
