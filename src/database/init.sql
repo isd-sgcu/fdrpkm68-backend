@@ -83,8 +83,7 @@ CREATE TABLE houses (
     max_member INT NOT NULL,
     instagram TEXT,
     facebook TEXT,
-    tiktok TEXT,
-    CONSTRAINT capacity_constraint CHECK(member_count <= max_member)
+    tiktok TEXT
 );
 
 

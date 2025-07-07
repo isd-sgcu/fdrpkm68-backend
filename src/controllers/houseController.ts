@@ -53,8 +53,8 @@ export const getGroupSelectedHousesIds = async (req: Request, res: Response, nex
 
 export const upDateGroupHouses = async (req: Request, res: Response, next: NextFunction) => {
     const group_id = req.params.groupId
+    const new_house_id = req.body.new_house_id
     try {
-        const new_house_id = req.body.new_house_id
         const rank = req.body.rank
         if(!new_house_id){
             res.status(400).json({
@@ -70,11 +70,11 @@ export const upDateGroupHouses = async (req: Request, res: Response, next: NextF
             })
             return
         }
-        const errorMsg = await houseService.addOneGroupHouseOnDB(group_id, new_house_id, rank)
-        if(errorMsg.trim().length !== 0){
+        const result = await houseService.addOneGroupHouseOnDB(group_id, new_house_id, rank)
+        if(result.trim().length !== 0){
             res.status(400).json({
                 status: 'error',
-                message: errorMsg
+                message: result
             })
             return
         }
@@ -86,7 +86,7 @@ export const upDateGroupHouses = async (req: Request, res: Response, next: NextF
     catch (error) {
         res.status(500).json({
             status: 'error',
-            message: `Could not update a house on group with id ${group_id}.`
+            message: `Could not update group id ${group_id}.`
         })
     }
 }
@@ -103,10 +103,10 @@ export const deleteOneHouseFromGroup = async (req: Request, res: Response, next:
             return
         }
         const result = await houseService.deleteOneGroupHouseOnDB(group_id, rank_to_delete)
-        if(!result){
+        if(result.trim().length !== 0){
             res.status(400).json({
                 status: 'error',
-                message: `Deletion failed.`
+                message: result
             })
             return
         }
@@ -127,10 +127,10 @@ export const deleteAllHousesFromGroup = async (req: Request, res: Response, next
     const group_id = req.params.groupId
     try {
         const result = await houseService.deleteAllGroupHousesOnDB(group_id)
-        if(!result){
+        if(result.trim().length !== 0){
             res.status(400).json({
                 status: 'error',
-                message: `Deletion failed.`
+                message: result
             })
             return
         }
