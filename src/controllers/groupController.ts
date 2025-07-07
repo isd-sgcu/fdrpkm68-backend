@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import * as groupService from "../services/groupService";
 import * as userService from "../services/userService";
+import { clearCache } from "../utils/CacheUtils";
 
 
 export const getGroupData = async (req: Request, res: Response, next: NextFunction) => {
@@ -29,6 +30,12 @@ export const createOwnGroup = async (req: Request, res: Response, next: NextFunc
       })
       return;
     }
+
+    // clear cache key first because cache lasts for 1 hour and when
+    // cache is set it may let an user create >1 group because the cached version
+    // states that user isn't tied to a group.
+    const cacheKey = `user:${req?.user?.student_id}:${req?.user?.citizen_id}`;
+    clearCache([cacheKey]);
 
     const user = await userService.findUserByStudentIdAndCitizenId(req.user.student_id,req.user.citizen_id);
 
