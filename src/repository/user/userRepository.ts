@@ -37,9 +37,7 @@ export class UserRepository {
       },
     });
 
-    // TODO: UNCOMMENT THIS WHEN GROUP FEATURE IS READY
-    // This will create a group for the user after registration :)
-    // await this.groupRepository.createGroupForUser(user.id);
+    await this.groupRepository.createGroupForUser(user.id);
 
     return user;
   }
