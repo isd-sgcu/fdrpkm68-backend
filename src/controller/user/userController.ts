@@ -1,13 +1,6 @@
 import type { Request, Response } from "express";
 import { UserUsecase } from "@/usecase/user/userUsecase";
-
-interface AuthenticatedRequest extends Request {
-  user?: {
-    id: string;
-    studentId: string;
-    citizenId: string;
-  };
-}
+import type { AuthenticatedRequest } from "@/types/auth/authenticatedRequest";
 
 export class UserController {
   private userUseCase: UserUsecase;

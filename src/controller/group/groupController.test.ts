@@ -1,6 +1,7 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import { GroupController } from "./groupController";
 import { GroupUsecase } from "@/usecase/group/groupUsecase";
+import type { AuthenticatedRequest } from "@/types/auth/authenticatedRequest";
 
 // Mock GroupUsecase
 jest.mock("@/usecase/group/groupUsecase");
@@ -13,14 +14,6 @@ jest.mock("@/utils/uuidValidator", () => ({
   },
 }));
 
-interface AuthenticatedRequest extends Request {
-  user?: {
-    id: string;
-    studentId: string;
-    citizenId: string;
-  };
-}
-
 describe("GroupController", () => {
   let groupController: GroupController;
   let mockGroupUsecase: jest.Mocked<GroupUsecase>;
@@ -30,7 +23,7 @@ describe("GroupController", () => {
   beforeEach(() => {
     groupController = new GroupController();
     mockGroupUsecase = new GroupUsecase() as jest.Mocked<GroupUsecase>;
-    
+
     // Mock the usecase in the controller
     (groupController as any).groupUsecase = mockGroupUsecase;
 
@@ -74,7 +67,10 @@ describe("GroupController", () => {
 
       mockGroupUsecase.getUserGroup.mockResolvedValue(mockGroup);
 
-      await groupController.getGroup(mockRequest as AuthenticatedRequest, mockResponse as Response);
+      await groupController.getGroup(
+        mockRequest as AuthenticatedRequest,
+        mockResponse as Response
+      );
 
       expect(mockGroupUsecase.getUserGroup).toHaveBeenCalledWith("user-1");
       expect(mockGroupUsecase.getUserGroup).toHaveBeenCalledTimes(1);
@@ -87,18 +83,23 @@ describe("GroupController", () => {
         timestamp: expect.any(String),
       });
       expect(mockResponse.json).toHaveBeenCalledTimes(1);
-      
+
       // Verify timestamp is valid ISO string
       const mockJsonCalls = (mockResponse.json as jest.Mock).mock.calls;
       expect(mockJsonCalls).toHaveLength(1);
       const responseData = mockJsonCalls[0][0];
-      expect(responseData.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+      expect(responseData.timestamp).toMatch(
+        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
+      );
     });
 
     it("should return 404 when user has no group", async () => {
       mockGroupUsecase.getUserGroup.mockResolvedValue(null);
 
-      await groupController.getGroup(mockRequest as AuthenticatedRequest, mockResponse as Response);
+      await groupController.getGroup(
+        mockRequest as AuthenticatedRequest,
+        mockResponse as Response
+      );
 
       expect(mockGroupUsecase.getUserGroup).toHaveBeenCalledWith("user-1");
       expect(mockGroupUsecase.getUserGroup).toHaveBeenCalledTimes(1);
@@ -110,18 +111,23 @@ describe("GroupController", () => {
         timestamp: expect.any(String),
       });
       expect(mockResponse.json).toHaveBeenCalledTimes(1);
-      
+
       // Verify timestamp is valid ISO string
       const mockJsonCalls = (mockResponse.json as jest.Mock).mock.calls;
       expect(mockJsonCalls).toHaveLength(1);
       const responseData = mockJsonCalls[0][0];
-      expect(responseData.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+      expect(responseData.timestamp).toMatch(
+        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
+      );
     });
 
     it("should return 401 when user is not authenticated", async () => {
       mockRequest.user = undefined;
 
-      await groupController.getGroup(mockRequest as AuthenticatedRequest, mockResponse as Response);
+      await groupController.getGroup(
+        mockRequest as AuthenticatedRequest,
+        mockResponse as Response
+      );
 
       expect(mockResponse.status).toHaveBeenCalledWith(401);
       expect(mockResponse.json).toHaveBeenCalledWith({
@@ -132,9 +138,14 @@ describe("GroupController", () => {
     });
 
     it("should return 500 on internal error", async () => {
-      mockGroupUsecase.getUserGroup.mockRejectedValue(new Error("Database error"));
+      mockGroupUsecase.getUserGroup.mockRejectedValue(
+        new Error("Database error")
+      );
 
-      await groupController.getGroup(mockRequest as AuthenticatedRequest, mockResponse as Response);
+      await groupController.getGroup(
+        mockRequest as AuthenticatedRequest,
+        mockResponse as Response
+      );
 
       expect(mockResponse.status).toHaveBeenCalledWith(500);
       expect(mockResponse.json).toHaveBeenCalledWith({
@@ -163,7 +174,10 @@ describe("GroupController", () => {
 
       mockGroupUsecase.createGroup.mockResolvedValue(mockGroup);
 
-      await groupController.createGroup(mockRequest as AuthenticatedRequest, mockResponse as Response);
+      await groupController.createGroup(
+        mockRequest as AuthenticatedRequest,
+        mockResponse as Response
+      );
 
       expect(mockGroupUsecase.createGroup).toHaveBeenCalledWith("user-1");
       expect(mockResponse.status).toHaveBeenCalledWith(201);
@@ -182,9 +196,14 @@ describe("GroupController", () => {
     });
 
     it("should return 400 on business logic error", async () => {
-      mockGroupUsecase.createGroup.mockRejectedValue(new Error("User already owns a group"));
+      mockGroupUsecase.createGroup.mockRejectedValue(
+        new Error("User already owns a group")
+      );
 
-      await groupController.createGroup(mockRequest as AuthenticatedRequest, mockResponse as Response);
+      await groupController.createGroup(
+        mockRequest as AuthenticatedRequest,
+        mockResponse as Response
+      );
 
       expect(mockResponse.status).toHaveBeenCalledWith(400);
       expect(mockResponse.json).toHaveBeenCalledWith({
@@ -200,9 +219,15 @@ describe("GroupController", () => {
       mockRequest.body = { inviteCode: "ABC123" };
       mockGroupUsecase.joinGroup.mockResolvedValue();
 
-      await groupController.joinGroup(mockRequest as AuthenticatedRequest, mockResponse as Response);
+      await groupController.joinGroup(
+        mockRequest as AuthenticatedRequest,
+        mockResponse as Response
+      );
 
-      expect(mockGroupUsecase.joinGroup).toHaveBeenCalledWith("user-1", "ABC123");
+      expect(mockGroupUsecase.joinGroup).toHaveBeenCalledWith(
+        "user-1",
+        "ABC123"
+      );
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith({
         success: true,
@@ -217,7 +242,10 @@ describe("GroupController", () => {
     it("should return 400 when invite code is missing", async () => {
       mockRequest.body = {};
 
-      await groupController.joinGroup(mockRequest as AuthenticatedRequest, mockResponse as Response);
+      await groupController.joinGroup(
+        mockRequest as AuthenticatedRequest,
+        mockResponse as Response
+      );
 
       expect(mockResponse.status).toHaveBeenCalledWith(400);
       expect(mockResponse.json).toHaveBeenCalledWith({
@@ -229,9 +257,14 @@ describe("GroupController", () => {
 
     it("should return 400 on invalid invite code", async () => {
       mockRequest.body = { inviteCode: "INVALID" };
-      mockGroupUsecase.joinGroup.mockRejectedValue(new Error("Invalid invite code"));
+      mockGroupUsecase.joinGroup.mockRejectedValue(
+        new Error("Invalid invite code")
+      );
 
-      await groupController.joinGroup(mockRequest as AuthenticatedRequest, mockResponse as Response);
+      await groupController.joinGroup(
+        mockRequest as AuthenticatedRequest,
+        mockResponse as Response
+      );
 
       expect(mockResponse.status).toHaveBeenCalledWith(400);
       expect(mockResponse.json).toHaveBeenCalledWith({
@@ -247,9 +280,15 @@ describe("GroupController", () => {
       mockRequest.body = { userId: "user-2" };
       mockGroupUsecase.kickMember.mockResolvedValue();
 
-      await groupController.kickMember(mockRequest as AuthenticatedRequest, mockResponse as Response);
+      await groupController.kickMember(
+        mockRequest as AuthenticatedRequest,
+        mockResponse as Response
+      );
 
-      expect(mockGroupUsecase.kickMember).toHaveBeenCalledWith("user-1", "user-2");
+      expect(mockGroupUsecase.kickMember).toHaveBeenCalledWith(
+        "user-1",
+        "user-2"
+      );
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith({
         success: true,
@@ -265,7 +304,10 @@ describe("GroupController", () => {
     it("should return 400 when userId is missing", async () => {
       mockRequest.body = {};
 
-      await groupController.kickMember(mockRequest as AuthenticatedRequest, mockResponse as Response);
+      await groupController.kickMember(
+        mockRequest as AuthenticatedRequest,
+        mockResponse as Response
+      );
 
       expect(mockResponse.status).toHaveBeenCalledWith(400);
       expect(mockResponse.json).toHaveBeenCalledWith({
@@ -285,7 +327,10 @@ describe("GroupController", () => {
 
       mockGroupUsecase.confirmGroup.mockResolvedValue(mockGroup as any);
 
-      await groupController.confirmGroup(mockRequest as AuthenticatedRequest, mockResponse as Response);
+      await groupController.confirmGroup(
+        mockRequest as AuthenticatedRequest,
+        mockResponse as Response
+      );
 
       expect(mockGroupUsecase.confirmGroup).toHaveBeenCalledWith("user-1");
       expect(mockResponse.status).toHaveBeenCalledWith(200);
@@ -319,11 +364,19 @@ describe("GroupController", () => {
       };
 
       mockRequest.body = preferences;
-      mockGroupUsecase.setHousePreferences.mockResolvedValue(updatedGroup as any);
+      mockGroupUsecase.setHousePreferences.mockResolvedValue(
+        updatedGroup as any
+      );
 
-      await groupController.setHousePreferences(mockRequest as AuthenticatedRequest, mockResponse as Response);
+      await groupController.setHousePreferences(
+        mockRequest as AuthenticatedRequest,
+        mockResponse as Response
+      );
 
-      expect(mockGroupUsecase.setHousePreferences).toHaveBeenCalledWith("user-1", preferences);
+      expect(mockGroupUsecase.setHousePreferences).toHaveBeenCalledWith(
+        "user-1",
+        preferences
+      );
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith({
         success: true,
@@ -331,7 +384,8 @@ describe("GroupController", () => {
         data: {
           groupId: "group-1",
           updatedPreferences: preferences,
-          message: "House preferences have been updated and chosen counts adjusted",
+          message:
+            "House preferences have been updated and chosen counts adjusted",
         },
         timestamp: expect.any(String),
       });
@@ -359,7 +413,10 @@ describe("GroupController", () => {
 
       mockGroupUsecase.getAllHouses.mockResolvedValue(mockHouses as any);
 
-      await groupController.getAllHouses(mockRequest as AuthenticatedRequest, mockResponse as Response);
+      await groupController.getAllHouses(
+        mockRequest as AuthenticatedRequest,
+        mockResponse as Response
+      );
 
       expect(mockGroupUsecase.getAllHouses).toHaveBeenCalled();
       expect(mockResponse.status).toHaveBeenCalledWith(200);
