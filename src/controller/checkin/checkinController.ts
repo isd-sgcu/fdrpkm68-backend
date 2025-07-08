@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
 import { CheckinUsecase } from "@/usecase/checkin/checkinUsecase";
   
 
@@ -14,7 +13,7 @@ export class CheckinController {
   async getCheckinById(req: Request, res: Response) {
     const id = req.params.id; // UUID string
     try {
-      const checkin = await this.checkinUsecase.getCheckinById(id);
+      const checkin = await this.checkinUsecase.findCheckinById(id);
       if (!checkin) {
         return res.status(404).json({ message: "Check-in not found" });
       }
@@ -24,26 +23,14 @@ export class CheckinController {
     }
   }
 
-  // Get check-ins by userId
-  // async getCheckinsByUserId(req: Request, res: Response) {
-  //   const userId = req.params.userId; // UUID string
-  //   try {
-  //     const userCheckins = await prisma.checkin.findMany({ where: { userId } });
-  //     res.json(userCheckins);
-  //   } catch (error) {
-  //     res.status(500).json({ error: "Failed to fetch check-ins by userId" });
-  //   }
-  // }
-
   // Create a new check-in
   async createCheckin(req: Request, res: Response) {
-    
-      const newCheckin = await.create({
-        data: {
-          userId,
-          event,
-          status,
-        },
+    const { id, event, status } = req.body;
+    try {
+      const newCheckin = await this.checkinUsecase.createCheckin({
+        userId: id, // Assuming id is the userId
+        event,
+        status,
       });
       res.status(201).json(newCheckin);
     } catch (error) {
@@ -51,19 +38,15 @@ export class CheckinController {
     }
   }
 
-  // Update a check-in
+  // Update a check-in by id
   async updateCheckin(req: Request, res: Response) {
     const id = req.params.id; // UUID string
-    const { userId, event, status } = req.body;
+    const { event, status } = req.body;
     try {
-      const updatedCheckin = await prisma.checkin.update({
-        where: { id },
-        data: {
-          userId,
-          event,
-          status,
-          updatedAt: new Date(),
-        },
+      const updatedCheckin = await this.checkinUsecase.updateCheckin(id, {
+        event,
+        status,
+        updatedAt: new Date(),
       });
       res.json(updatedCheckin);
     } catch (error) {
@@ -76,17 +59,18 @@ export class CheckinController {
     const userId = req.params.userId; // UUID string
     const { event, status } = req.body;
     try {
-      const updatedCheckin = await prisma.checkin.updateMany({
-        where: { userId, event },
-        data: {
+      const count = await this.checkinUsecase.updateCheckinByUserIdAndEvent(
+        userId,
+        event,
+        {
           status,
           updatedAt: new Date(),
-        },
-      });
-      if (updatedCheckin.count === 0) {
+        }
+      );
+      if (count === 0) {
         return res.status(404).json({ error: "Check-in not found for this user and event" });
       }
-      res.json({ message: "Check-in updated", count: updatedCheckin.count });
+      res.json({ message: "Check-in updated", count });
     } catch (error) {
       res.status(500).json({ error: "Failed to update check-in" });
     }
