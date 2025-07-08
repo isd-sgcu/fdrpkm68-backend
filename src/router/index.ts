@@ -2,6 +2,7 @@ import { Router } from "express";
 import { AuthRouter } from "./authRouter";
 import { GroupRouter } from "./groupRouter";
 import { HouseRouter } from "./houseRouter";
+import { UserRouter } from "./userRouter";
 
 export class RouterManager {
   private router: Router;
@@ -15,10 +16,12 @@ export class RouterManager {
     const authRouter = new AuthRouter();
     const groupRouter = new GroupRouter();
     const houseRouter = new HouseRouter();
+    const userRouter = new UserRouter();
 
     this.router.use("/auth", authRouter.getRouter());
     this.router.use("/group", groupRouter.getRouter());
     this.router.use("/houses", houseRouter.getRouter());
+    this.router.use("/user", userRouter.getRouter());
   }
 
   public getRouter(): Router {

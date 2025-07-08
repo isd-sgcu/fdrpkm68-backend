@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { GroupRepository } from "@/repository/group/groupRepository";
 
 import { RegisterRequest } from "@/types/auth/POST";
+import { UpdateRequest } from "@/types/user/PATCH";
 
 export class UserRepository {
   private groupRepository: GroupRepository;
@@ -40,6 +41,19 @@ export class UserRepository {
     // This will create a group for the user after registration :)
     // await this.groupRepository.createGroupForUser(user.id);
 
+    return user;
+  }
+
+  async update(id: string, body: Partial<UpdateRequest>): Promise<User | null> {
+    const user = await prisma.user.update({
+      where: {
+        id: id,
+      },
+      data: body,
+    });
+    if (!user) {
+      return null;
+    }
     return user;
   }
 

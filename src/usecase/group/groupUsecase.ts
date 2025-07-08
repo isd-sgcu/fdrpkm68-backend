@@ -3,6 +3,7 @@ import { GroupRepository } from "@/repository/group/groupRepository";
 import { HouseRepository } from "@/repository/house/houseRepository";
 import { InviteCodeGenerator } from "@/utils/inviteCodeGenerator";
 import { prisma } from "@/lib/prisma";
+import { AppError } from "@/types/error/AppError";
 
 export class GroupUsecase {
   private groupRepository: GroupRepository;
@@ -21,31 +22,47 @@ export class GroupUsecase {
       }
 
       if (existingGroup) {
-        await this.groupRepository.removeUserFromGroup(userId, existingGroup.id);
+        await this.groupRepository.removeUserFromGroup(
+          userId,
+          existingGroup.id
+        );
       }
 
       return await this.groupRepository.createGroupForUser(userId);
     } catch (error) {
       console.error("Error in createGroupForUser:", error);
-      throw error;
+      throw new AppError(
+        `Failed to create group for user: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
+        500
+      );
     }
   }
 
-  async getUserGroup(userId: string): Promise<Group & {
-    owner: User;
-    users: User[];
-    house1: House | null;
-    house2: House | null;
-    house3: House | null;
-    house4: House | null;
-    house5: House | null;
-    houseSub: House | null;
-  } | null> {
+  async getUserGroup(userId: string): Promise<
+    | (Group & {
+        owner: User;
+        users: User[];
+        house1: House | null;
+        house2: House | null;
+        house3: House | null;
+        house4: House | null;
+        house5: House | null;
+        houseSub: House | null;
+      })
+    | null
+  > {
     try {
       return await this.groupRepository.findUserGroup(userId);
     } catch (error) {
       console.error("Error getting user group:", error);
-      throw error;
+      throw new AppError(
+        `Failed to get user group: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
+        500
+      );
     }
   }
 
@@ -57,13 +74,20 @@ export class GroupUsecase {
       }
 
       if (existingGroup) {
-        throw new Error("User must leave current group before creating a new one");
+        throw new Error(
+          "User must leave current group before creating a new one"
+        );
       }
 
       return await this.groupRepository.createGroupForUser(userId);
     } catch (error) {
       console.error("Error creating group:", error);
-      throw error;
+      throw new AppError(
+        `Failed to create group: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
+        500
+      );
     }
   }
 
@@ -73,7 +97,9 @@ export class GroupUsecase {
         throw new Error("Invalid invite code format");
       }
 
-      const targetGroup = await this.groupRepository.findGroupByInviteCode(inviteCode);
+      const targetGroup = await this.groupRepository.findGroupByInviteCode(
+        inviteCode
+      );
       if (!targetGroup) {
         throw new Error("Invalid invite code");
       }
@@ -88,7 +114,9 @@ export class GroupUsecase {
 
       const currentGroup = await this.groupRepository.findUserGroup(userId);
       if (currentGroup) {
-        throw new Error("User is already in a group. Leave current group first.");
+        throw new Error(
+          "User is already in a group. Leave current group first."
+        );
       }
 
       if (targetGroup.ownerId === userId) {
@@ -98,7 +126,12 @@ export class GroupUsecase {
       await this.groupRepository.addUserToGroup(userId, targetGroup.id);
     } catch (error) {
       console.error("Error joining group:", error);
-      throw error;
+      throw new AppError(
+        `Failed to join group: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
+        500
+      );
     }
   }
 
@@ -119,12 +152,17 @@ export class GroupUsecase {
 
       await prisma.$transaction(async (tx) => {
         await this.groupRepository.removeUserFromGroup(userId, currentGroup.id);
-        
+
         await this.groupRepository.createGroupForUser(userId);
       });
     } catch (error) {
       console.error("Error leaving group:", error);
-      throw error;
+      throw new AppError(
+        `Failed to leave group: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
+        500
+      );
     }
   }
 
@@ -143,7 +181,9 @@ export class GroupUsecase {
         throw new Error("Cannot kick members from a confirmed group");
       }
 
-      const memberInGroup = ownerGroup.users.some(user => user.id === memberUserId);
+      const memberInGroup = ownerGroup.users.some(
+        (user) => user.id === memberUserId
+      );
       if (!memberInGroup) {
         throw new Error("User is not a member of this group");
       }
@@ -153,13 +193,21 @@ export class GroupUsecase {
       }
 
       await prisma.$transaction(async (tx) => {
-        await this.groupRepository.removeUserFromGroup(memberUserId, ownerGroup.id);
-        
+        await this.groupRepository.removeUserFromGroup(
+          memberUserId,
+          ownerGroup.id
+        );
+
         await this.groupRepository.createGroupForUser(memberUserId);
       });
     } catch (error) {
       console.error("Error kicking member:", error);
-      throw error;
+      throw new AppError(
+        `Failed to kick member: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
+        500
+      );
     }
   }
 
@@ -181,7 +229,12 @@ export class GroupUsecase {
       return await this.groupRepository.confirmGroup(userGroup.id);
     } catch (error) {
       console.error("Error confirming group:", error);
-      throw error;
+      throw new AppError(
+        `Failed to confirm group: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
+        500
+      );
     }
   }
 
@@ -203,7 +256,12 @@ export class GroupUsecase {
       return await this.groupRepository.regenerateInviteCode(userGroup.id);
     } catch (error) {
       console.error("Error regenerating invite code:", error);
-      throw error;
+      throw new AppError(
+        `Failed to regenerate invite code: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
+        500
+      );
     }
   }
 
@@ -217,7 +275,12 @@ export class GroupUsecase {
       return userGroup.inviteCode;
     } catch (error) {
       console.error("Error getting invite code:", error);
-      throw error;
+      throw new AppError(
+        `Failed to get invite code: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
+        500
+      );
     }
   }
 
@@ -246,9 +309,13 @@ export class GroupUsecase {
         throw new Error("Cannot change house preferences for confirmed group");
       }
 
-      const houseIds = Object.values(preferences).filter(id => id !== null && id !== undefined);
+      const houseIds = Object.values(preferences).filter(
+        (id) => id !== null && id !== undefined
+      );
       if (houseIds.length > 0) {
-        const validHouses = await this.houseRepository.validateHouseIds(houseIds);
+        const validHouses = await this.houseRepository.validateHouseIds(
+          houseIds
+        );
         if (!validHouses) {
           throw new Error("One or more house IDs are invalid");
         }
@@ -260,11 +327,13 @@ export class GroupUsecase {
         preferences.houseRank3,
         preferences.houseRank4,
         preferences.houseRank5,
-      ].filter(id => id !== null && id !== undefined);
+      ].filter((id) => id !== null && id !== undefined);
 
       const uniqueRanks = new Set(ranks1to5);
       if (ranks1to5.length !== uniqueRanks.size) {
-        throw new Error("Cannot select the same house for multiple ranks (1-5)");
+        throw new Error(
+          "Cannot select the same house for multiple ranks (1-5)"
+        );
       }
 
       return await prisma.$transaction(async (tx) => {
@@ -292,11 +361,19 @@ export class GroupUsecase {
           tx
         );
 
-        return await this.groupRepository.updateHousePreferences(userGroup.id, normalizedPreferences);
+        return await this.groupRepository.updateHousePreferences(
+          userGroup.id,
+          normalizedPreferences
+        );
       });
     } catch (error) {
       console.error("Error setting house preferences:", error);
-      throw error;
+      throw new AppError(
+        `Failed to set house preferences: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
+        500
+      );
     }
   }
 
@@ -305,7 +382,12 @@ export class GroupUsecase {
       return await this.houseRepository.getAllHouses();
     } catch (error) {
       console.error("Error getting all houses:", error);
-      throw error;
+      throw new AppError(
+        `Failed to get all houses: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
+        500
+      );
     }
   }
 
@@ -333,7 +415,12 @@ export class GroupUsecase {
       };
     } catch (error) {
       console.error("Error getting house preferences:", error);
-      throw error;
+      throw new AppError(
+        `Failed to get house preferences: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
+        500
+      );
     }
   }
 }

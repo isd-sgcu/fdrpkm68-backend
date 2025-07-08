@@ -6,14 +6,7 @@ import {
   SetHousePreferencesRequest,
 } from "@/types/group/POST";
 import { UUIDValidator } from "@/utils/uuidValidator";
-
-interface AuthenticatedRequest extends Request {
-  user?: {
-    id: string;
-    studentId: string;
-    citizenId: string;
-  };
-}
+import { AuthenticatedRequest } from "@/types/auth/authenticatedRequest";
 
 export class GroupController {
   private groupUsecase: GroupUsecase;
@@ -88,7 +81,7 @@ export class GroupController {
       });
     } catch (error) {
       console.error("Create group error:", error);
-      
+
       if (error instanceof Error) {
         res.status(400).json({
           success: false,
@@ -127,7 +120,7 @@ export class GroupController {
       });
     } catch (error) {
       console.error("Leave group error:", error);
-      
+
       if (error instanceof Error) {
         res.status(400).json({
           success: false,
@@ -172,7 +165,8 @@ export class GroupController {
       } catch (error) {
         res.status(400).json({
           success: false,
-          error: error instanceof Error ? error.message : "Invalid member user ID",
+          error:
+            error instanceof Error ? error.message : "Invalid member user ID",
           timestamp: new Date().toISOString(),
         });
         return;
@@ -191,7 +185,7 @@ export class GroupController {
       });
     } catch (error) {
       console.error("Kick member error:", error);
-      
+
       if (error instanceof Error) {
         res.status(400).json({
           success: false,
@@ -235,7 +229,7 @@ export class GroupController {
       });
     } catch (error) {
       console.error("Confirm group error:", error);
-      
+
       if (error instanceof Error) {
         res.status(400).json({
           success: false,
@@ -253,7 +247,10 @@ export class GroupController {
     }
   }
 
-  async regenerateInviteCode(req: AuthenticatedRequest, res: Response): Promise<void> {
+  async regenerateInviteCode(
+    req: AuthenticatedRequest,
+    res: Response
+  ): Promise<void> {
     try {
       const userId = req.user?.id;
       if (!userId) {
@@ -265,7 +262,9 @@ export class GroupController {
         return;
       }
 
-      const newInviteCode = await this.groupUsecase.regenerateInviteCode(userId);
+      const newInviteCode = await this.groupUsecase.regenerateInviteCode(
+        userId
+      );
 
       res.status(200).json({
         success: true,
@@ -278,7 +277,7 @@ export class GroupController {
       });
     } catch (error) {
       console.error("Regenerate invite code error:", error);
-      
+
       if (error instanceof Error) {
         res.status(400).json({
           success: false,
@@ -330,7 +329,7 @@ export class GroupController {
       });
     } catch (error) {
       console.error("Join group error:", error);
-      
+
       if (error instanceof Error) {
         res.status(400).json({
           success: false,
@@ -370,7 +369,7 @@ export class GroupController {
       });
     } catch (error) {
       console.error("Get invite code error:", error);
-      
+
       if (error instanceof Error) {
         res.status(400).json({
           success: false,
@@ -388,7 +387,10 @@ export class GroupController {
     }
   }
 
-  async setHousePreferences(req: AuthenticatedRequest, res: Response): Promise<void> {
+  async setHousePreferences(
+    req: AuthenticatedRequest,
+    res: Response
+  ): Promise<void> {
     try {
       const userId = req.user?.id;
       if (!userId) {
@@ -409,7 +411,7 @@ export class GroupController {
         preferences.houseRank4,
         preferences.houseRank5,
         preferences.houseRankSub,
-      ].filter(id => id !== null && id !== undefined);
+      ].filter((id) => id !== null && id !== undefined);
 
       try {
         for (const houseId of houseIds) {
@@ -420,13 +422,17 @@ export class GroupController {
       } catch (error) {
         res.status(400).json({
           success: false,
-          error: error instanceof Error ? error.message : "Invalid house ID format",
+          error:
+            error instanceof Error ? error.message : "Invalid house ID format",
           timestamp: new Date().toISOString(),
         });
         return;
       }
 
-      const updatedGroup = await this.groupUsecase.setHousePreferences(userId, preferences);
+      const updatedGroup = await this.groupUsecase.setHousePreferences(
+        userId,
+        preferences
+      );
 
       res.status(200).json({
         success: true,
@@ -441,13 +447,14 @@ export class GroupController {
             houseRank5: updatedGroup.houseRank5,
             houseRankSub: updatedGroup.houseRankSub,
           },
-          message: "House preferences have been updated and chosen counts adjusted",
+          message:
+            "House preferences have been updated and chosen counts adjusted",
         },
         timestamp: new Date().toISOString(),
       });
     } catch (error) {
       console.error("Set house preferences error:", error);
-      
+
       if (error instanceof Error) {
         res.status(400).json({
           success: false,
@@ -465,7 +472,10 @@ export class GroupController {
     }
   }
 
-  async getHousePreferences(req: AuthenticatedRequest, res: Response): Promise<void> {
+  async getHousePreferences(
+    req: AuthenticatedRequest,
+    res: Response
+  ): Promise<void> {
     try {
       const userId = req.user?.id;
       if (!userId) {
@@ -487,7 +497,7 @@ export class GroupController {
       });
     } catch (error) {
       console.error("Get house preferences error:", error);
-      
+
       if (error instanceof Error) {
         res.status(400).json({
           success: false,
@@ -517,7 +527,7 @@ export class GroupController {
       });
     } catch (error) {
       console.error("Get all houses error:", error);
-      
+
       res.status(500).json({
         success: false,
         error: "Internal server error",

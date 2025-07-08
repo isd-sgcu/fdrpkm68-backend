@@ -11,6 +11,7 @@ import type {
   RegisterRequest,
 } from "@/types/auth/POST";
 import { AppError } from "@/types/error/AppError";
+import { validatePhoneNumber } from "../../utils/validatePhoneNumber";
 
 export class AuthUsecase {
   private userRepository: UserRepository;
@@ -102,10 +103,8 @@ export class AuthUsecase {
       return false;
     }
     if (
-      !/^(0\d{9})$/.test(body.phoneNumber) ||
-      body.phoneNumber.length !== 10 ||
-      !/^(0\d{9})$/.test(body.parentPhoneNumber) ||
-      body.parentPhoneNumber.length !== 10
+      !validatePhoneNumber(body.phoneNumber) ||
+      !validatePhoneNumber(body.parentPhoneNumber)
     ) {
       return false;
     }
