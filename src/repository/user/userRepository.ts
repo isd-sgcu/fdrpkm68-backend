@@ -33,6 +33,7 @@ export class UserRepository {
         foodAllergy: body.foodAllergy || null,
         drugAllergy: body.drugAllergy || null,
         illness: body.illness || null,
+        avatarId: Math.floor(Math.random() * 5) + 1,
         role: body.role,
       },
     });
