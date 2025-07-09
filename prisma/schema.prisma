@@ -112,8 +112,8 @@ model Group {
 enum PrefixType {
     MR
     MS
+    MRS
     OTHER
-
     @@map("prefix_type")
 }
 
