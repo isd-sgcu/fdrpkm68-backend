@@ -98,7 +98,7 @@ export class AuthUsecase {
     ) {
       return false;
     }
-    const validPrefixes = ["MR", "MS", "Other"];
+    const validPrefixes = ["MR", "MS", "MRS", "Other"];
     if (!validPrefixes.includes(body.prefix)) {
       return false;
     }

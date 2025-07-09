@@ -1,6 +1,7 @@
 export enum PrefixType {
   MR = "MR",
   MS = "MS",
+  MRS = "MRS",
   OTHER = "OTHER",
 }
 

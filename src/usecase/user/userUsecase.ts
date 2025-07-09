@@ -41,7 +41,7 @@ export class UserUsecase {
     ) {
       return false;
     }
-    const validPrefixes = ["MR", "MS", "Other"];
+    const validPrefixes = ["MR", "MS", "MRS", "Other"];
     if (body.prefix && !validPrefixes.includes(body.prefix)) {
       return false;
     }
