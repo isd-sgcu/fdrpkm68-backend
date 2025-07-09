@@ -11,12 +11,12 @@ model User {
     id                 String     @id @default(uuid()) @map("id") @db.Uuid
     studentId          String     @map("student_id")
     citizenId          String     @map("citizen_id")
-    prefix             PrefixType
+    prefix             PrefixType @default(OTHER) @map("prefix")
     firstName          String     @map("first_name")
     lastName           String     @map("last_name")
-    nickname           String
+    nickname           String     @map("nickname")
     academicYear       Int        @map("academic_year")
-    faculty            String
+    faculty            String     @map("faculty")
     password           String     @map("password")
     phoneNumber        String     @map("phone_number")
     parentName         String     @map("parent_name")
@@ -24,10 +24,11 @@ model User {
     parentRelationship String     @map("parent_relationship")
     foodAllergy        String?    @map("food_allergy")
     drugAllergy        String?    @map("drug_allergy")
-    illness            String?
+    illness            String?      @map("illness")
     avatarId           Int        @default(1) @map("avatar_id") @db.SmallInt
     groupId            String?    @map("group_id") @db.Uuid
     role               RoleType   @default(FRESHMAN)
+    bottleChoice       BottleChoice  @default(NONE) @map("bottle_choice")
     createdAt          DateTime   @default(now()) @map("created_at") @db.Timestamp(6)
     updatedAt          DateTime   @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
 
@@ -51,7 +52,7 @@ model Checkin {
 
     user User @relation("UserCheckins", fields: [userId], references: [id])
 
-    @@unique([userId, event])
+    @@unique([userId, event, status])
     @@map("checkin")
 }
 
@@ -107,6 +108,25 @@ model Group {
     @@index([memberCount])
     @@index([ownerId])
     @@map("groups")
+}
+
+model RPKMworkshop {
+    id              String           @id @default(uuid()) @map("id") @db.Uuid
+    workshopType    WorkshopType     @map("workshop_type")
+    userId          String           @map("user_id") @db.Uuid
+    workshopTime    Int              @map("workshop_time")
+
+    @@index([workshopTime])
+    @@unique([workshopType, userId])
+    @@map("rpkm_workshops")
+}
+
+enum BottleChoice {
+    NONE
+    A
+    B
+    C
+    @@map("bottle_choice")
 }
 
 enum PrefixType {

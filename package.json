@@ -13,8 +13,7 @@
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
-    "swagger:gen": "ts-node -r tsconfig-paths/register src/docs/generate-swagger-docs.ts"
+    "prisma:migrate": "prisma migrate dev"
   },
   "repository": {
     "type": "git",
