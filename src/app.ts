@@ -10,6 +10,12 @@ const PORT = 8080;
 app.use(cors());
 app.use(bodyParser.json());
 
+// Simple request logging
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  next();
+});
+
 const routerManager = new RouterManager();
 
 app.use(routerManager.getRouter());
