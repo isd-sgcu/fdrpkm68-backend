@@ -1,8 +1,8 @@
 import { UserRepository } from "@/repository/user/userRepository";
-import { UpdateRequest } from "@/types/user/PATCH";
-import { AppError } from "@/types/error/AppError";
-import { validatePhoneNumber } from "@/utils/validatePhoneNumber";
 import { AuthUser } from "@/types/auth/authenticatedRequest";
+import { AppError } from "@/types/error/AppError";
+import { UpdateRequest } from "@/types/user/PATCH";
+import { validatePhoneNumber } from "@/utils/validatePhoneNumber";
 
 export class UserUsecase {
   private userRepository: UserRepository;

@@ -1,4 +1,5 @@
 import { HouseUseCase } from "./houseUsecase";
+
 import { HouseRepository } from "@/repository/house/houseRepository";
 import { House } from "@/types/house/house";
 

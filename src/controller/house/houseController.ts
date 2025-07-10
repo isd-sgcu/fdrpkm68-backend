@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
-import { UUID } from "@/types/common";
+
 import { HouseUseCase } from "../../usecase/house/houseUsecase";
+
+import { UUID } from "@/types/common";
 
 export class HouseController {
   private houseUserCase: HouseUseCase;

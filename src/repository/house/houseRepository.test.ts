@@ -1,6 +1,8 @@
-import { HouseRepository } from "./houseRepository";
-import { prisma } from "@/lib/prisma";
 import { Prisma, PrismaClient } from "@prisma/client";
+
+import { HouseRepository } from "./houseRepository";
+
+import { prisma } from "@/lib/prisma";
 import { House } from "@/types/house/house";
 
 // Mock Prisma client

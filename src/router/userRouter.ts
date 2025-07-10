@@ -1,4 +1,5 @@
 import { BaseRouter } from "./baseRouter";
+
 import { UserController } from "@/controller/user/userController";
 import { authMiddleware } from "@/middleware/authMiddleware";
 

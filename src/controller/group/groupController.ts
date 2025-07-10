@@ -1,12 +1,13 @@
-import { Request, Response } from "express";
-import { GroupUsecase } from "@/usecase/group/groupUsecase";
+import { Response } from "express";
+
+import { AuthenticatedRequest } from "@/types/auth/authenticatedRequest";
 import {
   JoinGroupRequest,
   KickMemberRequest,
   SetHousePreferencesRequest,
 } from "@/types/group/POST";
+import { GroupUsecase } from "@/usecase/group/groupUsecase";
 import { UUIDValidator } from "@/utils/uuidValidator";
-import { AuthenticatedRequest } from "@/types/auth/authenticatedRequest";
 
 export class GroupController {
   private groupUsecase: GroupUsecase;

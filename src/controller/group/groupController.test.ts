@@ -1,7 +1,9 @@
 import { Response } from "express";
+
 import { GroupController } from "./groupController";
-import { GroupUsecase } from "@/usecase/group/groupUsecase";
+
 import type { AuthenticatedRequest } from "@/types/auth/authenticatedRequest";
+import { GroupUsecase } from "@/usecase/group/groupUsecase";
 
 // Mock GroupUsecase
 jest.mock("@/usecase/group/groupUsecase");

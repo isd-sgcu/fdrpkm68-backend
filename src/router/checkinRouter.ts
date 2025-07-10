@@ -1,6 +1,7 @@
 import { BaseRouter } from "./baseRouter";
-import { CheckinController } from "@/controller/checkin/checkinController";
 import { authMiddleware } from "../middleware/authMiddleware";
+
+import { CheckinController } from "@/controller/checkin/checkinController";
 
 export class CheckinRouter extends BaseRouter {
   private checkinController: CheckinController;
@@ -24,8 +25,10 @@ export class CheckinRouter extends BaseRouter {
 
     // Get a check-in by userId and event
     this.router.get(
-      "/:userId/:event",
-      this.checkinController.getCheckinByUserIdAndEvent.bind(this.checkinController)
+      "/:event",
+      this.checkinController.getCheckinByUserIdAndEvent.bind(
+        this.checkinController
+      )
     );
 
     // Create a new check-in

@@ -1,6 +1,13 @@
-import { Checkin, CheckinStatusType, User, EventType, Prisma } from "@prisma/client";
-import { CheckinRepository } from "../../repository/checkin/checkinRepository";
-import { CheckinRequest } from "../../types/checkin/POST";
+import {
+  Checkin,
+  CheckinStatusType,
+  User,
+  EventType,
+  Prisma,
+} from "@prisma/client";
+
+import { CheckinRepository } from "@/repository/checkin/checkinRepository";
+import { CheckinRequest } from "@/types/checkin/POST";
 
 export class CheckinUsecase {
   private checkinRepository: CheckinRepository;

@@ -1,7 +1,8 @@
-import { Checkin, Prisma, EventType, CheckinStatusType } from "@prisma/client";
+import { Checkin, EventType, CheckinStatusType } from "@prisma/client";
+
 import { prisma } from "@/lib/prisma";
-import { AppError } from "../../types/error/AppError";
-import { CheckinRequest } from "../../types/checkin/POST";
+import { CheckinRequest } from "@/types/checkin/POST";
+import { AppError } from "@/types/error/AppError";
 
 export class CheckinRepository {
   // async findCheckinById(id: string): Promise<
@@ -57,11 +58,13 @@ export class CheckinRepository {
 
   async createCheckin(data: CheckinRequest): Promise<Checkin> {
     try {
-      const checkin = await prisma.checkin.create({ data: {
+      const checkin = await prisma.checkin.create({
+        data: {
           userId: data.userId,
-          event: data.event ,
-          status: data.status
-        } });
+          event: data.event,
+          status: data.status,
+        },
+      });
       return checkin;
     } catch (error) {
       console.error("Error creating checkin:", error);
