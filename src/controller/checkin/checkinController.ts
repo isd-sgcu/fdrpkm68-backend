@@ -1,10 +1,10 @@
 import { EventType } from "@prisma/client";
 import { Response } from "express";
 
-import type { AuthenticatedRequest } from "../../types/auth/authenticatedRequest";
-
 import { CheckinRequest } from "@/types/checkin/POST";
 import { CheckinUsecase } from "@/usecase/checkin/checkinUsecase";
+
+import type { AuthenticatedRequest } from "@/types/auth/authenticatedRequest";
 
 export class CheckinController {
   private checkinUsecase: CheckinUsecase;
@@ -45,6 +45,7 @@ export class CheckinController {
       }
       res.json(checkin);
     } catch (error) {
+      console.error("Error fetching check-in:", error);
       res.status(500).json({ error: "Failed to fetch check-in" });
     }
   }

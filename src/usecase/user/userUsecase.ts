@@ -17,7 +17,7 @@ export class UserUsecase {
       authUser!.studentId,
       authUser!.citizenId
     );
-    const { password: _, ...userWithoutPassword } = user!;
+    const { password: _password, ...userWithoutPassword } = user!;
 
     return userWithoutPassword;
   }

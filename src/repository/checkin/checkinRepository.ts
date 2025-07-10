@@ -1,4 +1,4 @@
-import { Checkin, EventType, CheckinStatusType } from "@prisma/client";
+import { Checkin, EventType } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 import { CheckinRequest } from "@/types/checkin/POST";

@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
 
-import type { RegisterRequest } from "@/types/auth/POST";
+
 import { AppError } from "@/types/error/AppError";
 import { AuthUsecase } from "@/usecase/auth/authUsecase";
+
+import type { RegisterRequest } from "@/types/auth/POST";
 
 export class AuthController {
   private authUseCase: AuthUsecase;

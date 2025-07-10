@@ -1,4 +1,4 @@
-import { Group, User, House, Prisma } from "@prisma/client";
+import { Group, User, House } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 import { InviteCodeGenerator } from "@/utils/inviteCodeGenerator";

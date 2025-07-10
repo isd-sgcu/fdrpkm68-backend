@@ -26,17 +26,17 @@ export default [
             "builtin",
             "external",
             "internal",
-            ["parent", "sibling", "index"],
+            ["parent", "sibling", "index", "object", "type"],
           ],
           "newlines-between": "always",
           alphabetize: { order: "asc", caseInsensitive: true },
         },
       ],
-      "no-unused-vars": [
+      "@typescript-eslint/no-unused-vars": [
         "warn",
         {
           varsIgnorePattern: "^_",
-          argsIgnorePattern: "^_",
+          argsIgnorePattern: ".*",
         },
       ],
     },
@@ -55,6 +55,8 @@ export default [
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-var-requires": "off",
       "@typescript-eslint/no-require-imports": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+      "import/order": "off",
     },
   },
 ];
