@@ -1,6 +1,6 @@
 import { PrefixType, RoleType } from "@prisma/client";
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from "../src/lib/prisma";
 
 async function setup() {
   console.log("🚀 Setting up test data...");

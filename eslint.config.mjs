@@ -5,6 +5,7 @@ import importPlugin from "eslint-plugin-import";
 export default [
   {
     files: ["**/*.ts"],
+    ignores: ["scripts/*"],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
