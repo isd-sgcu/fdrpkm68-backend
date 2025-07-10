@@ -1,9 +1,10 @@
-import { prisma } from "../src/lib/prisma";
 import { PrefixType, RoleType } from "@prisma/client";
+
+import { prisma } from "@/lib/prisma";
 
 async function setup() {
   console.log("🚀 Setting up test data...");
-  
+
   console.log("🗑️  Cleaning existing data...");
   await prisma.user.deleteMany({});
   await prisma.group.deleteMany({});
@@ -20,8 +21,8 @@ async function setup() {
         capacity: 100,
         instagram: "@redhouse",
         facebook: "redhouse",
-        tiktok: "@redhouse"
-      }
+        tiktok: "@redhouse",
+      },
     }),
     prisma.house.create({
       data: {
@@ -33,8 +34,8 @@ async function setup() {
         capacity: 100,
         instagram: "@bluehouse",
         facebook: "bluehouse",
-        tiktok: "@bluehouse"
-      }
+        tiktok: "@bluehouse",
+      },
     }),
     prisma.house.create({
       data: {
@@ -46,8 +47,8 @@ async function setup() {
         capacity: 80,
         instagram: "@greenhouse",
         facebook: "greenhouse",
-        tiktok: "@greenhouse"
-      }
+        tiktok: "@greenhouse",
+      },
     }),
     prisma.house.create({
       data: {
@@ -59,8 +60,8 @@ async function setup() {
         capacity: 80,
         instagram: "@yellowhouse",
         facebook: "yellowhouse",
-        tiktok: "@yellowhouse"
-      }
+        tiktok: "@yellowhouse",
+      },
     }),
     prisma.house.create({
       data: {
@@ -72,9 +73,9 @@ async function setup() {
         capacity: 60,
         instagram: "@purplehouse",
         facebook: "purplehouse",
-        tiktok: "@purplehouse"
-      }
-    })
+        tiktok: "@purplehouse",
+      },
+    }),
   ]);
 
   const users = await Promise.all([
@@ -93,8 +94,8 @@ async function setup() {
         parentName: "Jane Doe",
         parentPhoneNumber: "0823456789",
         parentRelationship: "Mother",
-        role: RoleType.FRESHMAN
-      }
+        role: RoleType.FRESHMAN,
+      },
     }),
     prisma.user.create({
       data: {
@@ -111,8 +112,8 @@ async function setup() {
         parentName: "Bob Smith",
         parentPhoneNumber: "0823456790",
         parentRelationship: "Father",
-        role: RoleType.FRESHMAN
-      }
+        role: RoleType.FRESHMAN,
+      },
     }),
     prisma.user.create({
       data: {
@@ -129,8 +130,8 @@ async function setup() {
         parentName: "Mary Johnson",
         parentPhoneNumber: "0823456791",
         parentRelationship: "Mother",
-        role: RoleType.FRESHMAN
-      }
+        role: RoleType.FRESHMAN,
+      },
     }),
     prisma.user.create({
       data: {
@@ -147,20 +148,22 @@ async function setup() {
         parentName: "David Williams",
         parentPhoneNumber: "0823456792",
         parentRelationship: "Father",
-        role: RoleType.FRESHMAN
-      }
-    })
+        role: RoleType.FRESHMAN,
+      },
+    }),
   ]);
 
   console.log("✅ Test data created successfully!");
   console.log("\n📋 Created Houses:");
-  houses.forEach(house => {
+  houses.forEach((house) => {
     console.log(`  - ${house.nameEnglish} (ID: ${house.id})`);
   });
-  
+
   console.log("\n👥 Created Users:");
-  users.forEach(user => {
-    console.log(`  - ${user.firstName} ${user.lastName} (ID: ${user.id}, Student ID: ${user.studentId})`);
+  users.forEach((user) => {
+    console.log(
+      `  - ${user.firstName} ${user.lastName} (ID: ${user.id}, Student ID: ${user.studentId})`
+    );
   });
 
   console.log("\n🔧 Example API calls:");
@@ -168,7 +171,7 @@ async function setup() {
   console.log(`curl -X POST http://localhost:8080/group \\`);
   console.log(`  -H "x-user-id: ${users[0].id}" \\`);
   console.log(`  -H "Content-Type: application/json"`);
-  
+
   console.log(`\n# Or using student ID:`);
   console.log(`curl -X POST http://localhost:8080/group \\`);
   console.log(`  -H "x-student-id: ${users[0].studentId}" \\`);

@@ -11,7 +11,7 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "lint": "eslint src --ext .ts",
-    "lint:fix": "eslint --ext .ts src --fix",
+    "lint:fix": "eslint --ext .ts src scripts --fix",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev"
   },
