@@ -16,6 +16,8 @@ export class UserRouter extends BaseRouter {
   private setupRoutes(): void {
     this.router.use(authMiddleware);
 
+    this.router.get("/", this.userController.get.bind(this.userController));
+
     this.router.patch(
       "/update",
       this.userController.update.bind(this.userController)
