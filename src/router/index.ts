@@ -3,6 +3,7 @@ import { AuthRouter } from "./authRouter";
 import { GroupRouter } from "./groupRouter";
 import { HouseRouter } from "./houseRouter";
 import { UserRouter } from "./userRouter";
+import { CheckinRouter } from "./checkinRouter";
 
 export class RouterManager {
   private router: Router;
@@ -17,11 +18,13 @@ export class RouterManager {
     const groupRouter = new GroupRouter();
     const houseRouter = new HouseRouter();
     const userRouter = new UserRouter();
+    const checkinRouter = new CheckinRouter();
 
     this.router.use("/auth", authRouter.getRouter());
     this.router.use("/group", groupRouter.getRouter());
     this.router.use("/houses", houseRouter.getRouter());
     this.router.use("/user", userRouter.getRouter());
+    this.router.use("/checkin", checkinRouter.getRouter());
   }
 
   public getRouter(): Router {
