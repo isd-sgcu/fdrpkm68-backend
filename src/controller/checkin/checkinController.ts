@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import { CheckinUsecase } from "@/usecase/checkin/checkinUsecase";
 import type { AuthenticatedRequest } from "../../types/auth/authenticatedRequest";
 import { CheckinRequest } from "../../types/checkin/POST";
@@ -27,8 +27,11 @@ export class CheckinController {
 
   async getCheckinByUserIdAndEvent(req: AuthenticatedRequest, res: Response) {
     try {
-      const userId = req.params.userId;
+      // const userId = req.params.userId;
+      const userId = req.user?.id// UUID string
       const event = req.params.event;
+      // Validate userId and event
+      
       if (!userId || !event) {
          res
           .status(400)

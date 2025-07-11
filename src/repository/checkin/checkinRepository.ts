@@ -54,6 +54,37 @@ export class CheckinRepository {
       throw new AppError("Failed to find checkin by userId and event", 404);
     }
   }
+  async findCheckinByUserIdEventandStatus(
+    userId: string,
+    event: EventType,
+    status: CheckinStatusType
+  ): Promise<
+    | (Checkin & {
+        id: string;
+        userId: string;
+        event: string;
+        status: string;
+        updatedAt: Date;
+        createdAt: Date;
+      })
+    | null
+  > {
+    try {
+      return await prisma.checkin.findFirst({
+        where: {
+          userId,
+          event,
+          status,
+        },
+        orderBy: {
+          status: "desc",
+        },
+      });
+    } catch (error) {
+      console.error("Error finding checkin by userId and event:", error);
+      throw new AppError("Failed to find checkin by userId and event", 404);
+    }
+  }
 
   async createCheckin(data: CheckinRequest): Promise<Checkin> {
     try {

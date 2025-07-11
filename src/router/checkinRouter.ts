@@ -24,7 +24,7 @@ export class CheckinRouter extends BaseRouter {
 
     // Get a check-in by userId and event
     this.router.get(
-      "/:userId/:event",
+      "/:event",
       this.checkinController.getCheckinByUserIdAndEvent.bind(this.checkinController)
     );
 
