@@ -106,38 +106,22 @@ export class UserRepository {
     return false;
   }
 
-  async registerStaff(body: RegisterRequest): Promise<User | null> {
-  
-  const staff = await prisma.staffData.findUnique({
-    where: {
-      studentId_citizenId: {
-        studentId: body.studentId,
-        citizenId: body.citizenId,
-      },
-    },
-  });
-
-    // there is no staff data 
-    if (!staff) {
-      // console.error("Staff data not found for registration");
-      return null;
-    }
-
-    const existing = await prisma.user.findUnique({
+  async findExistsStaff(studentId : string , citizenId : string): Promise<boolean> {
+    const staff = await prisma.staffData.findUnique({
       where: {
         studentId_citizenId: {
-          studentId: body.studentId,
-          citizenId: body.citizenId,
+          studentId: studentId,
+          citizenId: citizenId,
         },
       },
     });
-
-    //staff already exist in users table 
-    //!!!! there is a case that staff registered via nong nong form (registered as a freshmen), 
-    // then when register with /staff-register it causes error as they're already exist in users table. T^T
-    if (existing) {
-      return null;
+    if (staff) {
+      return true;
     }
+    return false;
+  }
+
+  async registerStaff(body: RegisterRequest): Promise<User | null> {
 
     //register staff to db
     const user = await prisma.user.create({

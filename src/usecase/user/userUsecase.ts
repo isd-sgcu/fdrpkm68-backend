@@ -56,6 +56,28 @@ export class UserUsecase {
       throw new AppError("Invalid registration request", 400);
     }
 
+    const existingStaff = await this.userRepository.findExistsStaff(
+      body.studentId,
+      body.citizenId
+    );
+
+    // there is no staff data in StaffData table
+    if (!existingStaff) {
+      throw new AppError("Staff data not found", 404);
+    }
+
+    const existingStaffInUsers = await this.userRepository.findExists(
+      body.studentId,
+      body.citizenId
+    );
+    
+    //staff already exist in users table 
+    //!!!! there is a case that staff registered via nong nong form (registered as a freshmen), 
+    // then when register with /staff-register it causes error as they're already exist in users table. T^T
+    if (existingStaffInUsers) {
+      throw new AppError("Staff already exists in users table", 409);
+    }
+
     body.password = await hashPassword(body.password);
 
     const user = await this.userRepository.registerStaff(body);
