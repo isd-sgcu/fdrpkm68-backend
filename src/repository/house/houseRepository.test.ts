@@ -1,10 +1,7 @@
-import { Prisma, PrismaClient } from "@prisma/client";
-
-
-import { prisma } from "@/lib/prisma";
-import { House } from "@/types/house/house";
-
 import { HouseRepository } from "./houseRepository";
+import { prisma } from "@/lib/prisma";
+import { Prisma, PrismaClient } from "@prisma/client";
+import { House } from "@/types/house/house";
 
 // Mock Prisma client
 jest.mock("@/lib/prisma", () => ({

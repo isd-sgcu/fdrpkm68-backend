@@ -1,5 +1,5 @@
-import { User } from "@prisma/client";
 import jwt from "jsonwebtoken";
+import { User } from "@prisma/client";
 
 const JWT_SECRET = process.env.JWT_SECRET || "secret";
 const EXPIRES_IN = "48h";

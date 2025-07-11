@@ -1,8 +1,6 @@
-
-import { GroupController } from "@/controller/group/groupController";
-import { authMiddleware } from "@/middleware/authMiddleware";
-
+import { authMiddleware } from "../middleware/authMiddleware";
 import { BaseRouter } from "./baseRouter";
+import { GroupController } from "@/controller/group/groupController";
 
 export class GroupRouter extends BaseRouter {
   private groupController: GroupController;

@@ -1,8 +1,6 @@
-
+import { BaseRouter } from "./baseRouter";
 import { UserController } from "@/controller/user/userController";
 import { authMiddleware } from "@/middleware/authMiddleware";
-
-import { BaseRouter } from "./baseRouter";
 
 export class UserRouter extends BaseRouter {
   private userController: UserController;
@@ -17,8 +15,6 @@ export class UserRouter extends BaseRouter {
 
   private setupRoutes(): void {
     this.router.use(authMiddleware);
-
-    this.router.get("/", this.userController.get.bind(this.userController));
 
     this.router.patch(
       "/update",

@@ -1,7 +1,6 @@
 import { UserRepository } from "@/repository/user/userRepository";
-import { AuthUser } from "@/types/auth/authenticatedRequest";
-import { AppError } from "@/types/error/AppError";
 import { UpdateRequest } from "@/types/user/PATCH";
+import { AppError } from "@/types/error/AppError";
 import { validatePhoneNumber } from "@/utils/validatePhoneNumber";
 import { RegisterRequest } from "@/types/auth/POST";
 import { hashPassword } from "@/utils/password";
@@ -11,17 +10,6 @@ export class UserUsecase {
 
   constructor() {
     this.userRepository = new UserRepository();
-  }
-
-  async get(authUser?: AuthUser) {
-    // Guarantee that authUser is defined (from middleware)
-    const user = await this.userRepository.getUserByCredentials(
-      authUser!.studentId,
-      authUser!.citizenId
-    );
-    const { password: _password, ...userWithoutPassword } = user!;
-
-    return userWithoutPassword;
   }
 
   async update(id: string | undefined, body: UpdateRequest) {

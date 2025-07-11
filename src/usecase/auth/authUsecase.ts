@@ -1,15 +1,17 @@
+import type { User } from "@prisma/client";
+
 import { UserRepository } from "@/repository/user/userRepository";
-import { AppError } from "@/types/error/AppError";
-import { signJwt } from "@/utils/jwt";
+
 import { hashPassword, comparePassword } from "@/utils/password";
-import { validatePhoneNumber } from "@/utils/validatePhoneNumber";
+import { signJwt } from "@/utils/jwt";
 
 import type {
   ForgotPasswordRequest,
   LoginRequest,
   RegisterRequest,
 } from "@/types/auth/POST";
-import type { User } from "@prisma/client";
+import { AppError } from "@/types/error/AppError";
+import { validatePhoneNumber } from "../../utils/validatePhoneNumber";
 
 export class AuthUsecase {
   private userRepository: UserRepository;

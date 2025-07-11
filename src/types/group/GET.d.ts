@@ -1,3 +1,5 @@
+import { Group, User, House } from "@prisma/client";
+
 export interface ApiResponse<T> {
   success: boolean;
   message: string;

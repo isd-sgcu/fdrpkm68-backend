@@ -1,8 +1,7 @@
-import { Checkin, EventType } from "@prisma/client";
-
+import { Checkin, Prisma, EventType, CheckinStatusType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { CheckinRequest } from "@/types/checkin/POST";
-import { AppError } from "@/types/error/AppError";
+import { AppError } from "../../types/error/AppError";
+import { CheckinRequest } from "../../types/checkin/POST";
 
 export class CheckinRepository {
   // async findCheckinById(id: string): Promise<
@@ -55,47 +54,14 @@ export class CheckinRepository {
       throw new AppError("Failed to find checkin by userId and event", 404);
     }
   }
-  async findCheckinByUserIdEventandStatus(
-    userId: string,
-    event: EventType,
-    status: CheckinStatusType
-  ): Promise<
-    | (Checkin & {
-        id: string;
-        userId: string;
-        event: string;
-        status: string;
-        updatedAt: Date;
-        createdAt: Date;
-      })
-    | null
-  > {
-    try {
-      return await prisma.checkin.findFirst({
-        where: {
-          userId,
-          event,
-          status,
-        },
-        orderBy: {
-          status: "desc",
-        },
-      });
-    } catch (error) {
-      console.error("Error finding checkin by userId and event:", error);
-      throw new AppError("Failed to find checkin by userId and event", 404);
-    }
-  }
 
   async createCheckin(data: CheckinRequest): Promise<Checkin> {
     try {
-      const checkin = await prisma.checkin.create({
-        data: {
+      const checkin = await prisma.checkin.create({ data: {
           userId: data.userId,
-          event: data.event,
-          status: data.status,
-        },
-      });
+          event: data.event ,
+          status: data.status
+        } });
       return checkin;
     } catch (error) {
       console.error("Error creating checkin:", error);

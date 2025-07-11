@@ -1,4 +1,5 @@
-import { PrefixType, RoleType } from "@prisma/client";
+import { FacultyId, PrefixType, RoleType } from "@prisma/client";
+import type { UUID } from "crypto";
 
 export interface LoginRequest {
   studentId: string;

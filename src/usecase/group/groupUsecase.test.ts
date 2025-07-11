@@ -1,9 +1,7 @@
-
+import { GroupUsecase } from "./groupUsecase";
 import { GroupRepository } from "@/repository/group/groupRepository";
 import { HouseRepository } from "@/repository/house/houseRepository";
 import { InviteCodeGenerator } from "@/utils/inviteCodeGenerator";
-
-import { GroupUsecase } from "./groupUsecase";
 
 // Mock dependencies
 jest.mock("@/repository/group/groupRepository");
@@ -24,11 +22,11 @@ describe("GroupUsecase", () => {
     groupUsecase = new GroupUsecase();
     mockGroupRepository = new GroupRepository() as jest.Mocked<GroupRepository>;
     mockHouseRepository = new HouseRepository() as jest.Mocked<HouseRepository>;
-
+    
     // Mock the repositories in the usecase
     (groupUsecase as any).groupRepository = mockGroupRepository;
     (groupUsecase as any).houseRepository = mockHouseRepository;
-
+    
     jest.clearAllMocks();
   });
 
@@ -58,9 +56,7 @@ describe("GroupUsecase", () => {
       expect(result.memberCount).toBe(1);
       expect(result.isConfirmed).toBe(false);
       expect(mockGroupRepository.findUserGroup).toHaveBeenCalledWith("user-1");
-      expect(mockGroupRepository.createGroupForUser).toHaveBeenCalledWith(
-        "user-1"
-      );
+      expect(mockGroupRepository.createGroupForUser).toHaveBeenCalledWith("user-1");
       expect(mockGroupRepository.removeUserFromGroup).not.toHaveBeenCalled();
     });
 
@@ -80,10 +76,9 @@ describe("GroupUsecase", () => {
 
       mockGroupRepository.findUserGroup.mockResolvedValue(existingGroup as any);
 
-      await expect(groupUsecase.createGroupForUser("user-1")).rejects.toThrow(
-        "User already owns a group"
-      );
-
+      await expect(groupUsecase.createGroupForUser("user-1"))
+        .rejects.toThrow("User already owns a group");
+        
       expect(mockGroupRepository.findUserGroup).toHaveBeenCalledWith("user-1");
       expect(mockGroupRepository.createGroupForUser).not.toHaveBeenCalled();
       expect(mockGroupRepository.removeUserFromGroup).not.toHaveBeenCalled();
@@ -126,19 +121,12 @@ describe("GroupUsecase", () => {
       expect(result).toEqual(newGroup);
       expect(result.ownerId).toBe("user-1");
       expect(mockGroupRepository.findUserGroup).toHaveBeenCalledWith("user-1");
-      expect(mockGroupRepository.removeUserFromGroup).toHaveBeenCalledWith(
-        "user-1",
-        "group-1"
-      );
-      expect(mockGroupRepository.createGroupForUser).toHaveBeenCalledWith(
-        "user-1"
-      );
-
+      expect(mockGroupRepository.removeUserFromGroup).toHaveBeenCalledWith("user-1", "group-1");
+      expect(mockGroupRepository.createGroupForUser).toHaveBeenCalledWith("user-1");
+      
       // Verify call order
-      const calls = jest.mocked(mockGroupRepository.removeUserFromGroup).mock
-        .calls;
-      const createCalls = jest.mocked(mockGroupRepository.createGroupForUser)
-        .mock.calls;
+      const calls = jest.mocked(mockGroupRepository.removeUserFromGroup).mock.calls;
+      const createCalls = jest.mocked(mockGroupRepository.createGroupForUser).mock.calls;
       expect(calls.length).toBe(1);
       expect(createCalls.length).toBe(1);
     });
@@ -147,10 +135,8 @@ describe("GroupUsecase", () => {
       const dbError = new Error("Database connection failed");
       mockGroupRepository.findUserGroup.mockRejectedValue(dbError);
 
-      await expect(groupUsecase.createGroupForUser("user-1")).rejects.toThrow(
-        "Database connection failed"
-      );
-
+      await expect(groupUsecase.createGroupForUser("user-1")).rejects.toThrow("Database connection failed");
+      
       expect(mockGroupRepository.findUserGroup).toHaveBeenCalledWith("user-1");
       expect(mockGroupRepository.createGroupForUser).not.toHaveBeenCalled();
       expect(mockGroupRepository.removeUserFromGroup).not.toHaveBeenCalled();
@@ -161,14 +147,10 @@ describe("GroupUsecase", () => {
       mockGroupRepository.findUserGroup.mockResolvedValue(null);
       mockGroupRepository.createGroupForUser.mockRejectedValue(createError);
 
-      await expect(groupUsecase.createGroupForUser("user-1")).rejects.toThrow(
-        "Failed to create group"
-      );
-
+      await expect(groupUsecase.createGroupForUser("user-1")).rejects.toThrow("Failed to create group");
+      
       expect(mockGroupRepository.findUserGroup).toHaveBeenCalledWith("user-1");
-      expect(mockGroupRepository.createGroupForUser).toHaveBeenCalledWith(
-        "user-1"
-      );
+      expect(mockGroupRepository.createGroupForUser).toHaveBeenCalledWith("user-1");
       expect(mockGroupRepository.removeUserFromGroup).not.toHaveBeenCalled();
     });
   });
@@ -197,30 +179,22 @@ describe("GroupUsecase", () => {
       await groupUsecase.joinGroup("user-1", "ABC123");
 
       expect(InviteCodeGenerator.isValidFormat).toHaveBeenCalledWith("ABC123");
-      expect(mockGroupRepository.findGroupByInviteCode).toHaveBeenCalledWith(
-        "ABC123"
-      );
+      expect(mockGroupRepository.findGroupByInviteCode).toHaveBeenCalledWith("ABC123");
       expect(mockGroupRepository.findUserGroup).toHaveBeenCalledWith("user-1");
-      expect(mockGroupRepository.addUserToGroup).toHaveBeenCalledWith(
-        "user-1",
-        "group-1"
-      );
-
+      expect(mockGroupRepository.addUserToGroup).toHaveBeenCalledWith("user-1", "group-1");
+      
       // Verify validation checks were called
       expect(InviteCodeGenerator.isValidFormat).toHaveBeenCalledTimes(1);
-      expect(mockGroupRepository.findGroupByInviteCode).toHaveBeenCalledTimes(
-        1
-      );
+      expect(mockGroupRepository.findGroupByInviteCode).toHaveBeenCalledTimes(1);
       expect(mockGroupRepository.findUserGroup).toHaveBeenCalledTimes(1);
     });
 
     it("should throw error for invalid invite code format", async () => {
       (InviteCodeGenerator.isValidFormat as jest.Mock).mockReturnValue(false);
 
-      await expect(groupUsecase.joinGroup("user-1", "invalid")).rejects.toThrow(
-        "Invalid invite code format"
-      );
-
+      await expect(groupUsecase.joinGroup("user-1", "invalid"))
+        .rejects.toThrow("Invalid invite code format");
+        
       expect(InviteCodeGenerator.isValidFormat).toHaveBeenCalledWith("invalid");
       expect(mockGroupRepository.findGroupByInviteCode).not.toHaveBeenCalled();
       expect(mockGroupRepository.addUserToGroup).not.toHaveBeenCalled();
@@ -230,14 +204,11 @@ describe("GroupUsecase", () => {
       (InviteCodeGenerator.isValidFormat as jest.Mock).mockReturnValue(true);
       mockGroupRepository.findGroupByInviteCode.mockResolvedValue(null);
 
-      await expect(groupUsecase.joinGroup("user-1", "ABC123")).rejects.toThrow(
-        "Invalid invite code"
-      );
-
+      await expect(groupUsecase.joinGroup("user-1", "ABC123"))
+        .rejects.toThrow("Invalid invite code");
+        
       expect(InviteCodeGenerator.isValidFormat).toHaveBeenCalledWith("ABC123");
-      expect(mockGroupRepository.findGroupByInviteCode).toHaveBeenCalledWith(
-        "ABC123"
-      );
+      expect(mockGroupRepository.findGroupByInviteCode).toHaveBeenCalledWith("ABC123");
       expect(mockGroupRepository.findUserGroup).not.toHaveBeenCalled();
       expect(mockGroupRepository.addUserToGroup).not.toHaveBeenCalled();
     });
@@ -260,14 +231,11 @@ describe("GroupUsecase", () => {
       (InviteCodeGenerator.isValidFormat as jest.Mock).mockReturnValue(true);
       mockGroupRepository.findGroupByInviteCode.mockResolvedValue(targetGroup);
 
-      await expect(groupUsecase.joinGroup("user-1", "ABC123")).rejects.toThrow(
-        "Cannot join a confirmed group"
-      );
-
+      await expect(groupUsecase.joinGroup("user-1", "ABC123"))
+        .rejects.toThrow("Cannot join a confirmed group");
+        
       expect(InviteCodeGenerator.isValidFormat).toHaveBeenCalledWith("ABC123");
-      expect(mockGroupRepository.findGroupByInviteCode).toHaveBeenCalledWith(
-        "ABC123"
-      );
+      expect(mockGroupRepository.findGroupByInviteCode).toHaveBeenCalledWith("ABC123");
       expect(mockGroupRepository.findUserGroup).not.toHaveBeenCalled();
       expect(mockGroupRepository.addUserToGroup).not.toHaveBeenCalled();
     });
@@ -290,9 +258,8 @@ describe("GroupUsecase", () => {
       (InviteCodeGenerator.isValidFormat as jest.Mock).mockReturnValue(true);
       mockGroupRepository.findGroupByInviteCode.mockResolvedValue(targetGroup);
 
-      await expect(groupUsecase.joinGroup("user-1", "ABC123")).rejects.toThrow(
-        "Group is at maximum capacity (3 members)"
-      );
+      await expect(groupUsecase.joinGroup("user-1", "ABC123"))
+        .rejects.toThrow("Group is at maximum capacity (3 members)");
     });
 
     it("should throw error if user is already in a group", async () => {
@@ -319,9 +286,8 @@ describe("GroupUsecase", () => {
       mockGroupRepository.findGroupByInviteCode.mockResolvedValue(targetGroup);
       mockGroupRepository.findUserGroup.mockResolvedValue(currentGroup as any);
 
-      await expect(groupUsecase.joinGroup("user-1", "ABC123")).rejects.toThrow(
-        "User is already in a group. Leave current group first."
-      );
+      await expect(groupUsecase.joinGroup("user-1", "ABC123"))
+        .rejects.toThrow("User is already in a group. Leave current group first.");
     });
 
     it("should throw error if user tries to join their own group", async () => {
@@ -343,9 +309,8 @@ describe("GroupUsecase", () => {
       mockGroupRepository.findGroupByInviteCode.mockResolvedValue(targetGroup);
       mockGroupRepository.findUserGroup.mockResolvedValue(null);
 
-      await expect(groupUsecase.joinGroup("user-1", "ABC123")).rejects.toThrow(
-        "Cannot join your own group"
-      );
+      await expect(groupUsecase.joinGroup("user-1", "ABC123"))
+        .rejects.toThrow("Cannot join your own group");
     });
   });
 
@@ -379,9 +344,8 @@ describe("GroupUsecase", () => {
     it("should throw error if user is not in any group", async () => {
       mockGroupRepository.findUserGroup.mockResolvedValue(null);
 
-      await expect(groupUsecase.leaveGroup("user-1")).rejects.toThrow(
-        "User is not in any group"
-      );
+      await expect(groupUsecase.leaveGroup("user-1"))
+        .rejects.toThrow("User is not in any group");
     });
 
     it("should throw error if group is confirmed", async () => {
@@ -401,9 +365,8 @@ describe("GroupUsecase", () => {
 
       mockGroupRepository.findUserGroup.mockResolvedValue(currentGroup as any);
 
-      await expect(groupUsecase.leaveGroup("user-1")).rejects.toThrow(
-        "Cannot leave a confirmed group"
-      );
+      await expect(groupUsecase.leaveGroup("user-1"))
+        .rejects.toThrow("Cannot leave a confirmed group");
     });
 
     it("should throw error if owner tries to leave", async () => {
@@ -423,9 +386,8 @@ describe("GroupUsecase", () => {
 
       mockGroupRepository.findUserGroup.mockResolvedValue(currentGroup as any);
 
-      await expect(groupUsecase.leaveGroup("user-1")).rejects.toThrow(
-        "Group owner cannot leave their own group"
-      );
+      await expect(groupUsecase.leaveGroup("user-1"))
+        .rejects.toThrow("Group owner cannot leave their own group");
     });
   });
 
@@ -473,9 +435,8 @@ describe("GroupUsecase", () => {
 
       mockGroupRepository.findUserGroup.mockResolvedValue(ownerGroup as any);
 
-      await expect(groupUsecase.kickMember("user-1", "user-3")).rejects.toThrow(
-        "Only group owner can kick members"
-      );
+      await expect(groupUsecase.kickMember("user-1", "user-3"))
+        .rejects.toThrow("Only group owner can kick members");
     });
 
     it("should throw error if group is confirmed", async () => {
@@ -495,9 +456,8 @@ describe("GroupUsecase", () => {
 
       mockGroupRepository.findUserGroup.mockResolvedValue(ownerGroup as any);
 
-      await expect(groupUsecase.kickMember("user-1", "user-2")).rejects.toThrow(
-        "Cannot kick members from a confirmed group"
-      );
+      await expect(groupUsecase.kickMember("user-1", "user-2"))
+        .rejects.toThrow("Cannot kick members from a confirmed group");
     });
 
     it("should throw error if member is not in group", async () => {
@@ -517,9 +477,8 @@ describe("GroupUsecase", () => {
 
       mockGroupRepository.findUserGroup.mockResolvedValue(ownerGroup as any);
 
-      await expect(groupUsecase.kickMember("user-1", "user-2")).rejects.toThrow(
-        "User is not a member of this group"
-      );
+      await expect(groupUsecase.kickMember("user-1", "user-2"))
+        .rejects.toThrow("User is not a member of this group");
     });
 
     it("should throw error if trying to kick the owner", async () => {
@@ -539,9 +498,8 @@ describe("GroupUsecase", () => {
 
       mockGroupRepository.findUserGroup.mockResolvedValue(ownerGroup as any);
 
-      await expect(groupUsecase.kickMember("user-1", "user-1")).rejects.toThrow(
-        "Cannot kick the group owner"
-      );
+      await expect(groupUsecase.kickMember("user-1", "user-1"))
+        .rejects.toThrow("Cannot kick the group owner");
     });
   });
 
@@ -589,9 +547,8 @@ describe("GroupUsecase", () => {
 
       mockGroupRepository.findUserGroup.mockResolvedValue(userGroup as any);
 
-      await expect(groupUsecase.confirmGroup("user-1")).rejects.toThrow(
-        "Only group owner can confirm the group"
-      );
+      await expect(groupUsecase.confirmGroup("user-1"))
+        .rejects.toThrow("Only group owner can confirm the group");
     });
 
     it("should throw error if group is already confirmed", async () => {
@@ -611,9 +568,8 @@ describe("GroupUsecase", () => {
 
       mockGroupRepository.findUserGroup.mockResolvedValue(userGroup as any);
 
-      await expect(groupUsecase.confirmGroup("user-1")).rejects.toThrow(
-        "Group is already confirmed"
-      );
+      await expect(groupUsecase.confirmGroup("user-1"))
+        .rejects.toThrow("Group is already confirmed");
     });
   });
 });
