@@ -1,7 +1,7 @@
-import { UUID } from "@/types/common";
 import { HouseRepository } from "@/repository/house/houseRepository";
-import { House } from "@/types/house/house";
+import { UUID } from "@/types/common";
 import { AppError } from "@/types/error/AppError";
+import { House } from "@/types/house/house";
 
 export class HouseUseCase {
   private houseRepository: HouseRepository;

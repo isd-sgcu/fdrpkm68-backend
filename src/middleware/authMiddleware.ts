@@ -1,5 +1,6 @@
 import { AppError } from "@/types/error/AppError";
 import { verifyJwt } from "@/utils/jwt";
+
 import type { Request, Response, NextFunction } from "express";
 
 declare module "express" {
@@ -28,7 +29,8 @@ export function authMiddleware(
     const decoded = verifyJwt(token);
     req.user = decoded;
     next();
-  } catch (error) {
+  } catch (error: unknown) {
+    console.error("JWT verification error:", error);
     throw new AppError("Unauthorized: Invalid token", 401);
   }
 }

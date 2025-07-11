@@ -1,9 +1,10 @@
 import { Router } from "express";
+
 import { AuthRouter } from "./authRouter";
+import { CheckinRouter } from "./checkinRouter";
 import { GroupRouter } from "./groupRouter";
 import { HouseRouter } from "./houseRouter";
 import { UserRouter } from "./userRouter";
-import { CheckinRouter } from "./checkinRouter";
 
 export class RouterManager {
   private router: Router;

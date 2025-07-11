@@ -1,6 +1,8 @@
-import { HouseUseCase } from "./houseUsecase";
+
 import { HouseRepository } from "@/repository/house/houseRepository";
 import { House } from "@/types/house/house";
+
+import { HouseUseCase } from "./houseUsecase";
 
 // Mock HouseRepository
 jest.mock("@/repository/house/houseRepository");
