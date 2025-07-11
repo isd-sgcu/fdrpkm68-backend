@@ -1,6 +1,8 @@
 import type { Request, Response } from "express";
 import { UserUsecase } from "@/usecase/user/userUsecase";
 import type { AuthenticatedRequest } from "@/types/auth/authenticatedRequest";
+import type { RegisterRequest } from "@/types/auth/POST";
+import { AppError } from "@/types/error/AppError";
 
 export class UserController {
   private userUseCase: UserUsecase;
@@ -30,4 +32,24 @@ export class UserController {
       });
     }
   }
+
+  async registerStaff(req: Request, res: Response): Promise<void> {
+    try {
+      const user = await this.userUseCase.registerStaff(
+        req.body as RegisterRequest
+      );
+      res.status(201).json({ user });
+      return;
+    } catch (error: unknown) {
+      if (error instanceof AppError) {
+        res.status(error.statusCode).json({ message: error.message });
+        return;
+      }
+      console.error("Error registering staff:", error);
+      res.status(500).json({
+        message: "An unexpected error occurred",
+      });
+    }
+  }
+
 }

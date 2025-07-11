@@ -105,4 +105,70 @@ export class UserRepository {
     }
     return false;
   }
+
+  async registerStaff(body: RegisterRequest): Promise<User | null> {
+  
+  const staff = await prisma.staffData.findUnique({
+    where: {
+      studentId_citizenId: {
+        studentId: body.studentId,
+        citizenId: body.citizenId,
+      },
+    },
+  });
+
+    // there is no staff data 
+    if (!staff) {
+      console.error("Staff data not found for registration");
+      return null;
+    }
+
+    const existing = await prisma.user.findUnique({
+      where: {
+        studentId_citizenId: {
+          studentId: body.studentId,
+          citizenId: body.citizenId,
+        },
+      },
+    });
+
+    //staff already exist in users table 
+    //!!!! there is a case that staff registered via nong nong form (registered as a freshmen), 
+    // then when register with /staff-register it causes error as they're already exist in users table. T^T
+    if (existing) {
+      await prisma.user.delete({
+        where: {
+          id: existing.id,
+        },
+      });
+    }
+    
+
+    //register staff to db
+    const user = await prisma.user.create({
+      data: {
+        studentId: body.studentId,
+        citizenId: body.citizenId,
+        prefix: body.prefix,
+        firstName: body.firstName,
+        lastName: body.lastName,
+        nickname: body.nickname,
+        academicYear: body.academicYear,
+        faculty: body.faculty,
+        password: body.password,
+        phoneNumber: body.phoneNumber,
+        parentName: body.parentName,
+        parentPhoneNumber: body.parentPhoneNumber,
+        parentRelationship: body.parentRelationship,
+        foodAllergy: body.foodAllergy || null,
+        drugAllergy: body.drugAllergy || null,
+        illness: body.illness || null,
+        avatarId: Math.floor(Math.random() * 5) + 1,
+        role: body.role,
+      },
+    });
+
+    return user;
+  }
+
 }
