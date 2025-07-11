@@ -1,8 +1,10 @@
-import { House } from "@/types/house/house";
-import { UUID } from "@/types/common";
-import { prisma } from "@/lib/prisma";
-import { HouseModel } from "@/types/models";
 import { Prisma, PrismaClient } from "@prisma/client";
+
+import { prisma } from "@/lib/prisma";
+import { UUID } from "@/types/common";
+import { House } from "@/types/house/house";
+import { HouseModel } from "@/types/models";
+
 
 export class HouseRepository {
   async getAllHouses(): Promise<House[]> {
