@@ -119,7 +119,7 @@ export class UserRepository {
 
     // there is no staff data 
     if (!staff) {
-      console.error("Staff data not found for registration");
+      // console.error("Staff data not found for registration");
       return null;
     }
 
@@ -136,13 +136,8 @@ export class UserRepository {
     //!!!! there is a case that staff registered via nong nong form (registered as a freshmen), 
     // then when register with /staff-register it causes error as they're already exist in users table. T^T
     if (existing) {
-      await prisma.user.delete({
-        where: {
-          id: existing.id,
-        },
-      });
+      return null;
     }
-    
 
     //register staff to db
     const user = await prisma.user.create({
