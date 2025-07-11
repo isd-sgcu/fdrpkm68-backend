@@ -55,3 +55,8 @@ export enum GroupRoleType {
   OWNER = "OWNER",
   MEMBER = "MEMBER",
 }
+
+export enum WorkshopType {
+  DIFFUSER = "DIFFUSER",
+  KEYCHAIN = "KEYCHAIN",
+}
