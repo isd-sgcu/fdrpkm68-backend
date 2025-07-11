@@ -1,9 +1,10 @@
 import { Group, User, House } from "@prisma/client";
+
+import { prisma } from "@/lib/prisma";
 import { GroupRepository } from "@/repository/group/groupRepository";
 import { HouseRepository } from "@/repository/house/houseRepository";
-import { InviteCodeGenerator } from "@/utils/inviteCodeGenerator";
-import { prisma } from "@/lib/prisma";
 import { AppError } from "@/types/error/AppError";
+import { InviteCodeGenerator } from "@/utils/inviteCodeGenerator";
 
 export class GroupUsecase {
   private groupRepository: GroupRepository;

@@ -1,6 +1,6 @@
-import { BaseRouter } from "@/router/baseRouter";
 import { HouseController } from "@/controller/house/houseController";
-import { authMiddleware } from "../middleware/authMiddleware";
+import { authMiddleware } from "@/middleware/authMiddleware";
+import { BaseRouter } from "@/router/baseRouter";
 
 export class HouseRouter extends BaseRouter {
   private houseController!: HouseController;

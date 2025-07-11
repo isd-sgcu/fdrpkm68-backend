@@ -1,6 +1,8 @@
-import { BaseRouter } from "./baseRouter";
 import { CheckinController } from "@/controller/checkin/checkinController";
+
+import { BaseRouter } from "./baseRouter";
 import { authMiddleware } from "../middleware/authMiddleware";
+
 
 export class CheckinRouter extends BaseRouter {
   private checkinController: CheckinController;

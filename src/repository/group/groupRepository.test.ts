@@ -1,5 +1,6 @@
-import { GroupRepository } from "./groupRepository";
 import { InviteCodeGenerator } from "@/utils/inviteCodeGenerator";
+
+import { GroupRepository } from "./groupRepository";
 
 // Mock Prisma client
 jest.mock("@/lib/prisma", () => ({
@@ -136,7 +137,9 @@ describe("GroupRepository", () => {
       } as any;
 
       (InviteCodeGenerator.generate as jest.Mock).mockResolvedValue("ABC123");
-      (mockPrisma.$transaction as jest.Mock).mockImplementation((callback: any) => callback(mockTx));
+      (mockPrisma.$transaction as jest.Mock).mockImplementation(
+        (callback: any) => callback(mockTx)
+      );
 
       const result = await groupRepository.createGroupForUser("user-1");
 
@@ -164,7 +167,9 @@ describe("GroupRepository", () => {
         group: { update: jest.fn() },
       } as any;
 
-      (mockPrisma.$transaction as jest.Mock).mockImplementation((callback: any) => callback(mockTx));
+      (mockPrisma.$transaction as jest.Mock).mockImplementation(
+        (callback: any) => callback(mockTx)
+      );
 
       await groupRepository.addUserToGroup("user-1", "group-1");
 
@@ -186,7 +191,9 @@ describe("GroupRepository", () => {
         group: { update: jest.fn() },
       } as any;
 
-      (mockPrisma.$transaction as jest.Mock).mockImplementation((callback: any) => callback(mockTx));
+      (mockPrisma.$transaction as jest.Mock).mockImplementation(
+        (callback: any) => callback(mockTx)
+      );
 
       await groupRepository.removeUserFromGroup("user-1", "group-1");
 
@@ -236,7 +243,9 @@ describe("GroupRepository", () => {
 
   describe("isGroupOwner", () => {
     it("should return true if user is owner", async () => {
-      (mockPrisma.group.findUnique as jest.Mock).mockResolvedValue({ ownerId: "user-1" });
+      (mockPrisma.group.findUnique as jest.Mock).mockResolvedValue({
+        ownerId: "user-1",
+      });
 
       const result = await groupRepository.isGroupOwner("user-1", "group-1");
 
@@ -244,7 +253,9 @@ describe("GroupRepository", () => {
     });
 
     it("should return false if user is not owner", async () => {
-      (mockPrisma.group.findUnique as jest.Mock).mockResolvedValue({ ownerId: "user-2" });
+      (mockPrisma.group.findUnique as jest.Mock).mockResolvedValue({
+        ownerId: "user-2",
+      });
 
       const result = await groupRepository.isGroupOwner("user-1", "group-1");
 

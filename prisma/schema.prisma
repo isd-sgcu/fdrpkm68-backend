@@ -7,6 +7,16 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+model StaffData {
+    id       String   @id @default(uuid()) @map("id") @db.Uuid
+    studentId String   @map("student_id")
+    citizenId String   @map("citizen_id")
+
+    @@unique([studentId, citizenId])
+    @@index([studentId])
+    @@index([citizenId])
+}
+
 model User {
     id                 String     @id @default(uuid()) @map("id") @db.Uuid
     studentId          String     @map("student_id")
@@ -119,6 +129,13 @@ model RPKMworkshop {
     @@index([workshopTime])
     @@unique([workshopType, userId])
     @@map("rpkm_workshops")
+}
+
+enum WorkshopType {
+    DIFFUSER
+    KEYCHAIN
+
+    @@map("workshop_type")
 }
 
 enum BottleChoice {
