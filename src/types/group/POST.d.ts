@@ -1,7 +1,7 @@
 import { ApiResponse } from "./GET";
 
-export interface CreateGroupRequest {
-}
+// export interface CreateGroupRequest {
+// }
 
 export interface JoinGroupRequest {
   inviteCode: string;
@@ -11,11 +11,11 @@ export interface KickMemberRequest {
   userId: string;
 }
 
-export interface ConfirmGroupRequest {
-}
+// export interface ConfirmGroupRequest {
+// }
 
-export interface RegenerateInviteCodeRequest {
-}
+// export interface RegenerateInviteCodeRequest {
+// }
 
 export interface SetHousePreferencesRequest {
   houseRank1?: string | null;
@@ -74,8 +74,10 @@ export type CreateGroupApiResponse = ApiResponse<CreateGroupResponse>;
 export type JoinGroupApiResponse = ApiResponse<JoinGroupResponse>;
 export type KickMemberApiResponse = ApiResponse<KickMemberResponse>;
 export type ConfirmGroupApiResponse = ApiResponse<ConfirmGroupResponse>;
-export type RegenerateInviteCodeApiResponse = ApiResponse<RegenerateInviteCodeResponse>;
-export type SetHousePreferencesApiResponse = ApiResponse<SetHousePreferencesResponse>;
+export type RegenerateInviteCodeApiResponse =
+  ApiResponse<RegenerateInviteCodeResponse>;
+export type SetHousePreferencesApiResponse =
+  ApiResponse<SetHousePreferencesResponse>;
 
 export type SuccessResponse = ApiResponse<{ message: string }>;
 

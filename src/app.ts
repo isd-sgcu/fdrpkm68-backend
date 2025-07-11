@@ -1,7 +1,8 @@
 import "dotenv/config";
-import express, { Request, Response } from "express";
-import cors from "cors";
 import bodyParser from "body-parser";
+import cors from "cors";
+import express, { Request, Response } from "express";
+
 import { RouterManager } from "@/router";
 
 const app = express();

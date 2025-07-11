@@ -1,9 +1,7 @@
 import { User } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
-
 import { GroupRepository } from "@/repository/group/groupRepository";
-
 import { RegisterRequest } from "@/types/auth/POST";
 import { UpdateRequest } from "@/types/user/PATCH";
 

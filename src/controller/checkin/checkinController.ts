@@ -1,8 +1,10 @@
-import { Request, Response } from "express";
-import { CheckinUsecase } from "@/usecase/checkin/checkinUsecase";
-import type { AuthenticatedRequest } from "../../types/auth/authenticatedRequest";
-import { CheckinRequest } from "../../types/checkin/POST";
 import { EventType } from "@prisma/client";
+import { Response } from "express";
+
+import { CheckinRequest } from "@/types/checkin/POST";
+import { CheckinUsecase } from "@/usecase/checkin/checkinUsecase";
+
+import type { AuthenticatedRequest } from "@/types/auth/authenticatedRequest";
 
 export class CheckinController {
   private checkinUsecase: CheckinUsecase;
@@ -27,13 +29,13 @@ export class CheckinController {
 
   async getCheckinByUserIdAndEvent(req: AuthenticatedRequest, res: Response) {
     try {
-      const userId = req.params.userId;
+      const userId = req.user?.id;
       const event = req.params.event;
+      // Validate userId and event
+      
       if (!userId || !event) {
-         res
-          .status(400)
-          .json({ message: "User ID and event are required" });
-          return
+        res.status(400).json({ message: "User ID and event are required" });
+        return;
       }
       const checkin = await this.checkinUsecase.findCheckinByUserIdAndEvent(
         userId,
@@ -45,6 +47,7 @@ export class CheckinController {
       }
       res.json(checkin);
     } catch (error) {
+      console.error("Error fetching check-in:", error);
       res.status(500).json({ error: "Failed to fetch check-in" });
     }
   }
