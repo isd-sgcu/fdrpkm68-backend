@@ -1,9 +1,10 @@
-import { User } from "@prisma/client";
+import { User, BottleChoice } from '@prisma/client';
 
 import { prisma } from "@/lib/prisma";
 import { GroupRepository } from "@/repository/group/groupRepository";
 import { RegisterRequest } from "@/types/auth/POST";
 import { UpdateRequest } from "@/types/user/PATCH";
+import { AppError } from '../../types/error/AppError';
 
 export class UserRepository {
   private groupRepository: GroupRepository;
@@ -102,5 +103,21 @@ export class UserRepository {
       return true;
     }
     return false;
+  }
+
+  async updateBottleChoice(id: string, bottleChoice: BottleChoice): Promise<void> {
+    try {
+      await prisma.user.update({
+        where: {
+          id: id,
+        },
+        data: {
+          bottleChoice,
+        },
+      });
+    } catch (error) {
+      console.error("Error updating bottle choice:", error);
+      throw new AppError("Failed to update bottle choice", 404);
+    }
   }
 }
