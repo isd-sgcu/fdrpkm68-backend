@@ -31,6 +31,8 @@ export class CheckinController {
     try {
       const userId = req.user?.id;
       const event = req.params.event;
+      // Validate userId and event
+      
       if (!userId || !event) {
         res.status(400).json({ message: "User ID and event are required" });
         return;
