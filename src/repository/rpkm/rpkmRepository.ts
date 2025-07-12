@@ -1,14 +1,13 @@
 import { WorkshopRegisterRequest } from "../../types/rpkm/POST";
 import { UserRepository } from "../user/userRepository";
-import { RPKMworkshop } from "@prisma/client";
+import { RPKMworkshop, WorkshopType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { WorkshopType } from "../../types/enum";
 import { workshopParticipantCountType, _rawWorkshopParticipantCountType } from "../../types/rpkm/GET";
 
 export class RpkmRepository {
     async userRegisterNewWorkshop(body: WorkshopRegisterRequest): Promise<RPKMworkshop> {
         try{
-            const register = await prisma.rpkm_workshop.create({
+            const register = await prisma.rPKMworkshop.create({
                 data: {
                     workshopType: body.workshopType,
                     workshopTime: body.workshopTime,
@@ -25,7 +24,7 @@ export class RpkmRepository {
 
     async getWorkshopsRegisteredByUserID(userId: string): Promise<RPKMworkshop[]> {
         try{
-            const workshops = await prisma.rpkm_workshop.findMany({
+            const workshops = await prisma.rPKMworkshop.findMany({
                 where: {
                     userId: userId
                 }
@@ -40,17 +39,26 @@ export class RpkmRepository {
 
     async getWorkshopsParticipantCounts(): Promise<workshopParticipantCountType[]> {
         try{
-            const result = await prisma.rpkm_workshop.groupBy({
+            const allTypes = Object.values(WorkshopType);
+            const baseCounts: Record<WorkshopType, number> = {} as Record<WorkshopType, number>;
+            allTypes.forEach((type: WorkshopType) => {
+                baseCounts[type] = 0;
+            });
+
+            const result = await prisma.rPKMworkshop.groupBy({
                 by: ['workshopType'],
                 _count: {
                     _all: true,
                 },
             });
-            const formatted = result.map((element: _rawWorkshopParticipantCountType) => ({
-                workshopType: element.workshopType,
-                count: element._count._all
-            }));
-            return formatted
+            result.forEach((row: _rawWorkshopParticipantCountType) => {
+                baseCounts[row.workshopType] = row._count._all
+            });
+
+            return allTypes.map((type: WorkshopType) => ({
+                workshopType: type,
+                count: baseCounts[type]
+            } as workshopParticipantCountType));
         }
         catch(error) {
             console.log(`Error getting participant counts of RPKM workshops: `, error);
@@ -61,13 +69,13 @@ export class RpkmRepository {
     async getUserWorkshopConflicts(body: WorkshopRegisterRequest): Promise<RPKMworkshop[][]> {
         try {
             const [workshopDuplicate, timeSlotDuplicate] = await prisma.$transaction([
-                prisma.rpkm_workshop.findMany({
+                prisma.rPKMworkshop.findMany({
                     where: {
                         workshopType: body.workshopType,
                         userId: body.userId
                     }
                 }),
-                prisma.rpkm_workshop.findMany({
+                prisma.rPKMworkshop.findMany({
                     where: {
                         workshopTime: body.workshopTime,
                         userId: body.userId

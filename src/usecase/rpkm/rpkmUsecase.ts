@@ -14,10 +14,14 @@ export class RpkmUsecase {
 
     async register(body: WorkshopRegisterRequest): Promise<RPKMworkshop> {
         try{
+            if(body.workshopTime > 5 || body.workshopTime < 0){
+                throw new AppError("workshopTime must be integer from 0 to 5.", 400);
+            }
             if(!Object.values<string>(WorkshopType).includes(body.workshopType)){
                 throw new AppError("workshopType must be either 'DIFFUSER' or 'KEYCHAIN'.", 400);
             }
 
+            body.workshopTime += 1;
             const [workshopDuplicate, timeSlotDuplicate] = await this.rpkmRepository.getUserWorkshopConflicts(body);
             if(workshopDuplicate.length >= 1){
                 throw new AppError(`User id ${body.userId} already registered for workshop ${body.workshopType}.`, 400);
@@ -32,7 +36,7 @@ export class RpkmUsecase {
         catch(error) {
             console.log("Error in RpkmUsecase.register: ", error);
             throw new AppError(
-                `Failed to register RPKM workshop for user id ${body.userId}: ${
+                `Failed to register RPKM workshop for user: ${
                     error instanceof Error ? error.message : "Unknown error"
                 }`, 
                 500

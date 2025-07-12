@@ -1,4 +1,4 @@
-import { WorkshopType } from "../enum";
+import { WorkshopType } from "@prisma/client"
 
 export interface workshopParticipantCountType {
     workshopType: WorkshopType;

@@ -1,4 +1,4 @@
-import { Response } from "express";
+import { Response, Request } from "express";
 import { WorkshopRegisterRequest } from "../../types/rpkm/POST";
 import { RpkmUsecase } from "../../usecase/rpkm/rpkmUsecase";
 import { AuthenticatedRequest } from "../../types/auth/authenticatedRequest";
@@ -24,7 +24,7 @@ export class RpkmController {
             }
             
             const body: WorkshopRegisterRequest = req.body;
-            if(!body.userId || !body.workshopTime || !body.workshopType){
+            if(!body.userId || body.workshopTime == null || !body.workshopType){
                 res.status(400).json({
                     success: false,
                     error: "Requires non-null userId, workshopType, and workshopTime.",
@@ -112,7 +112,7 @@ export class RpkmController {
             }
 
             const result = await this.rpkmUsecase.getWorkshopsByUserId(paramUserId);
-            res.status(201).json({
+            res.status(200).json({
                 success: true,
                 message: "Successfully retrieved user's registered RPKM workshops.",
                 data: result,
@@ -138,7 +138,7 @@ export class RpkmController {
         }        
     }
 
-    async getWorkshopsParticipantCounts(res: Response): Promise<void> {
+    async getWorkshopsParticipantCounts(req: Request, res: Response): Promise<void> {
         try{
             const result = await this.rpkmUsecase.getWorkshopParticipantCounts();
             res.status(200).json({

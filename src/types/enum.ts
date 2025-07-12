@@ -6,25 +6,28 @@ export enum PrefixType {
 }
 
 export enum FacultyId {
-  SCIENCE = "SCIENCE", // คณะวิทยาศาสตร์
-  ENGINEER = "ENGINEER", // คณะวิศวกรรมศาสตร์
-  MEDICINE = "MEDICINE", // คณะแพทยศาสตร์
-  ARTS = "ARTS", // คณะอักษรศาสตร์
-  EDUCATION = "EDUCATION", // คณะครุศาสตร์
-  PSYCHOLOGY = "PSYCHOLOGY", // คณะจิตวิทยา
-  DENTISTRY = "DENTISTRY", // คณะทันตแพทยศาสตร์
-  LAW = "LAW", // คณะนิติศาสตร์
-  COMMUNICATION_ARTS = "COMMUNICATION_ARTS", // คณะนิเทศศาสตร์
-  NURSING = "NURSING", // คณะพยาบาลศาสตร์
-  COMMERCE_AND_ACCOUNTANCY = "COMMERCE_AND_ACCOUNTANCY", // คณะพาณิชยศาสตร์และการบัญชี
-  PHARMACEUTICAL_SCIENCE = "PHARMACEUTICAL_SCIENCE", // คณะเภสัชศาสตร์
-  POLITICAL_SCIENCE = "POLITICAL_SCIENCE", // คณะรัฐศาสตร์
-  SPORTS_SCIENCE = "SPORTS_SCIENCE", // คณะวิทยาศาสตร์การกีฬา
-  FINE_AND_APPLIED_ARTS = "FINE_AND_APPLIED_ARTS", // คณะศิลปกรรมศาสตร์
-  ECONOMICS = "ECONOMICS", // คณะเศรษฐศาสตร์
-  ARCHITECTURE = "ARCHITECTURE", // คณะสถาปัตยกรรมศาสตร์
-  ALLIED_HEALTH_SCIENCES = "ALLIED_HEALTH_SCIENCES", // คณะสหเวชศาสตร์
-  VETERINARY_SCIENCE = "VETERINARY_SCIENCE", // คณะสัตวแพทยศาสตร์
+  FACULTY_OF_EDUCATION = "FACULTY_OF_EDUCATION", // คณะครุศาสตร์
+  FACULTY_OF_PSYCHOLOGY = "FACULTY_OF_PSYCHOLOGY", // คณะจิตวิทยา
+  FACULTY_OF_DENTISTRY = "FACULTY_OF_DENTISTRY", // คณะทันตแพทยศาสตร์
+  FACULTY_OF_LAW = "FACULTY_OF_LAW", // คณะนิติศาสตร์
+  FACULTY_OF_COMMUNICATION_ARTS = "FACULTY_OF_COMMUNICATION_ARTS", // คณะนิเทศศาสตร์
+  FACULTY_OF_NURSING = "FACULTY_OF_NURSING", // คณะพยาบาลศาสตร์
+  FACULTY_OF_COMMERCE_AND_ACCOUNTANCY = "FACULTY_OF_COMMERCE_AND_ACCOUNTANCY", // คณะพาณิชยศาสตร์และการบัญชี
+  FACULTY_OF_MEDICINE = "FACULTY_OF_MEDICINE", // คณะแพทยศาสตร์
+  FACULTY_OF_PHAMACEUTICAL_SCIENCE = "FACULTY_OF_PHAMACEUTICAL_SCIENCE", // คณะเภสัชศาสตร์
+  FACULTY_OF_POLITICAL_SCIENCE = "FACULTY_OF_POLITICAL_SCIENCE", // คณะรัฐศาสตร์
+  FACULTY_OF_SCIENCE = "FACULTY_OF_SCIENCE", // คณะวิทยาศาสตร์
+  FACULTY_OF_SPORTS_SCIENCE = "FACULTY_OF_SPORTS_SCIENCE", // คณะวิทยาศาสตร์การกีฬา
+  FACULTY_OF_ENGINEERING = "FACULTY_OF_ENGINEERING", // คณะวิศวกรรมศาสตร์
+  FACULTY_OF_FINE_AND_APPLIED_ARTS = "FACULTY_OF_FINE_AND_APPLIED_ARTS", // คณะศิลปกรรมศาสตร์
+  FACULTY_OF_ECONOMICS = "FACULTY_OF_ECONOMICS", // คณะเศรษฐศาสตร์
+  FACULTY_OF_ARCHITECTURE = "FACULTY_OF_ARCHITECTURE", // คณะสถาปัตยกรรมศาสตร์
+  FACULTY_OF_ALLIED_HEALTH_SCIENCES = "FACULTY_OF_ALLIED_HEALTH_SCIENCES", // คณะสหเวชศาสตร์
+  FACULTY_OF_VETERINARY_SCIENCE = "FACULTY_OF_VETERINARY_SCIENCE", // คณะสัตวแพทยศาสตร์
+  FACULTY_OF_ARTS = "FACULTY_OF_ARTS", // คณะอักษรศาสตร์
+  SCHOOL_OF_INTEGRATED_INNOVATION_SCII = "SCHOOL_OF_INTEGRATED_INNOVATION_SCII", // สถาบันนวัตกรรมบูรณาการแห่งจุฬาลงกรณ์มหาวิทยาลัย
+  SCHOOL_OF_AGRICULTURAL_RESOURCES = "SCHOOL_OF_AGRICULTURAL_RESOURCES", // สำนักวิชาทรัพยากรการเกษตร
+  GRADUATE_SCHOOL = "GRADUATE_SCHOOL", // บัณฑิตวิทยาลัย
 }
 
 export enum RoleType {
