@@ -4,7 +4,7 @@ import { PrefixType, RoleType } from "@prisma/client";
 async function setup() {
 	console.log("🚀 Setting up house data...");
 
-	console.log("🗑️  Cleaning existing data...");
+	console.log("🗑️ Cleaning existing house data...");
 	await prisma.house.deleteMany({});
 
 	const houses = await Promise.all([
