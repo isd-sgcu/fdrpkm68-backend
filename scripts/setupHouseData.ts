@@ -6,7 +6,7 @@ async function setup() {
 	console.log("🗑️ Cleaning existing house data...");
 	await prisma.house.deleteMany({});
 
-	const houses = await prisma.house.createMany({
+	const houses = await prisma.house.createManyAndReturn({
 		data: [
 			{
 				nameThai: "บ้านอะอึ๋ม",
@@ -345,9 +345,9 @@ async function setup() {
 
 	console.log("✅ House data created successfully!");
 	console.log("\n📋 Created Houses:");
-	// houses.forEach((house) => {
-	// 	console.log(`  - ${house.nameEnglish} (ID: ${house.id})`);
-	// });
+	houses.forEach((house) => {
+		console.log(`  - ${house.nameEnglish} (ID: ${house.id})`);
+	});
 }
 
 setup()
