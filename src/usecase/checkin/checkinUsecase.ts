@@ -1,41 +1,49 @@
-import { Checkin, CheckinStatusType, User, EventType, Prisma } from "@prisma/client";
+import {
+  Checkin,
+  CheckinStatusType,
+  User,
+  EventType,
+  Prisma,
+} from "@prisma/client";
 import { CheckinRepository } from "../../repository/checkin/checkinRepository";
-import { CheckinRequest } from "../../types/checkin/POST";
+import { CheckinRequest, UserIdRequest ,CheckinRequestWithStatus} from "../../types/checkin/POST";
 import { AppError } from "../../types/error/AppError";
-    
-    
-const EVENT_PERIODS: Record<EventType, {
-  PRE_REGISTER: { start: Date; end: Date };
-  EVENT_REGISTER: { start: Date; end: Date };
-}> = {
+
+const EVENT_PERIODS: Record<
+  EventType,
+  {
+    PRE_REGISTER: { start: Date; end: Date };
+    EVENT_REGISTER: { start: Date; end: Date };
+  }
+> = {
   FIRSTDATE: {
     PRE_REGISTER: {
       start: new Date("2025-07-17T19:00:00+07:00"),
-      end:   new Date("2025-07-19T23:59:59+07:00"),
+      end: new Date("2025-07-19T23:59:59+07:00"),
     },
     EVENT_REGISTER: {
       start: new Date("2025-07-19T00:00:00+07:00"),
-      end:   new Date("2025-07-19T23:59:59+07:00"),
+      end: new Date("2025-07-19T23:59:59+07:00"),
     },
   },
   RPKM: {
     PRE_REGISTER: {
       start: new Date("2025-07-20T19:00:00+07:00"),
-      end:   new Date("2025-08-03T23:59:59+07:00"),
+      end: new Date("2025-08-03T23:59:59+07:00"),
     },
     EVENT_REGISTER: {
       start: new Date("2025-08-01T00:00:00+07:00"),
-      end:   new Date("2025-08-01T23:59:59+07:00"),
+      end: new Date("2025-08-01T23:59:59+07:00"),
     },
   },
   FRESHMENNIGHT: {
     PRE_REGISTER: {
       start: new Date("2025-07-20T19:00:00+07:00"),
-      end:   new Date("2025-08-03T23:59:59+07:00"),
+      end: new Date("2025-08-03T23:59:59+07:00"),
     },
     EVENT_REGISTER: {
       start: new Date("2025-08-03T00:00:00+07:00"),
-      end:   new Date("2025-08-03T23:59:59+07:00"),
+      end: new Date("2025-08-03T23:59:59+07:00"),
     },
   },
 };
@@ -61,41 +69,104 @@ export class CheckinUsecase {
   async createCheckin(data: CheckinRequest): Promise<Checkin> {
     try {
       // Check if check-in already exists for this user and event
-      const existing = await this.checkinRepository.findCheckinByUserIdEventandStatus(
-        data.userId,
-        data.event,
-        data.status
-      );
+      const existing =
+        await this.checkinRepository.findCheckinByUserIdEventandStatus(
+          data.userId,
+          data.event,
+          CheckinStatusType.PRE_REGISTER
+        );
       if (existing) {
-        throw new AppError("Check-in already exists for this user and event",400);
+        throw new AppError(
+          "Check-in already exists for this user and event",
+          400
+        );
       }
 
       // Period check based on status
       const now = new Date();
       const period = EVENT_PERIODS[data.event];
       if (!period) {
-        throw new AppError("Invalid event type",400);
+        throw new AppError("Invalid event type", 400);
       }
 
-      if (data.status === CheckinStatusType.PRE_REGISTER) {
-        if (now < period.PRE_REGISTER.start) {
-          throw new AppError("Checking is not allowed before register period",400);
-        }
-        if (now > period.PRE_REGISTER.end) {
-          throw new AppError("Checking is not allowed after register period",400);
-        }
-      } else if (data.status === CheckinStatusType.EVENT_REGISTER) {
-        if (now < period.EVENT_REGISTER.start) {
-          throw new AppError("Checking is not allowed before event period",400);
-        }
-        if (now > period.EVENT_REGISTER.end) {
-          throw new AppError("Checking is not allowed after event period",400);
-        }
+      if (now < period.PRE_REGISTER.start) {
+        throw new AppError(
+          "Checking is not allowed before register period",
+          400
+        );
       }
-      return await this.checkinRepository.createCheckin(data);
+      if (now > period.PRE_REGISTER.end) {
+        throw new AppError(
+          "Checking is not allowed after register period",
+          400
+        );
+      }
+      const checkinData: CheckinRequestWithStatus = {
+        userId: data.userId,
+        event: data.event,
+        status: CheckinStatusType.PRE_REGISTER,
+      };
+      return await this.checkinRepository.createCheckin(checkinData);
     } catch (error) {
       console.error("Error creating checkin:", error);
-      throw new AppError("Failed to create checkin",500);
+      throw new AppError("Failed to create checkin", 500);
+    }
+  }
+  async createCheckinByUserId(data: UserIdRequest): Promise<Checkin> {
+    try {
+      const now = new Date();
+      let event: EventType | null = null;
+
+      // Determine event based on current time
+      for (const [eventKey, period] of Object.entries(EVENT_PERIODS)) {
+        if (
+          now >= period.EVENT_REGISTER.start &&
+          now <= period.EVENT_REGISTER.end
+        ) {
+          event = eventKey as EventType;
+          break;
+        }
+      }
+      if (!event) {
+        throw new AppError(
+          "No event is open for EVENT_REGISTER at this time",
+          400
+        );
+      }
+
+      // Check if check-in already exists for this user and event with EVENT_REGISTER status
+      const existing =
+        await this.checkinRepository.findCheckinByUserIdEventandStatus(
+          data.userId,
+          event,
+          CheckinStatusType.EVENT_REGISTER
+        );
+      if (existing) {
+        throw new AppError(
+          "Check-in already exists for this user and event",
+          400
+        );
+      }
+
+      // Check if now is in the event period
+      const period = EVENT_PERIODS[event];
+      if (
+        now < period.EVENT_REGISTER.start ||
+        now > period.EVENT_REGISTER.end
+      ) {
+        throw new AppError("Checking is not allowed outside event period", 400);
+      }
+      // Create the check-in
+      const newCheckin = await this.checkinRepository.createCheckin({
+        userId: data.userId,
+        event: event,
+        status: CheckinStatusType.EVENT_REGISTER,
+      });
+
+      return newCheckin;
+    } catch (error) {
+      console.error("Error creating checkin by userId:", error);
+      throw new AppError("Failed to create checkin by userId", 500);
     }
   }
 

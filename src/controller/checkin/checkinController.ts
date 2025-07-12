@@ -1,7 +1,7 @@
-import { EventType } from "@prisma/client";
+import { EventType, User } from "@prisma/client";
 import { Response } from "express";
 
-import { CheckinRequest } from "@/types/checkin/POST";
+import { CheckinRequest,UserIdRequest } from "@/types/checkin/POST";
 import { CheckinUsecase } from "@/usecase/checkin/checkinUsecase";
 
 import type { AuthenticatedRequest } from "@/types/auth/authenticatedRequest";
@@ -55,8 +55,18 @@ export class CheckinController {
   // Create a new check-in
   async createCheckin(req: AuthenticatedRequest, res: Response) {
     try {
+      const userId = req.user?.id; // Get userId from authenticated user
+      if (!userId) {
+        res.status(400).json({ message: "User ID is required" });
+        return;
+      }
+      const checkinData = req.body as CheckinRequest;
+      // checkinData.userId = userId; // Ensure userId is set from authenticated user
       const newCheckin = await this.checkinUsecase.createCheckin(
-        req.body as CheckinRequest
+        {
+          ...checkinData,
+          userId,
+        }
       );
       res.status(201).json(newCheckin);
     } catch (error) {
@@ -65,6 +75,27 @@ export class CheckinController {
     }
   }
 
+  async createCheckinByUserId(
+    req: AuthenticatedRequest,
+    res: Response
+  ) {
+    try {
+      const userId = req.body.userId ;// Get userId from request body or authenticated user
+
+      if (!userId ) {
+        res.status(400).json({ message: "User ID and event are required" });
+        return;
+      }
+
+      const newCheckin = await this.checkinUsecase.createCheckinByUserId(
+        userId,
+      );
+      res.status(201).json(newCheckin);
+    } catch (error) {
+      console.error("Error creating check-in by user ID:", error);
+      res.status(500).json({ error: "Failed to create check-in" });
+    }
+  }
   // Update a check-in by id
   // async updateCheckin(req: Request, res: Response) {
   //   const id = req.params.id; // UUID string
