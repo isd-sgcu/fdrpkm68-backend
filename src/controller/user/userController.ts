@@ -2,6 +2,7 @@ import { UserUsecase } from "@/usecase/user/userUsecase";
 
 import type { AuthenticatedRequest } from "@/types/auth/authenticatedRequest";
 import type { Response } from "express";
+import { AppError } from "@/types/error/AppError";
 
 
 export class UserController {
@@ -47,6 +48,26 @@ export class UserController {
         return;
       }
       console.error("Error updating user:", error);
+      res.status(500).json({
+        message: "An unexpected error occurred",
+      });
+    }
+  }
+
+  async updateBottleChoice(req: AuthenticatedRequest, res: Response): Promise<void> {
+    try {
+      await this.userUseCase.updateBottleChoice(req.user?.id, req.body);
+      res.status(200).json({
+        message: "Bottle choice updated successfully",
+      });
+    } catch (error: unknown) {
+      if (error instanceof AppError) {
+        res.status(error.statusCode).json({
+          message: error.message,
+        });
+        return;
+      }
+      console.error("Error updating bottle choice:", error);
       res.status(500).json({
         message: "An unexpected error occurred",
       });

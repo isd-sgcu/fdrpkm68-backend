@@ -1,4 +1,4 @@
-import { PrefixType, RoleType } from "@prisma/client";
+import { PrefixType, RoleType, BottleChoice } from "@prisma/client";
 
 export interface UpdateRequest {
   prefix: PrefixType;
@@ -12,4 +12,8 @@ export interface UpdateRequest {
   parentRelationship: string;
   role: RoleType;
   academicYear: number;
+}
+
+export interface UpdateBottleChoiceRequest {
+  bottleChoice: BottleChoice;
 }
