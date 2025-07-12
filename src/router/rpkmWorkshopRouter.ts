@@ -1,6 +1,6 @@
 import { BaseRouter } from "./baseRouter";
-import { authMiddleware } from "../middleware/authMiddleware";
-import { RpkmController } from "../controller/rpkm/rpkmController";
+import { authMiddleware } from "@/middleware/authMiddleware";
+import { RpkmController } from "@/controller/rpkm/rpkmController";
 
 export class RpkmWorkshopRouter extends BaseRouter {
     private rpkmController: RpkmController;
@@ -18,7 +18,7 @@ export class RpkmWorkshopRouter extends BaseRouter {
             "/counts",
             this.rpkmController.getWorkshopsParticipantCounts.bind(this.rpkmController)
         );
-        
+
         this.router.use(authMiddleware);
 
         this.router.post(

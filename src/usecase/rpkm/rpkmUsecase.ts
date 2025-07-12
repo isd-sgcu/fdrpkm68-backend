@@ -1,9 +1,9 @@
-import { RpkmRepository } from "../../repository/rpkm/rpkmRepository";
-import { WorkshopRegisterRequest } from "../../types/rpkm/POST";
+import { RpkmRepository } from "@/repository/rpkm/rpkmRepository";
+import { WorkshopRegisterRequest } from "@/types/rpkm/POST";
 import { RPKMworkshop } from "@prisma/client";
 import { AppError } from "@/types/error/AppError";
-import { WorkshopType } from "../../types/enum";
-import { workshopParticipantCountType } from "../../types/rpkm/GET";
+import { WorkshopType } from "@/types/enum";
+import { workshopParticipantCountType } from "@/types/rpkm/GET";
 
 export class RpkmUsecase {
     private rpkmRepository: RpkmRepository;
