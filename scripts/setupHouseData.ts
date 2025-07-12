@@ -1,5 +1,4 @@
 import { prisma } from "../src/lib/prisma";
-import { PrefixType, RoleType } from "@prisma/client";
 
 async function setup() {
 	console.log("🚀 Setting up house data...");
