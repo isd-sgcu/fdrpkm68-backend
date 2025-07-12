@@ -3,6 +3,7 @@ import { Checkin, EventType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { CheckinRequest } from "@/types/checkin/POST";
 import { AppError } from "@/types/error/AppError";
+import { CheckinStatusType } from "@/types/enum";
 
 export class CheckinRepository {
   // async findCheckinById(id: string): Promise<

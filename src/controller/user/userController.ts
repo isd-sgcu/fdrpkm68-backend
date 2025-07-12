@@ -3,7 +3,7 @@ import { UserUsecase } from "@/usecase/user/userUsecase";
 import type { AuthenticatedRequest } from "@/types/auth/authenticatedRequest";
 import type { RegisterRequest } from "@/types/auth/POST";
 import { AppError } from "@/types/error/AppError";
-import type { Response } from "express";
+import type { Response , Request as ExpressReq} from "express";
 
 
 export class UserController {
@@ -55,7 +55,7 @@ export class UserController {
     }
   }
 
-  async registerStaff(req: Request, res: Response): Promise<void> {
+  async registerStaff(req: ExpressReq<{}, {}, RegisterRequest>, res: Response): Promise<void> {
     try {
       const user = await this.userUseCase.registerStaff(
         req.body as RegisterRequest
