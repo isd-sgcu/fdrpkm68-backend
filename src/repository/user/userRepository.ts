@@ -1,10 +1,11 @@
-import { User, BottleChoice } from "@prisma/client";
+import { User, BottleChoice, RoleType } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 import { GroupRepository } from "@/repository/group/groupRepository";
+import { AuthUser } from "@/types/auth/authenticatedRequest";
 import { RegisterRequest } from "@/types/auth/POST";
-import { UpdateRequest } from "@/types/user/PATCH";
 import { AppError } from "@/types/error/AppError";
+import { UpdateRequest } from "@/types/user/PATCH";
 
 export class UserRepository {
   private groupRepository: GroupRepository;
@@ -13,7 +14,7 @@ export class UserRepository {
     this.groupRepository = new GroupRepository();
   }
 
-  async create(body: RegisterRequest): Promise<User> {
+  async create(body: RegisterRequest, role: RoleType): Promise<User> {
     const user = await prisma.user.create({
       data: {
         studentId: body.studentId,
@@ -33,7 +34,7 @@ export class UserRepository {
         drugAllergy: body.drugAllergy || null,
         illness: body.illness || null,
         avatarId: Math.floor(Math.random() * 5) + 1,
-        role: body.role,
+        role: role,
       },
     });
 
@@ -105,7 +106,10 @@ export class UserRepository {
     return false;
   }
 
-  async updateBottleChoice(id: string, bottleChoice: BottleChoice): Promise<void> {
+  async updateBottleChoice(
+    id: string,
+    bottleChoice: BottleChoice
+  ): Promise<void> {
     try {
       await prisma.user.update({
         where: {

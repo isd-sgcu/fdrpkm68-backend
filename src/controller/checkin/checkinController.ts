@@ -1,7 +1,7 @@
 import { EventType, User } from "@prisma/client";
 import { Response } from "express";
 
-import { CheckinRequest,UserIdRequest } from "@/types/checkin/POST";
+import { CheckinRequest, UserIdRequest } from "@/types/checkin/POST";
 import { CheckinUsecase } from "@/usecase/checkin/checkinUsecase";
 
 import type { AuthenticatedRequest } from "@/types/auth/authenticatedRequest";
@@ -32,7 +32,7 @@ export class CheckinController {
       const userId = req.user?.id;
       const event = req.params.event;
       // Validate userId and event
-      
+
       if (!userId || !event) {
         res.status(400).json({ message: "User ID and event are required" });
         return;
@@ -62,12 +62,10 @@ export class CheckinController {
       }
       const checkinData = req.body as CheckinRequest;
       // checkinData.userId = userId; // Ensure userId is set from authenticated user
-      const newCheckin = await this.checkinUsecase.createCheckin(
-        {
-          ...checkinData,
-          userId,
-        }
-      );
+      const newCheckin = await this.checkinUsecase.createCheckin({
+        ...checkinData,
+        userId,
+      });
       res.status(201).json(newCheckin);
     } catch (error) {
       console.error("Error creating check-in:", error);
@@ -75,20 +73,17 @@ export class CheckinController {
     }
   }
 
-  async createCheckinByUserId(
-    req: AuthenticatedRequest,
-    res: Response
-  ) {
+  async createCheckinByUserId(req: AuthenticatedRequest, res: Response) {
     try {
-      const userId = req.body.userId ;// Get userId from request body or authenticated user
+      const userId = req.body.userId; // Get userId from request body or authenticated user
 
-      if (!userId ) {
+      if (!userId) {
         res.status(400).json({ message: "User ID and event are required" });
         return;
       }
 
       const newCheckin = await this.checkinUsecase.createCheckinByUserId(
-        userId,
+        userId
       );
       res.status(201).json(newCheckin);
     } catch (error) {

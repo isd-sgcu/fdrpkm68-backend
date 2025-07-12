@@ -1,9 +1,8 @@
+import { AppError } from "@/types/error/AppError";
 import { UserUsecase } from "@/usecase/user/userUsecase";
 
 import type { AuthenticatedRequest } from "@/types/auth/authenticatedRequest";
 import type { Response } from "express";
-import { AppError } from "@/types/error/AppError";
-
 
 export class UserController {
   private userUseCase: UserUsecase;
@@ -54,7 +53,10 @@ export class UserController {
     }
   }
 
-  async updateBottleChoice(req: AuthenticatedRequest, res: Response): Promise<void> {
+  async updateBottleChoice(
+    req: AuthenticatedRequest,
+    res: Response
+  ): Promise<void> {
     try {
       await this.userUseCase.updateBottleChoice(req.user?.id, req.body);
       res.status(200).json({
