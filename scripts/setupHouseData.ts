@@ -344,7 +344,7 @@ async function setup() {
 	});
 
 	console.log("✅ House data created successfully!");
-	console.log("\n📋 Created Houses:");
+	console.log(`\n📋 Created ${houses.length} Houses:`);
 	houses.forEach((house) => {
 		console.log(`  - ${house.nameEnglish} (ID: ${house.id})`);
 	});
