@@ -2,6 +2,7 @@ import { EventType } from "@prisma/client";
 import { Response } from "express";
 
 import { CheckinRequest } from "@/types/checkin/POST";
+import { AppError } from "@/types/error/AppError";
 import { CheckinUsecase } from "@/usecase/checkin/checkinUsecase";
 
 import type { AuthenticatedRequest } from "@/types/auth/authenticatedRequest";
@@ -46,7 +47,13 @@ export class CheckinController {
         return;
       }
       res.json(checkin);
-    } catch (error) {
+    } catch (error: unknown) {
+      if (error instanceof AppError) {
+        res.status(error.statusCode).json({
+          message: error.message,
+        });
+        return;
+      }
       console.error("Error fetching check-in:", error);
       res.status(500).json({ error: "Failed to fetch check-in" });
     }
@@ -67,9 +74,17 @@ export class CheckinController {
         userId,
       });
       res.status(201).json(newCheckin);
-    } catch (error) {
-      console.error("Error creating check-in:", error);
-      res.status(500).json({ error: "Failed to create check-in" });
+    } catch (error: unknown) {
+      if (error instanceof AppError) {
+        res.status(error.statusCode).json({
+          message: error.message,
+        });
+        return;
+      }
+      console.error("Error updating user:", error);
+      res.status(500).json({
+        message: "An unexpected error occurred",
+      });
     }
   }
 
@@ -86,9 +101,17 @@ export class CheckinController {
         userId
       );
       res.status(201).json(newCheckin);
-    } catch (error) {
+    } catch (error: unknown) {
+      if (error instanceof AppError) {
+        res.status(error.statusCode).json({
+          message: error.message,
+        });
+        return;
+      }
       console.error("Error creating check-in by user ID:", error);
-      res.status(500).json({ error: "Failed to create check-in" });
+      res.status(500).json({
+        message: "An unexpected error occurred",
+      });
     }
   }
   // Update a check-in by id

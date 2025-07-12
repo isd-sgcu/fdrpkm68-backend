@@ -18,8 +18,8 @@ export class UserController {
         user,
       });
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        res.status(400).json({
+      if (error instanceof AppError) {
+        res.status(error.statusCode).json({
           message: error.message,
         });
         return;
@@ -40,8 +40,8 @@ export class UserController {
       });
       return;
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        res.status(400).json({
+      if (error instanceof AppError) {
+        res.status(error.statusCode).json({
           message: error.message,
         });
         return;
