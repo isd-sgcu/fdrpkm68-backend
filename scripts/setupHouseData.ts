@@ -353,6 +353,6 @@ async function setup() {
 setup()
 	.then(() => prisma.$disconnect())
 	.catch((error) => {
-		console.error("❌ Error setting up test data:", error);
+		console.error("❌ Error setting up house data:", error);
 		process.exit(1);
 	});
