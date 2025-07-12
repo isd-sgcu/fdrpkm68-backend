@@ -14,12 +14,12 @@ export class RpkmWorkshopRouter extends BaseRouter {
     }
 
     private setupRoutes(): void {
+        this.router.use(authMiddleware);
+
         this.router.get(
             "/counts",
             this.rpkmController.getWorkshopsParticipantCounts.bind(this.rpkmController)
         );
-
-        this.router.use(authMiddleware);
 
         this.router.post(
             "/",
@@ -27,7 +27,7 @@ export class RpkmWorkshopRouter extends BaseRouter {
         );
 
         this.router.get(
-            "/:userId",
+            "/me",
             this.rpkmController.getWorkshopsOfUserId.bind(this.rpkmController)
         );
     }

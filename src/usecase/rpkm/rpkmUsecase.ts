@@ -12,7 +12,7 @@ export class RpkmUsecase {
         this.rpkmRepository = new RpkmRepository();
     }
 
-    async register(body: WorkshopRegisterRequest): Promise<RPKMworkshop> {
+    async register(body: WorkshopRegisterRequest, userId: string): Promise<RPKMworkshop> {
         try{
             if(body.workshopTime > 5 || body.workshopTime < 0){
                 throw new AppError("workshopTime must be integer from 0 to 5.", 400);
@@ -22,15 +22,15 @@ export class RpkmUsecase {
             }
 
             body.workshopTime += 1;
-            const [workshopDuplicate, timeSlotDuplicate] = await this.rpkmRepository.getUserWorkshopConflicts(body);
+            const [workshopDuplicate, timeSlotDuplicate] = await this.rpkmRepository.getUserWorkshopConflicts(body, userId);
             if(workshopDuplicate.length >= 1){
-                throw new AppError(`User id ${body.userId} already registered for workshop ${body.workshopType}.`, 400);
+                throw new AppError(`User id ${userId} already registered for workshop ${body.workshopType}.`, 400);
             }
             if(timeSlotDuplicate.length >= 1){
-                throw new AppError(`User id ${body.userId} already registered for time slot ${body.workshopTime}.`, 400);
+                throw new AppError(`User id ${userId} already registered for time slot ${body.workshopTime}.`, 400);
             }
 
-            const registrationResult = await this.rpkmRepository.userRegisterNewWorkshop(body);
+            const registrationResult = await this.rpkmRepository.userRegisterNewWorkshop(body, userId);
             return registrationResult;
         }
         catch(error) {

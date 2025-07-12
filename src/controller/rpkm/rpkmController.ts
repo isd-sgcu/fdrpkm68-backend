@@ -24,17 +24,17 @@ export class RpkmController {
             }
             
             const body: WorkshopRegisterRequest = req.body;
-            if(!body.userId || body.workshopTime == null || !body.workshopType){
+            if(body.workshopTime == null || !body.workshopType){
                 res.status(400).json({
                     success: false,
-                    error: "Requires non-null userId, workshopType, and workshopTime.",
+                    error: "Requires non-null workshopType and workshopTime.",
                     timestamp: new Date().toISOString(),
                 });
                 return;
             }
 
             try {
-                UUIDValidator.validate(body.userId);
+                UUIDValidator.validate(userId);
             }
             catch (error) {
                 res.status(400).json({
@@ -45,7 +45,7 @@ export class RpkmController {
                 return;
             }
 
-            const result = await this.rpkmUsecase.register(body);
+            const result = await this.rpkmUsecase.register(body, userId);
             res.status(201).json({
                 success: true,
                 message: "RPKM workshop registered successfully.",
@@ -89,18 +89,8 @@ export class RpkmController {
                 return;
             }
 
-            const paramUserId = req.params.userId;
-            if(!paramUserId){
-                res.status(400).json({
-                    success: false,
-                    error: "Null userId in request params.",
-                    timestamp: new Date().toISOString(),
-                });
-                return;
-            }
-
             try {
-                UUIDValidator.validate(paramUserId);
+                UUIDValidator.validate(userId);
             }
             catch (error) {
                 res.status(400).json({
@@ -111,7 +101,7 @@ export class RpkmController {
                 return;
             }
 
-            const result = await this.rpkmUsecase.getWorkshopsByUserId(paramUserId);
+            const result = await this.rpkmUsecase.getWorkshopsByUserId(userId);
             res.status(200).json({
                 success: true,
                 message: "Successfully retrieved user's registered RPKM workshops.",
@@ -138,7 +128,7 @@ export class RpkmController {
         }        
     }
 
-    async getWorkshopsParticipantCounts(req: Request, res: Response): Promise<void> {
+    async getWorkshopsParticipantCounts(req: AuthenticatedRequest, res: Response): Promise<void> {
         try{
             const result = await this.rpkmUsecase.getWorkshopParticipantCounts();
             res.status(200).json({

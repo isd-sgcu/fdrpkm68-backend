@@ -4,13 +4,13 @@ import { prisma } from "@/lib/prisma";
 import { workshopParticipantCountType, _rawWorkshopParticipantCountType } from "@/types/rpkm/GET";
 
 export class RpkmRepository {
-    async userRegisterNewWorkshop(body: WorkshopRegisterRequest): Promise<RPKMworkshop> {
+    async userRegisterNewWorkshop(body: WorkshopRegisterRequest, userId: string): Promise<RPKMworkshop> {
         try{
             const register = await prisma.rPKMworkshop.create({
                 data: {
                     workshopType: body.workshopType,
                     workshopTime: body.workshopTime,
-                    userId: body.userId
+                    userId: userId
                 }
             });
             return register;
@@ -65,19 +65,19 @@ export class RpkmRepository {
         }
     }
 
-    async getUserWorkshopConflicts(body: WorkshopRegisterRequest): Promise<RPKMworkshop[][]> {
+    async getUserWorkshopConflicts(body: WorkshopRegisterRequest, userId: string): Promise<RPKMworkshop[][]> {
         try {
             const [workshopDuplicate, timeSlotDuplicate] = await prisma.$transaction([
                 prisma.rPKMworkshop.findMany({
                     where: {
                         workshopType: body.workshopType,
-                        userId: body.userId
+                        userId: userId
                     }
                 }),
                 prisma.rPKMworkshop.findMany({
                     where: {
                         workshopTime: body.workshopTime,
-                        userId: body.userId
+                        userId: userId
                     }
                 })
             ]);
@@ -85,8 +85,8 @@ export class RpkmRepository {
             return [workshopDuplicate, timeSlotDuplicate];
         }
         catch(error) {
-            console.log(`Error checking workshop time/type conflicts of user id ${body.userId}: `, error);
-            throw new Error(`Failed to check workshop time/type conflicts of user id ${body.userId}.`);           
+            console.log(`Error checking workshop time/type conflicts of user id ${userId}: `, error);
+            throw new Error(`Failed to check workshop time/type conflicts of user id ${userId}.`);           
         }
     }
 }
