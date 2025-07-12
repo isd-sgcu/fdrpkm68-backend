@@ -130,6 +130,28 @@ export class RpkmController {
 
     async getWorkshopsParticipantCounts(req: AuthenticatedRequest, res: Response): Promise<void> {
         try{
+            const userId = req.user?.id;
+            if(!userId){
+                res.status(401).json({
+                    success: false,
+                    error: "User not authenticated.",
+                    timestamp: new Date().toISOString(),
+                });
+                return;
+            }
+
+            try {
+                UUIDValidator.validate(userId);
+            }
+            catch (error) {
+                res.status(400).json({
+                    success: false,
+                    error: error instanceof Error ? error.message : "Invalid user ID",
+                    timestamp: new Date().toISOString(),
+                });
+                return;
+            }
+
             const result = await this.rpkmUsecase.getWorkshopParticipantCounts();
             res.status(200).json({
                 success: true,
