@@ -6,9 +6,9 @@ async function setup() {
 	console.log("🗑️ Cleaning existing house data...");
 	await prisma.house.deleteMany({});
 
-	const houses = await Promise.all([
-		prisma.house.create({
-			data: {
+	const houses = await prisma.house.createMany({
+		data: [
+			{
 				nameThai: "บ้านอะอึ๋ม",
 				nameEnglish: "Baan A-Aum",
 				descriptionThai:
@@ -22,9 +22,8 @@ async function setup() {
 				sizeLetter: "M",
 				capacity: 252,
 			},
-		}),
-		prisma.house.create({
-			data: {
+
+			{
 				nameThai: "บ้านสด",
 				nameEnglish: "Baansod",
 				descriptionThai:
@@ -38,9 +37,8 @@ async function setup() {
 				sizeLetter: "L",
 				capacity: 324,
 			},
-		}),
-		prisma.house.create({
-			data: {
+
+			{
 				nameThai: "บ้านโจ๋",
 				nameEnglish: "Baan Jo+",
 				descriptionThai:
@@ -54,9 +52,8 @@ async function setup() {
 				sizeLetter: "XL",
 				capacity: 792,
 			},
-		}),
-		prisma.house.create({
-			data: {
+
+			{
 				nameThai: "บ้านโบ้",
 				nameEnglish: "BaanBoe",
 				descriptionThai:
@@ -70,9 +67,8 @@ async function setup() {
 				sizeLetter: "M",
 				capacity: 129,
 			},
-		}),
-		prisma.house.create({
-			data: {
+
+			{
 				nameThai: "บ้านดัง",
 				nameEnglish: "Baandung",
 				descriptionThai:
@@ -86,9 +82,8 @@ async function setup() {
 				sizeLetter: "S",
 				capacity: 90,
 			},
-		}),
-		prisma.house.create({
-			data: {
+
+			{
 				nameThai: "บ้านคุณหนู",
 				nameEnglish: "Baankhunnoo",
 				descriptionThai:
@@ -103,9 +98,8 @@ async function setup() {
 				sizeLetter: "S",
 				capacity: 123,
 			},
-		}),
-		prisma.house.create({
-			data: {
+
+			{
 				nameThai: "บ้านเดอะ",
 				nameEnglish: "BAANTHE",
 				descriptionThai:
@@ -118,9 +112,8 @@ async function setup() {
 				sizeLetter: "S",
 				capacity: 114,
 			},
-		}),
-		prisma.house.create({
-			data: {
+
+			{
 				nameThai: "บ้านจิ๊จ๊ะ",
 				nameEnglish: "BaanJiJah",
 				descriptionThai:
@@ -134,9 +127,8 @@ async function setup() {
 				sizeLetter: "M",
 				capacity: 201,
 			},
-		}),
-		prisma.house.create({
-			data: {
+
+			{
 				nameThai: "บ้านคุ้ม",
 				nameEnglish: "BAAN KOOM",
 				descriptionThai:
@@ -150,9 +142,8 @@ async function setup() {
 				sizeLetter: "XL",
 				capacity: 532,
 			},
-		}),
-		prisma.house.create({
-			data: {
+
+			{
 				nameThai: "บ้านนอก",
 				nameEnglish: "Baan Nork",
 				descriptionThai:
@@ -166,9 +157,8 @@ async function setup() {
 				sizeLetter: "M",
 				capacity: 183,
 			},
-		}),
-		prisma.house.create({
-			data: {
+
+			{
 				nameThai: "โจ๊ะเด๊ะ ฮือซา",
 				nameEnglish: "Jodeh Huesa",
 				descriptionThai:
@@ -182,9 +172,8 @@ async function setup() {
 				sizeLetter: "M",
 				capacity: 297,
 			},
-		}),
-		prisma.house.create({
-			data: {
+
+			{
 				nameThai: "บ้านว้อนท์",
 				nameEnglish: "BaanWanted",
 				descriptionThai:
@@ -199,9 +188,8 @@ async function setup() {
 				sizeLetter: "S",
 				capacity: 96,
 			},
-		}),
-		prisma.house.create({
-			data: {
+
+			{
 				nameThai: "บ้านแจ๋ว",
 				nameEnglish: "BAAN JAEW",
 				descriptionThai:
@@ -214,9 +202,8 @@ async function setup() {
 				sizeLetter: "L",
 				capacity: 357,
 			},
-		}),
-		prisma.house.create({
-			data: {
+
+			{
 				nameThai: "บ้านแรงส์",
 				nameEnglish: "BaanRangs",
 				descriptionThai:
@@ -230,9 +217,8 @@ async function setup() {
 				sizeLetter: "XXL",
 				capacity: 1248,
 			},
-		}),
-		prisma.house.create({
-			data: {
+
+			{
 				nameThai: "บ้านเฮา",
 				nameEnglish: "BaanHaaw",
 				descriptionThai:
@@ -246,9 +232,8 @@ async function setup() {
 				sizeLetter: "L",
 				capacity: 357,
 			},
-		}),
-		prisma.house.create({
-			data: {
+
+			{
 				nameThai: "บ้านเอช้วน",
 				nameEnglish: "Baan A-Chuan",
 				descriptionThai:
@@ -263,9 +248,8 @@ async function setup() {
 				sizeLetter: "M",
 				capacity: 249,
 			},
-		}),
-		prisma.house.create({
-			data: {
+
+			{
 				nameThai: "บ้านคิดส์",
 				nameEnglish: "baankids",
 				descriptionThai:
@@ -279,9 +263,8 @@ async function setup() {
 				sizeLetter: "L",
 				capacity: 210,
 			},
-		}),
-		prisma.house.create({
-			data: {
+
+			{
 				nameThai: "อากาเป้",
 				nameEnglish: "agape",
 				descriptionThai:
@@ -295,9 +278,8 @@ async function setup() {
 				sizeLetter: "S",
 				capacity: 96,
 			},
-		}),
-		prisma.house.create({
-			data: {
+
+			{
 				nameThai: "บ้านโคะ",
 				nameEnglish: "BAANKOH",
 				descriptionThai:
@@ -311,9 +293,8 @@ async function setup() {
 				sizeLetter: "S",
 				capacity: 123,
 			},
-		}),
-		prisma.house.create({
-			data: {
+
+			{
 				nameThai: "บ้านโซ้ยตี๋หลีหมวย",
 				nameEnglish: "BaanSoeiteeLheemouy",
 				descriptionThai:
@@ -327,9 +308,8 @@ async function setup() {
 				sizeLetter: "XL",
 				capacity: 784,
 			},
-		}),
-		prisma.house.create({
-			data: {
+
+			{
 				nameThai: "บ้านยิ้ม",
 				nameEnglish: "BaanYim",
 				descriptionThai:
@@ -344,9 +324,8 @@ async function setup() {
 				sizeLetter: "XXL",
 				capacity: 804,
 			},
-		}),
-		prisma.house.create({
-			data: {
+
+			{
 				nameThai: "บ้านหลายใจ",
 				nameEnglish: "Baan Laijai",
 				descriptionThai:
@@ -360,14 +339,15 @@ async function setup() {
 				sizeLetter: "S",
 				capacity: 135,
 			},
-		}),
-	]);
+		],
+		skipDuplicates: true,
+	});
 
 	console.log("✅ House data created successfully!");
 	console.log("\n📋 Created Houses:");
-	houses.forEach((house) => {
-		console.log(`  - ${house.nameEnglish} (ID: ${house.id})`);
-	});
+	// houses.forEach((house) => {
+	// 	console.log(`  - ${house.nameEnglish} (ID: ${house.id})`);
+	// });
 }
 
 setup()
