@@ -2,7 +2,6 @@ import { User, BottleChoice, RoleType } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 import { GroupRepository } from "@/repository/group/groupRepository";
-import { AuthUser } from "@/types/auth/authenticatedRequest";
 import { RegisterRequest } from "@/types/auth/POST";
 import { AppError } from "@/types/error/AppError";
 import { UpdateRequest } from "@/types/user/PATCH";

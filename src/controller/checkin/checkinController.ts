@@ -1,7 +1,7 @@
-import { EventType, User } from "@prisma/client";
+import { EventType } from "@prisma/client";
 import { Response } from "express";
 
-import { CheckinRequest, UserIdRequest } from "@/types/checkin/POST";
+import { CheckinRequest } from "@/types/checkin/POST";
 import { CheckinUsecase } from "@/usecase/checkin/checkinUsecase";
 
 import type { AuthenticatedRequest } from "@/types/auth/authenticatedRequest";

@@ -1,12 +1,11 @@
-import {
-  Checkin,
-  CheckinStatusType,
-  User,
-  EventType,
-  Prisma,
-} from "@prisma/client";
+import { Checkin, CheckinStatusType, EventType } from "@prisma/client";
+
 import { CheckinRepository } from "../../repository/checkin/checkinRepository";
-import { CheckinRequest, UserIdRequest ,CheckinRequestWithStatus} from "../../types/checkin/POST";
+import {
+  CheckinRequest,
+  UserIdRequest,
+  CheckinRequestWithStatus,
+} from "../../types/checkin/POST";
 import { AppError } from "../../types/error/AppError";
 
 const EVENT_PERIODS: Record<
