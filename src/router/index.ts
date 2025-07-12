@@ -28,7 +28,7 @@ export class RouterManager {
     this.router.use("/houses", houseRouter.getRouter());
     this.router.use("/user", userRouter.getRouter());
     this.router.use("/checkin", checkinRouter.getRouter());
-    this.router.use("/rpkm-workshop", rpkmWorkshopRouter.getRouter());
+    this.router.use("/workshop", rpkmWorkshopRouter.getRouter());
   }
 
   public getRouter(): Router {

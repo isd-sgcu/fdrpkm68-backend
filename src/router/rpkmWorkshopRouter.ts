@@ -7,7 +7,7 @@ export class RpkmWorkshopRouter extends BaseRouter {
 
     constructor() {
         super({
-            prefix: "/rpkm-workshop",
+            prefix: "/workshop",
         });
         this.rpkmController = new RpkmController();
         this.setupRoutes();
