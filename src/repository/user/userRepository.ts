@@ -1,10 +1,10 @@
-import { User, BottleChoice } from '@prisma/client';
+import { User, BottleChoice } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 import { GroupRepository } from "@/repository/group/groupRepository";
 import { RegisterRequest } from "@/types/auth/POST";
 import { UpdateRequest } from "@/types/user/PATCH";
-import { AppError } from '../../types/error/AppError';
+import { AppError } from "@/types/error/AppError";
 
 export class UserRepository {
   private groupRepository: GroupRepository;

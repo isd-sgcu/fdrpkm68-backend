@@ -2,7 +2,7 @@ import { UserUsecase } from "@/usecase/user/userUsecase";
 
 import type { AuthenticatedRequest } from "@/types/auth/authenticatedRequest";
 import type { Response } from "express";
-import { AppError } from "../../types/error/AppError";
+import { AppError } from "@/types/error/AppError";
 
 
 export class UserController {
