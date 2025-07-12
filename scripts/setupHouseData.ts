@@ -5,8 +5,6 @@ async function setup() {
 	console.log("🚀 Setting up house data...");
 
 	console.log("🗑️  Cleaning existing data...");
-	await prisma.user.deleteMany({});
-	await prisma.group.deleteMany({});
 	await prisma.house.deleteMany({});
 
 	const houses = await Promise.all([
