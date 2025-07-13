@@ -138,10 +138,7 @@ export class UserUsecase {
     ) {
       return false;
     }
-    const validRoles = ["STAFF", "FRESHMAN"];
-    if (!validRoles.includes(body.role)) {
-      return false;
-    }
+    return true;
    }
    
   private validateUpdateBottleChoiceRequest(body: UpdateBottleChoiceRequest): boolean {
