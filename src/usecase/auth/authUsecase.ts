@@ -1,3 +1,5 @@
+import { RoleType, type User } from "@prisma/client";
+
 import { UserRepository } from "@/repository/user/userRepository";
 import { AppError } from "@/types/error/AppError";
 import { signJwt } from "@/utils/jwt";
@@ -9,7 +11,6 @@ import type {
   LoginRequest,
   RegisterRequest,
 } from "@/types/auth/POST";
-import type { User } from "@prisma/client";
 
 export class AuthUsecase {
   private userRepository: UserRepository;
@@ -33,7 +34,10 @@ export class AuthUsecase {
       );
     }
     body.password = await hashPassword(body.password);
-    const user: User = await this.userRepository.create(body);
+    const user: User = await this.userRepository.create(
+      body,
+      RoleType.FRESHMAN
+    );
 
     const { password: _, ...userWithoutPassword } = user;
     return userWithoutPassword;
@@ -106,10 +110,7 @@ export class AuthUsecase {
     ) {
       return false;
     }
-    const validRoles = ["STAFF", "FRESHMAN"];
-    if (!validRoles.includes(body.role)) {
-      return false;
-    }
+
     return true;
   }
 

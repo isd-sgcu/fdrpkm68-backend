@@ -24,5 +24,10 @@ export class UserRouter extends BaseRouter {
       "/update",
       this.userController.update.bind(this.userController)
     );
+
+    this.router.patch(
+      "/water-bottle",
+      this.userController.updateBottleChoice.bind(this.userController)
+    );
   }
 }

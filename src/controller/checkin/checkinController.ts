@@ -2,6 +2,7 @@ import { EventType } from "@prisma/client";
 import { Response } from "express";
 
 import { CheckinRequest } from "@/types/checkin/POST";
+import { AppError } from "@/types/error/AppError";
 import { CheckinUsecase } from "@/usecase/checkin/checkinUsecase";
 
 import type { AuthenticatedRequest } from "@/types/auth/authenticatedRequest";
@@ -32,7 +33,7 @@ export class CheckinController {
       const userId = req.user?.id;
       const event = req.params.event;
       // Validate userId and event
-      
+
       if (!userId || !event) {
         res.status(400).json({ message: "User ID and event are required" });
         return;
@@ -46,7 +47,13 @@ export class CheckinController {
         return;
       }
       res.json(checkin);
-    } catch (error) {
+    } catch (error: unknown) {
+      if (error instanceof AppError) {
+        res.status(error.statusCode).json({
+          message: error.message,
+        });
+        return;
+      }
       console.error("Error fetching check-in:", error);
       res.status(500).json({ error: "Failed to fetch check-in" });
     }
@@ -55,16 +62,58 @@ export class CheckinController {
   // Create a new check-in
   async createCheckin(req: AuthenticatedRequest, res: Response) {
     try {
-      const newCheckin = await this.checkinUsecase.createCheckin(
-        req.body as CheckinRequest
-      );
+      const userId = req.user?.id; // Get userId from authenticated user
+      if (!userId) {
+        res.status(400).json({ message: "User ID is required" });
+        return;
+      }
+      const checkinData = req.body as CheckinRequest;
+      // checkinData.userId = userId; // Ensure userId is set from authenticated user
+      const newCheckin = await this.checkinUsecase.createCheckin({
+        ...checkinData,
+        userId,
+      });
       res.status(201).json(newCheckin);
-    } catch (error) {
-      console.error("Error creating check-in:", error);
-      res.status(500).json({ error: "Failed to create check-in" });
+    } catch (error: unknown) {
+      if (error instanceof AppError) {
+        res.status(error.statusCode).json({
+          message: error.message,
+        });
+        return;
+      }
+      console.error("Error updating user:", error);
+      res.status(500).json({
+        message: "An unexpected error occurred",
+      });
     }
   }
 
+  async createCheckinByUserId(req: AuthenticatedRequest, res: Response) {
+    try {
+      const userId = req.body.userId; // Get userId from request body or authenticated user
+
+      if (!userId) {
+        res.status(400).json({ message: "User ID and event are required" });
+        return;
+      }
+
+      const newCheckin = await this.checkinUsecase.createCheckinByUserId(
+        userId
+      );
+      res.status(201).json(newCheckin);
+    } catch (error: unknown) {
+      if (error instanceof AppError) {
+        res.status(error.statusCode).json({
+          message: error.message,
+        });
+        return;
+      }
+      console.error("Error creating check-in by user ID:", error);
+      res.status(500).json({
+        message: "An unexpected error occurred",
+      });
+    }
+  }
   // Update a check-in by id
   // async updateCheckin(req: Request, res: Response) {
   //   const id = req.params.id; // UUID string

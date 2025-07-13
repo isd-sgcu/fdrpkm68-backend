@@ -1,7 +1,7 @@
 import { UserRepository } from "@/repository/user/userRepository";
 import { AuthUser } from "@/types/auth/authenticatedRequest";
 import { AppError } from "@/types/error/AppError";
-import { UpdateRequest } from "@/types/user/PATCH";
+import { UpdateRequest, UpdateBottleChoiceRequest } from "@/types/user/PATCH";
 import { validatePhoneNumber } from "@/utils/validatePhoneNumber";
 import { RegisterRequest } from "@/types/auth/POST";
 import { hashPassword } from "@/utils/password";
@@ -43,6 +43,17 @@ export class UserUsecase {
     }
 
     this.userRepository.update(id, filteredBody);
+  }
+
+  async updateBottleChoice(id: string | undefined, body: UpdateBottleChoiceRequest): Promise<void> {
+    if (!id) {
+      throw new AppError("Cannot retrieve Id from JWT", 500);
+    }
+    if (this.validateUpdateBottleChoiceRequest(body) === false) {
+      throw new AppError("Invalid update bottle choice request", 400);
+    }
+
+    await this.userRepository.updateBottleChoice(id, body.bottleChoice);
   }
 
   private validateUpdateRequest(body: Partial<UpdateRequest>): boolean {
@@ -131,6 +142,17 @@ export class UserUsecase {
     if (!validRoles.includes(body.role)) {
       return false;
     }
+   }
+   
+  private validateUpdateBottleChoiceRequest(body: UpdateBottleChoiceRequest): boolean {
+    if (!body.bottleChoice) {
+      return false;
+    }
+    const validBottleChoices = ["A", "B", "C"];
+    if (!validBottleChoices.includes(body.bottleChoice)) {
+      return false;
+    }
+
     return true;
   }
 }

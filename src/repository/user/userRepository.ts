@@ -1,8 +1,9 @@
-import { User } from "@prisma/client";
+import { User, BottleChoice, RoleType } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 import { GroupRepository } from "@/repository/group/groupRepository";
 import { RegisterRequest } from "@/types/auth/POST";
+import { AppError } from "@/types/error/AppError";
 import { UpdateRequest } from "@/types/user/PATCH";
 
 export class UserRepository {
@@ -12,7 +13,7 @@ export class UserRepository {
     this.groupRepository = new GroupRepository();
   }
 
-  async create(body: RegisterRequest): Promise<User> {
+  async create(body: RegisterRequest, role: RoleType): Promise<User> {
     const user = await prisma.user.create({
       data: {
         studentId: body.studentId,
@@ -32,7 +33,7 @@ export class UserRepository {
         drugAllergy: body.drugAllergy || null,
         illness: body.illness || null,
         avatarId: Math.floor(Math.random() * 5) + 1,
-        role: body.role,
+        role: role,
       },
     });
 
@@ -141,11 +142,29 @@ export class UserRepository {
         drugAllergy: body.drugAllergy || null,
         illness: body.illness || null,
         avatarId: Math.floor(Math.random() * 5) + 1,
-        role: body.role,
+        role: body.role || "STAFF",
       },
     });
 
     return user;
   }
 
+  async updateBottleChoice(
+    id: string,
+    bottleChoice: BottleChoice
+  ): Promise<void> {
+    try {
+      await prisma.user.update({
+        where: {
+          id: id,
+        },
+        data: {
+          bottleChoice,
+        },
+      });
+    } catch (error) {
+      console.error("Error updating bottle choice:", error);
+      throw new AppError("Failed to update bottle choice", 404);
+    }
+  }
 }

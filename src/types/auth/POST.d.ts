@@ -1,4 +1,4 @@
-import { PrefixType, RoleType } from "@prisma/client";
+import { PrefixType } from "@prisma/client";
 
 export interface LoginRequest {
   studentId: string;
@@ -23,7 +23,6 @@ export interface RegisterRequest {
   foodAllergy?: string;
   drugAllergy?: string;
   illness?: string;
-  role: RoleType;
 }
 
 export interface ForgotPasswordRequest {
