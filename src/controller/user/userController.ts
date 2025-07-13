@@ -1,9 +1,7 @@
 import { UserUsecase } from "@/usecase/user/userUsecase";
-
 import type { AuthenticatedRequest } from "@/types/auth/authenticatedRequest";
-import type { RegisterRequest } from "@/types/auth/POST";
 import { AppError } from "@/types/error/AppError";
-import type { Response , Request as ExpressReq} from "express";
+import type { Response} from "express";
 
 export class UserController {
   private userUseCase: UserUsecase;

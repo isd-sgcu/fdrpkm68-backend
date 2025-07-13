@@ -1,6 +1,4 @@
 import { Request, Response } from "express";
-
-
 import { AppError } from "@/types/error/AppError";
 import { AuthUsecase } from "@/usecase/auth/authUsecase";
 import { UserUsecase } from "@/usecase/user/userUsecase";

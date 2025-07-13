@@ -1,8 +1,6 @@
 
 import { AuthController } from "@/controller/auth/authController";
 import { authMiddleware } from "@/middleware/authMiddleware";
-import { UserController } from "@/controller/user/userController";
-
 import { BaseRouter } from "./baseRouter";
 
 export class AuthRouter extends BaseRouter {
