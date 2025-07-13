@@ -7,14 +7,12 @@ import { BaseRouter } from "./baseRouter";
 
 export class AuthRouter extends BaseRouter {
   private authController: AuthController;
-  private userController: UserController;
 
   constructor() {
     super({
       prefix: "/auth",
     });
     this.authController = new AuthController();
-    this.userController = new UserController();
     this.setupRoutes();
   }
 
@@ -38,7 +36,7 @@ export class AuthRouter extends BaseRouter {
     );
     this.router.post(
       "/staff-register",
-      this.userController.registerStaff.bind(this.userController)
+      this.authController.registerStaff.bind(this.authController)
     );
   }
 }

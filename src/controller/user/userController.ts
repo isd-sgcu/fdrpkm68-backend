@@ -54,23 +54,6 @@ export class UserController {
     }
   }
 
-  async registerStaff(req: ExpressReq<{}, {}, RegisterRequest>, res: Response): Promise<void> {
-    try {
-      const user = await this.userUseCase.registerStaff(
-        req.body as RegisterRequest
-      );
-      res.status(201).json({ user });
-      return;
-    } catch (error: unknown) {
-      if (error instanceof AppError) {
-        res.status(error.statusCode).json({ message: error.message });
-        return;
-      }
-      console.error("Error registering staff:", error);
-      
-    }
-  }
-
   async updateBottleChoice(
       req: AuthenticatedRequest,
       res: Response
