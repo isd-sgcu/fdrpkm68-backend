@@ -25,7 +25,7 @@ export class CheckinUsecase {
     userId: string,
     event: EventType
   ): Promise<Checkin | null> {
-    const now = DateTime.now();
+    const now = DateTime.now().setZone("Asia/Bangkok");
     const period = EVENT_PERIODS[event];
     if (!period) {
       throw new AppError("Invalid event type", 400);
