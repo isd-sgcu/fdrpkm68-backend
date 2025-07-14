@@ -105,7 +105,10 @@ export class UserRepository {
     return false;
   }
 
-  async findExistsStaff(studentId : string , citizenId : string): Promise<boolean> {
+  async findExistsStaff(
+    studentId: string,
+    citizenId: string
+  ): Promise<boolean> {
     const staff = await prisma.staffData.findUnique({
       where: {
         studentId_citizenId: {
@@ -121,7 +124,6 @@ export class UserRepository {
   }
 
   async registerStaff(body: RegisterRequest): Promise<User | null> {
-
     //register staff to db
     const user = await prisma.user.create({
       data: {
