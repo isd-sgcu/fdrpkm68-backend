@@ -1,6 +1,7 @@
 import { EventType } from "@prisma/client";
 import { Response } from "express";
 
+
 import { CheckinRequest } from "@/types/checkin/POST";
 import { AppError } from "@/types/error/AppError";
 import { CheckinUsecase } from "@/usecase/checkin/checkinUsecase";
@@ -30,8 +31,8 @@ export class CheckinController {
 
   async getCheckinByUserIdAndEvent(req: AuthenticatedRequest, res: Response) {
     try {
-      const userId = req.user?.id;
-      const event = req.params.event;
+      const userId = req.user!.id;
+      const event = req.params?.event;
       // Validate userId and event
 
       if (!userId || !event) {
@@ -60,13 +61,9 @@ export class CheckinController {
   }
 
   // Create a new check-in
-  async createCheckin(req: AuthenticatedRequest, res: Response) {
+  async register(req: AuthenticatedRequest, res: Response) {
     try {
-      const userId = req.user?.id; // Get userId from authenticated user
-      if (!userId) {
-        res.status(400).json({ message: "User ID is required" });
-        return;
-      }
+      const userId = req.user!.id; // Get userId from authenticated user
       const checkinData = req.body as CheckinRequest;
       // checkinData.userId = userId; // Ensure userId is set from authenticated user
       const newCheckin = await this.checkinUsecase.createCheckin({
@@ -88,7 +85,7 @@ export class CheckinController {
     }
   }
 
-  async createCheckinByUserId(req: AuthenticatedRequest, res: Response) {
+  async registerByStaff(req: AuthenticatedRequest, res: Response) {
     try {
       const userId = req.body.userId; // Get userId from request body or authenticated user
 

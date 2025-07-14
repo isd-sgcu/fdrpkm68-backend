@@ -1,6 +1,7 @@
-import { BaseRouter } from "./baseRouter";
-import { authMiddleware } from "@/middleware/authMiddleware";
 import { RpkmController } from "@/controller/rpkm/rpkmController";
+import { authMiddleware } from "@/middleware/authMiddleware";
+
+import { BaseRouter } from "./baseRouter";
 
 export class RpkmWorkshopRouter extends BaseRouter {
     private rpkmController: RpkmController;

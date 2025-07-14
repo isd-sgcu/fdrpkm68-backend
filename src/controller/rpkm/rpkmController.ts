@@ -1,7 +1,8 @@
 import { Response, Request } from "express";
+
+import { AuthenticatedRequest } from "@/types/auth/authenticatedRequest";
 import { WorkshopRegisterRequest } from "@/types/rpkm/POST";
 import { RpkmUsecase } from "@/usecase/rpkm/rpkmUsecase";
-import { AuthenticatedRequest } from "@/types/auth/authenticatedRequest";
 import { UUIDValidator } from "@/utils/uuidValidator";
 
 export class RpkmController {

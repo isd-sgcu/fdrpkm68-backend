@@ -4,8 +4,8 @@ import { AuthRouter } from "./authRouter";
 import { CheckinRouter } from "./checkinRouter";
 import { GroupRouter } from "./groupRouter";
 import { HouseRouter } from "./houseRouter";
-import { UserRouter } from "./userRouter";
 import { RpkmWorkshopRouter } from "./rpkmWorkshopRouter";
+import { UserRouter } from "./userRouter";
 
 export class RouterManager {
   private router: Router;

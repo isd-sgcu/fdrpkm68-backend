@@ -1,7 +1,8 @@
-import { WorkshopRegisterRequest } from "@/types/rpkm/POST";
 import { RPKMworkshop, WorkshopType } from "@prisma/client";
+
 import { prisma } from "@/lib/prisma";
 import { workshopParticipantCountType, _rawWorkshopParticipantCountType } from "@/types/rpkm/GET";
+import { WorkshopRegisterRequest } from "@/types/rpkm/POST";
 
 export class RpkmRepository {
     async userRegisterNewWorkshop(body: WorkshopRegisterRequest, userId: string): Promise<RPKMworkshop> {

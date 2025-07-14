@@ -1,8 +1,7 @@
 import { CheckinController } from "@/controller/checkin/checkinController";
+import { authMiddleware } from "@/middleware/authMiddleware";
 
 import { BaseRouter } from "./baseRouter";
-import { authMiddleware } from "../middleware/authMiddleware";
-
 
 export class CheckinRouter extends BaseRouter {
   private checkinController: CheckinController;
@@ -17,7 +16,7 @@ export class CheckinRouter extends BaseRouter {
 
   private setupRoutes(): void {
     this.router.use(authMiddleware);
-    
+
     // Get a check-in by userId and event
     this.router.get(
       "/:event",
@@ -26,14 +25,15 @@ export class CheckinRouter extends BaseRouter {
 
     // Create a new check-in
     this.router.post(
-      "/create",
-      this.checkinController.createCheckin.bind(this.checkinController)
+      "/register",
+      this.checkinController.register.bind(this.checkinController)
     );
+
     // Create a new check-in by userId and Time
     this.router.post(
-    "/createByUserId",
-    this.checkinController.createCheckinByUserId.bind(this.checkinController)
-  );
+      "/registerByStaff",
+      this.checkinController.registerByStaff.bind(this.checkinController)
+    );
     // Update a check-in
     // this.router.put(
     //   "/:id",
