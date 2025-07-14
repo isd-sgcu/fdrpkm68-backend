@@ -39,6 +39,7 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "luxon": "^3.7.1",
+    "module-alias": "^2.2.3",
     "prisma": "^6.11.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
@@ -58,7 +59,6 @@
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-import": "^2.32.0",
     "jest": "^30.0.4",
-    "module-alias": "^2.2.3",
     "nodemon": "^3.1.10",
     "ts-jest": "^29.4.0",
     "tsconfig-paths": "^4.2.0"
