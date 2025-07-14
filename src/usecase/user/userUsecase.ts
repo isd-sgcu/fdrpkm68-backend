@@ -3,6 +3,8 @@ import { AuthUser } from "@/types/auth/authenticatedRequest";
 import { AppError } from "@/types/error/AppError";
 import { UpdateRequest, UpdateBottleChoiceRequest } from "@/types/user/PATCH";
 import { validatePhoneNumber } from "@/utils/validatePhoneNumber";
+import { RegisterRequest } from "@/types/auth/POST";
+import { hashPassword } from "@/utils/password";
 
 export class UserUsecase {
   private userRepository: UserRepository;
@@ -72,6 +74,73 @@ export class UserUsecase {
     return true;
   }
 
+  async registerStaff(body: RegisterRequest) {
+    if (this.validateRegisterRequest(body) === false) {
+      throw new AppError("Invalid registration request", 400);
+    }
+
+    const existingStaff = await this.userRepository.findExistsStaff(
+      body.studentId,
+      body.citizenId
+    );
+
+    // there is no staff data in StaffData table
+    if (!existingStaff) {
+      throw new AppError("Staff data not found", 404);
+    }
+
+    const existingStaffInUsers = await this.userRepository.findExists(
+      body.studentId,
+      body.citizenId
+    );
+    
+    //staff already exist in users table 
+    //!!!! there is a case that staff registered via nong nong form (registered as a freshmen), 
+    // then when register with /staff-register it causes error as they're already exist in users table. T^T
+    if (existingStaffInUsers) {
+      throw new AppError("Staff already exists in users table", 409);
+    }
+
+    body.password = await hashPassword(body.password);
+
+    const user = await this.userRepository.registerStaff(body);
+    if (!user) {
+      throw new AppError("User registration failed", 500);
+    }
+    const { password:_, ...userWithoutPassword } = user;
+
+    return userWithoutPassword;
+  }
+
+   private validateRegisterRequest(body: RegisterRequest): boolean {
+    if (body.studentId.length !== 10 || body.citizenId.length !== 13) {
+      return false;
+    }
+    if (!/^\d+$/.test(body.studentId) || !/^\d+$/.test(body.citizenId)) {
+      return false;
+    }
+    if (
+      !/[A-Z]/.test(body.password) ||
+      !/[a-z]/.test(body.password) ||
+      !/\d/.test(body.password) ||
+      body.password.length < 8 ||
+      body.password.length > 20
+    ) {
+      return false;
+    }
+    const validPrefixes = ["MR", "MS", "MRS", "Other"];
+    if (!validPrefixes.includes(body.prefix)) {
+      return false;
+    }
+    if (
+      !validatePhoneNumber(body.phoneNumber) ||
+      !validatePhoneNumber(body.parentPhoneNumber)
+    ) {
+      return false;
+    }
+    return true;
+   }
+   
   private validateUpdateBottleChoiceRequest(body: UpdateBottleChoiceRequest): boolean {
     if (!body.bottleChoice) {
       return false;

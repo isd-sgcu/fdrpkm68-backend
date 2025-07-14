@@ -1,16 +1,16 @@
 import { Request, Response } from "express";
-
-
 import { AppError } from "@/types/error/AppError";
 import { AuthUsecase } from "@/usecase/auth/authUsecase";
-
+import { UserUsecase } from "@/usecase/user/userUsecase";
 import type { RegisterRequest } from "@/types/auth/POST";
 
 export class AuthController {
   private authUseCase: AuthUsecase;
+  private userUseCase: UserUsecase;
 
   constructor() {
     this.authUseCase = new AuthUsecase();
+    this.userUseCase = new UserUsecase();
   }
 
   async register(req: Request, res: Response): Promise<void> {
@@ -85,4 +85,22 @@ export class AuthController {
       message: "Logged out successfully",
     });
   }
+
+
+    async registerStaff(req: Request, res: Response): Promise<void> {
+      try {
+        const user = await this.userUseCase.registerStaff(
+          req.body as RegisterRequest
+        );
+        res.status(201).json({ user });
+        return;
+      } catch (error: unknown) {
+        if (error instanceof AppError) {
+          res.status(error.statusCode).json({ message: error.message });
+          return;
+        }
+        console.error("Error registering staff:", error);
+        
+      }
+    }
 }

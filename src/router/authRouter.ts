@@ -1,7 +1,6 @@
 
 import { AuthController } from "@/controller/auth/authController";
 import { authMiddleware } from "@/middleware/authMiddleware";
-
 import { BaseRouter } from "./baseRouter";
 
 export class AuthRouter extends BaseRouter {
@@ -32,6 +31,10 @@ export class AuthRouter extends BaseRouter {
       "/logout",
       authMiddleware,
       this.authController.logout.bind(this.authController)
+    );
+    this.router.post(
+      "/staff-register",
+      this.authController.registerStaff.bind(this.authController)
     );
   }
 }

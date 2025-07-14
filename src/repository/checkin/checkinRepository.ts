@@ -1,5 +1,4 @@
 import { Checkin, CheckinStatusType, EventType } from "@prisma/client";
-
 import { prisma } from "@/lib/prisma";
 import {  CheckinRequestWithStatus } from "@/types/checkin/POST";
 import { AppError } from "@/types/error/AppError";
