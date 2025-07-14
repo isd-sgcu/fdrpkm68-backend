@@ -1,4 +1,5 @@
 import { Checkin, CheckinStatusType, EventType } from "@prisma/client";
+import { DateTime } from "luxon";
 
 import { EVENT_PERIODS } from "@/constant/event_periods";
 import { CheckinRepository } from "@/repository/checkin/checkinRepository";
@@ -24,7 +25,7 @@ export class CheckinUsecase {
     userId: string,
     event: EventType
   ): Promise<Checkin | null> {
-    const now = new Date();
+    const now = DateTime.now();
     const period = EVENT_PERIODS[event];
     if (!period) {
       throw new AppError("Invalid event type", 400);
@@ -54,7 +55,7 @@ export class CheckinUsecase {
     }
 
     // Period check based on status
-    const now = new Date();
+    const now = DateTime.now();
     const period = EVENT_PERIODS[data.event];
     if (!period) {
       throw new AppError("Invalid event type", 400);
@@ -72,8 +73,9 @@ export class CheckinUsecase {
     };
     return await this.checkinRepository.createCheckin(checkinData);
   }
+
   async createCheckinByUserId(data: UserIdRequest): Promise<Checkin> {
-    const now = new Date();
+    const now = DateTime.now();
     let event: EventType | null = null;
 
     // Determine event based on current time
