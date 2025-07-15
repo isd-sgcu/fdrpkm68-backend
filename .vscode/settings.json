@@ -1,0 +1,8 @@
+{
+  "typescript.preferences.importModuleSpecifier": "project-relative",
+  "typescript.suggest.autoImports": true,
+  "typescript.preferences.includePackageJsonAutoImports": "auto",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  }
+}

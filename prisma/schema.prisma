@@ -1,0 +1,196 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model StaffData {
+  id        String @id @default(uuid()) @map("id") @db.Uuid
+  studentId String @map("student_id")
+  citizenId String @map("citizen_id")
+
+  @@unique([studentId, citizenId])
+  @@index([studentId])
+  @@index([citizenId])
+}
+
+model User {
+  id                 String       @id @default(uuid()) @map("id") @db.Uuid
+  studentId          String       @map("student_id")
+  citizenId          String       @map("citizen_id")
+  prefix             PrefixType   @default(OTHER) @map("prefix")
+  firstName          String       @map("first_name")
+  lastName           String       @map("last_name")
+  nickname           String       @map("nickname")
+  academicYear       Int          @map("academic_year")
+  faculty            String       @map("faculty")
+  password           String       @map("password")
+  phoneNumber        String       @map("phone_number")
+  parentName         String       @map("parent_name")
+  parentPhoneNumber  String       @map("parent_phone_number")
+  parentRelationship String       @map("parent_relationship")
+  foodAllergy        String?      @map("food_allergy")
+  drugAllergy        String?      @map("drug_allergy")
+  illness            String?      @map("illness")
+  avatarId           Int          @default(1) @map("avatar_id") @db.SmallInt
+  groupId            String?      @map("group_id") @db.Uuid
+  role               RoleType     @default(FRESHMAN)
+  bottleChoice       BottleChoice @default(NONE) @map("bottle_choice")
+  createdAt          DateTime     @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt          DateTime     @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  group      Group?    @relation("UserGroup", fields: [groupId], references: [id])
+  ownedGroup Group?    @relation("GroupOwner")
+  checkins   Checkin[] @relation("UserCheckins")
+
+  @@unique([studentId, citizenId])
+  @@index([groupId])
+  @@index([studentId])
+  @@map("users")
+}
+
+model Checkin {
+  id        String            @id @default(uuid()) @map("id") @db.Uuid
+  userId    String            @map("user_id") @db.Uuid
+  event     EventType
+  status    CheckinStatusType
+  createdAt DateTime          @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime          @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  user User @relation("UserCheckins", fields: [userId], references: [id])
+
+  @@unique([userId, event, status])
+  @@map("checkin")
+}
+
+model House {
+  id                 String @id @default(uuid()) @map("id") @db.Uuid
+  nameThai           String @map("name_th")
+  nameEnglish        String @map("name_en")
+  descriptionThai    String @map("description_th")
+  descriptionEnglish String @map("description_en")
+  sizeLetter         String @map("size_letter")
+  chosenCount        Int    @default(0) @map("chosen_count")
+  capacity           Int    @map("capacity")
+  instagram          String
+  facebook           String
+  tiktok             String
+
+  groupsRank1 Group[] @relation("GroupHouseRank1")
+  groupsRank2 Group[] @relation("GroupHouseRank2")
+  groupsRank3 Group[] @relation("GroupHouseRank3")
+  groupsRank4 Group[] @relation("GroupHouseRank4")
+  groupsRank5 Group[] @relation("GroupHouseRank5")
+  groupsSub   Group[] @relation("GroupHouseSub")
+
+  @@index([chosenCount])
+  @@index([capacity])
+  @@map("houses")
+}
+
+model Group {
+  id           String  @id @default(uuid()) @map("id") @db.Uuid
+  ownerId      String  @unique @map("owner_id") @db.Uuid
+  isConfirmed  Boolean @default(false) @map("is_confirmed")
+  inviteCode   String  @unique @map("invite_code")
+  memberCount  Int     @default(0) @map("member_count")
+  houseRank1   String? @map("house_rank_1") @db.Uuid
+  houseRank2   String? @map("house_rank_2") @db.Uuid
+  houseRank3   String? @map("house_rank_3") @db.Uuid
+  houseRank4   String? @map("house_rank_4") @db.Uuid
+  houseRank5   String? @map("house_rank_5") @db.Uuid
+  houseRankSub String? @map("house_rank_sub") @db.Uuid
+
+  owner    User   @relation("GroupOwner", fields: [ownerId], references: [id])
+  users    User[] @relation("UserGroup")
+  house1   House? @relation("GroupHouseRank1", fields: [houseRank1], references: [id])
+  house2   House? @relation("GroupHouseRank2", fields: [houseRank2], references: [id])
+  house3   House? @relation("GroupHouseRank3", fields: [houseRank3], references: [id])
+  house4   House? @relation("GroupHouseRank4", fields: [houseRank4], references: [id])
+  house5   House? @relation("GroupHouseRank5", fields: [houseRank5], references: [id])
+  houseSub House? @relation("GroupHouseSub", fields: [houseRankSub], references: [id])
+
+  @@index([inviteCode])
+  @@index([isConfirmed])
+  @@index([memberCount])
+  @@index([ownerId])
+  @@map("groups")
+}
+
+model RPKMworkshop {
+  id           String       @id @default(uuid()) @map("id") @db.Uuid
+  workshopType WorkshopType @map("workshop_type")
+  userId       String       @map("user_id") @db.Uuid
+  workshopTime Int          @map("workshop_time")
+
+  @@unique([workshopType, userId])
+  @@index([workshopTime])
+  @@map("rpkm_workshops")
+}
+
+enum WorkshopType {
+  DIFFUSER
+  KEYCHAIN
+
+  @@map("workshop_type")
+}
+
+enum BottleChoice {
+  NONE
+  A
+  B
+  C
+
+  @@map("bottle_choice")
+}
+
+enum PrefixType {
+  MR
+  MS
+  MRS
+  OTHER
+
+  @@map("prefix_type")
+}
+
+enum RoleType {
+  STAFF
+  FRESHMAN
+
+  @@map("role_type")
+}
+
+enum EventType {
+  FIRSTDATE
+  RPKM
+  FRESHMENNIGHT
+
+  @@map("event_type")
+}
+
+enum CheckinStatusType {
+  PRE_REGISTER
+  EVENT_REGISTER
+
+  @@map("checkin_status_type")
+}
+
+enum HouseSizeLetterType {
+  S
+  M
+  L
+  XL
+  XXL
+
+  @@map("housesize_letter_type")
+}
+
+enum GroupRoleType {
+  OWNER
+  MEMBER
+
+  @@map("group_role_type")
+}
