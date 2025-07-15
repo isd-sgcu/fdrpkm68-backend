@@ -54,6 +54,7 @@ export class CheckinController {
         });
         return;
       }
+
       console.error("Error fetching check-in:", error);
       res.status(500).json({ error: "Failed to fetch check-in" });
     }

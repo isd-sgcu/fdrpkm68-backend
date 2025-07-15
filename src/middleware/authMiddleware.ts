@@ -1,3 +1,5 @@
+import { RoleType } from "@prisma/client";
+
 import { AppError } from "@/types/error/AppError";
 import { verifyJwt } from "@/utils/jwt";
 
@@ -8,6 +10,7 @@ declare module "express" {
     user?: {
       studentId: string;
       citizenId: string;
+      role: RoleType;
     };
   }
 }
