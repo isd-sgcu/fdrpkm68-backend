@@ -125,7 +125,7 @@ async function setup() {
 					"https://www.instagram.com/baanjijah.chula?igsh=OHFmYnFtejBzaXpq&utm_source=qr",
 				tiktok: "https://www.tiktok.com/@baanjijah.chula?_t=ZS-8xhNCNKRyGw&_r=1",
 				sizeLetter: "M",
-				capacity: 201,
+				capacity: 204,
 			},
 
 			{
@@ -169,7 +169,7 @@ async function setup() {
 				instagram:
 					"https://www.instagram.com/jodeh_official?igsh=MWZuMTZ5bXgycGIxaA%3D%3D&utm_source=qr",
 				tiktok: "https://www.tiktok.com/@jodeh_official?_t=ZS-8xiibLfRiOf&_r=1",
-				sizeLetter: "M",
+				sizeLetter: "L",
 				capacity: 297,
 			},
 
@@ -215,7 +215,7 @@ async function setup() {
 					"https://www.instagram.com/baanrangs.official/?igsh=MWViczk0a2ZtaDh6Mg%3D%3D&utm_source=qr",
 				tiktok: "https://www.tiktok.com/@baanrangs.official?_t=ZS-8xilJ9bF2Kl&_r=1",
 				sizeLetter: "XXL",
-				capacity: 1248,
+				capacity: 888,
 			},
 
 			{
@@ -246,7 +246,7 @@ async function setup() {
 					"https://www.instagram.com/baanachuan_official?igsh=a3A1c2Ryd2FnNmJ2",
 				tiktok: "",
 				sizeLetter: "M",
-				capacity: 249,
+				capacity: 246,
 			},
 
 			{
@@ -260,7 +260,7 @@ async function setup() {
 				instagram:
 					"https://www.instagram.com/baankids.official?igsh=MTI5YzZ4c3c0ZGwyYg==",
 				tiktok: "https://www.tiktok.com/@baankids.official?_t=ZS-8xiqNbEO1WE&_r=1",
-				sizeLetter: "L",
+				sizeLetter: "M",
 				capacity: 210,
 			},
 
