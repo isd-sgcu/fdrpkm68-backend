@@ -59,6 +59,7 @@ export class AuthUsecase {
       id: user.id,
       studentId: user.studentId,
       citizenId: user.citizenId,
+      role: user.role,
     });
   }
 
