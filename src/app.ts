@@ -1,8 +1,14 @@
 import "dotenv/config";
-import "module-alias/register";
+import path from "path";
+
 import bodyParser from "body-parser";
 import cors from "cors";
 import express, { Request, Response } from "express";
+import * as moduleAlias from "module-alias";
+
+if (process.env.NODE_ENV !== "development") {
+  moduleAlias.addAlias("@", path.resolve(__dirname));
+}
 
 import { RouterManager } from "@/router";
 

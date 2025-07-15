@@ -1,10 +1,10 @@
 import { UserRepository } from "@/repository/user/userRepository";
 import { AuthUser } from "@/types/auth/authenticatedRequest";
+import { RegisterRequest } from "@/types/auth/POST";
 import { AppError } from "@/types/error/AppError";
 import { UpdateRequest, UpdateBottleChoiceRequest } from "@/types/user/PATCH";
-import { validatePhoneNumber } from "@/utils/validatePhoneNumber";
-import { RegisterRequest } from "@/types/auth/POST";
 import { hashPassword } from "@/utils/password";
+import { validatePhoneNumber } from "@/utils/validatePhoneNumber";
 
 export class UserUsecase {
   private userRepository: UserRepository;

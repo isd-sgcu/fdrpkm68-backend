@@ -5,7 +5,6 @@ import { GroupUsecase } from "@/usecase/group/groupUsecase";
 import { GroupController } from "./groupController";
 import type { AuthenticatedRequest } from "@/types/auth/authenticatedRequest";
 
-
 // Mock GroupUsecase
 jest.mock("@/usecase/group/groupUsecase");
 
@@ -31,7 +30,12 @@ describe("GroupController", () => {
     (groupController as any).groupUsecase = mockGroupUsecase;
 
     mockRequest = {
-      user: { id: "user-1", studentId: "123456", citizenId: "1234567890123" },
+      user: {
+        id: "user-1",
+        studentId: "123456",
+        citizenId: "1234567890123",
+        role: "FRESHMAN",
+      },
       body: {},
       headers: {},
     };
