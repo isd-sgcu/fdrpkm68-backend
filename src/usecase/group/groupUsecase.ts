@@ -67,6 +67,20 @@ export class GroupUsecase {
     }
   }
 
+  async getGroupByInviteCode(inviteCode: string): Promise<Group | null> {
+   
+      const data = await this.groupRepository.findGroupByInviteCode(inviteCode);
+      if (!data) {
+        throw new AppError("Group not found with the provided invite code", 404);
+      }
+      const group = await this.groupRepository.findUserGroup(data?.ownerId);
+      if (!group) {
+        throw new AppError("Group not found with the provided invite code", 404);
+      }
+      return group;
+
+  }
+
   async createGroup(userId: string): Promise<Group> {
     try {
       const existingGroup = await this.groupRepository.findUserGroup(userId);
