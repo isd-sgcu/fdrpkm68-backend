@@ -45,7 +45,7 @@ jobs:
             --region ${{ env.REGION }} \
             --allow-unauthenticated \
             --port 8080 \
-            --set-env-vars="DATABASE_URL=${{ env.DATABASE_URL }},SECRET_JWT_KEY=${{ env.SECRET_JWT_KEY }},REDIS_URL=${{ env.REDIS_URL }},NODE_ENV=development"
+            --set-env-vars="DATABASE_URL=${{ env.DATABASE_URL }},SECRET_JWT_KEY=${{ env.SECRET_JWT_KEY }},REDIS_URL=${{ env.REDIS_URL }},NODE_ENV=developmenthuakuay"
 
   deploy-prod:
     if: github.ref == 'refs/heads/main'
