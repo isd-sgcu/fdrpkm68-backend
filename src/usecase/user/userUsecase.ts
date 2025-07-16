@@ -1,3 +1,5 @@
+import { RoleType } from "@prisma/client";
+
 import { UserRepository } from "@/repository/user/userRepository";
 import { AuthUser } from "@/types/auth/authenticatedRequest";
 import { RegisterRequest } from "@/types/auth/POST";
@@ -45,7 +47,10 @@ export class UserUsecase {
     this.userRepository.update(id, filteredBody);
   }
 
-  async updateBottleChoice(id: string | undefined, body: UpdateBottleChoiceRequest): Promise<void> {
+  async updateBottleChoice(
+    id: string | undefined,
+    body: UpdateBottleChoiceRequest
+  ): Promise<void> {
     if (!id) {
       throw new AppError("Cannot retrieve Id from JWT", 500);
     }
@@ -93,9 +98,9 @@ export class UserUsecase {
       body.studentId,
       body.citizenId
     );
-    
-    //staff already exist in users table 
-    //!!!! there is a case that staff registered via nong nong form (registered as a freshmen), 
+
+    //staff already exist in users table
+    //!!!! there is a case that staff registered via nong nong form (registered as a freshmen),
     // then when register with /staff-register it causes error as they're already exist in users table. T^T
     if (existingStaffInUsers) {
       throw new AppError("Staff already exists in users table", 409);
@@ -103,16 +108,16 @@ export class UserUsecase {
 
     body.password = await hashPassword(body.password);
 
-    const user = await this.userRepository.registerStaff(body);
+    const user = await this.userRepository.create(body, RoleType.STAFF);
     if (!user) {
       throw new AppError("User registration failed", 500);
     }
-    const { password:_, ...userWithoutPassword } = user;
+    const { password: _, ...userWithoutPassword } = user;
 
     return userWithoutPassword;
   }
 
-   private validateRegisterRequest(body: RegisterRequest): boolean {
+  private validateRegisterRequest(body: RegisterRequest): boolean {
     if (body.studentId.length !== 10 || body.citizenId.length !== 13) {
       return false;
     }
@@ -139,9 +144,11 @@ export class UserUsecase {
       return false;
     }
     return true;
-   }
-   
-  private validateUpdateBottleChoiceRequest(body: UpdateBottleChoiceRequest): boolean {
+  }
+
+  private validateUpdateBottleChoiceRequest(
+    body: UpdateBottleChoiceRequest
+  ): boolean {
     if (!body.bottleChoice) {
       return false;
     }

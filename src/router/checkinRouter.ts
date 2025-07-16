@@ -34,6 +34,13 @@ export class CheckinRouter extends BaseRouter {
       "/registerByStaff",
       this.checkinController.registerByStaff.bind(this.checkinController)
     );
+
+    // Create a new check-in by studentId and citizenId
+    this.router.post(
+      "/registerByStudentId",
+      this.checkinController.registerByStudentId.bind(this.checkinController)
+    );
+
     // Update a check-in
     // this.router.put(
     //   "/:id",

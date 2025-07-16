@@ -7,14 +7,18 @@ import {
   CheckinRequest,
   UserIdRequest,
   CheckinRequestWithStatus,
+  StudentIdRequest,
 } from "@/types/checkin/POST";
 import { AppError } from "@/types/error/AppError";
 
+import { UserRepository } from "../../repository/user/userRepository";
+
 export class CheckinUsecase {
   private checkinRepository: CheckinRepository;
-
+  private userRepository: UserRepository;
   constructor() {
     this.checkinRepository = new CheckinRepository();
+    this.userRepository = new UserRepository();
   }
 
   // async findCheckinById(id: string): Promise<Checkin | null> {
@@ -117,6 +121,68 @@ export class CheckinUsecase {
     // Create the check-in
     const newCheckin = await this.checkinRepository.createCheckin({
       userId: data.userId,
+      event: event,
+      status: CheckinStatusType.EVENT_REGISTER,
+    });
+
+    return newCheckin;
+  }
+
+  async createCheckinByStudentId(data: StudentIdRequest): Promise<Checkin> {
+    const now = DateTime.now();
+    let event: EventType | null = null;
+
+    // Determine event based on current time
+    for (const [eventKey, period] of Object.entries(EVENT_PERIODS)) {
+      if (
+        now >= period.EVENT_REGISTER.start &&
+        now <= period.EVENT_REGISTER.end
+      ) {
+        event = eventKey as EventType;
+        break;
+      }
+    }
+    if (!event) {
+      throw new AppError(
+        "No event is open for EVENT_REGISTER at this time",
+        400
+      );
+    }
+
+    // Check if check-in already exists for this user and event with EVENT_REGISTER status
+    const existing =
+      await this.checkinRepository.findCheckinByStudentIdEventandStatus(
+        data.studentId,
+        data.citizenId,
+        event,
+        CheckinStatusType.EVENT_REGISTER
+      );
+    if (existing) {
+      throw new AppError(
+        "Check-in already exists for this user and event",
+        400
+      );
+    }
+
+    // Check if now is in the event period
+    const period = EVENT_PERIODS[event];
+    if (now < period.EVENT_REGISTER.start || now > period.EVENT_REGISTER.end) {
+      throw new AppError("Checking is not allowed outside event period", 400);
+    }
+
+    // Find userId by studentId and citizenId before creating check-in
+    const user = await this.userRepository.getUserByCredentials(
+      data.studentId,
+      data.citizenId
+    );
+
+    if (!user) {
+      throw new AppError("User not found for given student ID and citizen ID", 404);
+    }
+
+    // Create the check-in
+    const newCheckin = await this.checkinRepository.createCheckin({
+      userId: user.id,
       event: event,
       status: CheckinStatusType.EVENT_REGISTER,
     });
