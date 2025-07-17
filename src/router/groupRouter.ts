@@ -62,7 +62,7 @@ export class GroupRouter extends BaseRouter {
       this.groupController.setHousePreferences.bind(this.groupController)
     );
 
-    this.router.get(
+    this.router.post(
       "/groupByInviteCode",
       this.groupController.getGroupByInviteCode.bind(this.groupController)
     );
