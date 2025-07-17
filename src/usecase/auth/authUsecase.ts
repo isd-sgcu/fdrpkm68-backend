@@ -29,7 +29,7 @@ export class AuthUsecase {
     );
     if (existingUser) {
       throw new AppError(
-        "User with this student ID or citizen ID already exists",
+        "User with this student ID and citizen ID already exists",
         400
       );
     }
