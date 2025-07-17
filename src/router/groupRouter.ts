@@ -1,4 +1,3 @@
-
 import { GroupController } from "@/controller/group/groupController";
 import { authMiddleware } from "@/middleware/authMiddleware";
 
@@ -61,6 +60,11 @@ export class GroupRouter extends BaseRouter {
     this.router.post(
       "/house-preferences",
       this.groupController.setHousePreferences.bind(this.groupController)
+    );
+
+    this.router.get(
+      "/groupByInviteCode",
+      this.groupController.getGroupByInviteCode.bind(this.groupController)
     );
 
     this.router.get(

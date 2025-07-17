@@ -111,6 +111,33 @@ export class CheckinController {
       });
     }
   }
+    async registerByStudentId(req: AuthenticatedRequest, res: Response) {
+    try {
+      const studentId = req.body.studentId; // Get studentId from request body or authenticated user
+      const citizenId = req.body.citizenId; // Get citizenId from request body or authenticated user
+      if (!studentId|| !citizenId ) {
+        res.status(400).json({ message: "Student ID and event are required" });
+        return;
+      }
+
+      const newCheckin = await this.checkinUsecase.createCheckinByStudentId({
+        studentId,
+        citizenId, // Assuming citizenId is also provided in the request body
+      });
+      res.status(201).json(newCheckin);
+    } catch (error: unknown) {
+      if (error instanceof AppError) {
+        res.status(error.statusCode).json({
+          message: error.message,
+        });
+        return;
+      }
+      console.error("Error creating check-in by user ID:", error);
+      res.status(500).json({
+        message: "An unexpected error occurred",
+      });
+    }
+  }
   // Update a check-in by id
   // async updateCheckin(req: Request, res: Response) {
   //   const id = req.params.id; // UUID string
