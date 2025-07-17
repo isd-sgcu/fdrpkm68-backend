@@ -9,6 +9,8 @@ import {
 import { GroupUsecase } from "@/usecase/group/groupUsecase";
 import { UUIDValidator } from "@/utils/uuidValidator";
 
+import { AppError } from "../../types/error/AppError";
+
 export class GroupController {
   private groupUsecase: GroupUsecase;
 
@@ -52,6 +54,56 @@ export class GroupController {
         timestamp: new Date().toISOString(),
       });
     }
+  }
+  async getGroupByInviteCode(req: AuthenticatedRequest, res: Response): Promise<void> {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          error: "User not authenticated",
+          timestamp: new Date().toISOString(),
+        });
+        return;
+      }
+      const inviteCode = req.body.inviteCode;
+      if (!inviteCode) {
+        res.status(400).json({
+          success: false,
+          error: "Invite code is required",
+          timestamp: new Date().toISOString(),
+        });
+        return;
+      }
+      
+      const group = await this.groupUsecase.getGroupByInviteCode(inviteCode);
+      if (!group) {
+        res.status(404).json({
+          success: false,
+          error: "Group not found with the provided invite code",
+          timestamp: new Date().toISOString(),
+        });
+        return ;
+      }
+
+      res.status(200).json({
+        success: true,
+        message: "Group retrieved successfully",
+        data: group,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error: unknown) {
+          if (error instanceof AppError) {
+            res.status(error.statusCode).json({
+              message: error.message,
+            });
+            return;
+          }
+          console.error("Error creating check-in by user ID:", error);
+          res.status(500).json({
+            message: "An unexpected error occurred",
+          });
+        }
   }
 
   async createGroup(req: AuthenticatedRequest, res: Response): Promise<void> {

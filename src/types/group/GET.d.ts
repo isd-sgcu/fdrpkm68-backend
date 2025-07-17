@@ -39,6 +39,30 @@ export interface GroupWithDetails {
   house5?: HouseBasic | null;
   houseSub?: HouseBasic | null;
 }
+// export interface GroupwithoutUser{
+//   id: string;
+//   ownerId: string;
+//   memberCount: number;
+//   houseRank1: string | null;
+//   houseRank2: string | null;
+//   houseRank3: string | null;
+//   houseRank4: string | null;
+//   houseRank5: string | null;
+//   houseRankSub: string | null;
+//   owner: {
+//     id: string;
+//     studentId: string;
+//     firstName: string;
+//     lastName: string;
+//     nickname: string;
+//   };
+//   house1?: HouseBasic | null;
+//   house2?: HouseBasic | null;
+//   house3?: HouseBasic | null;
+//   house4?: HouseBasic | null;
+//   house5?: HouseBasic | null;
+//   houseSub?: HouseBasic | null;
+// }
 
 export interface HouseBasic {
   id: string;
@@ -77,3 +101,5 @@ export interface ErrorResponse {
   error: string;
   timestamp: string;
 }
+
+
