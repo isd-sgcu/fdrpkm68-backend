@@ -86,20 +86,12 @@ export class UserRepository {
   }
 
   async findExists(studentId: string, citizenId: string): Promise<boolean> {
-    const userFromStudentId = await prisma.user.findFirst({
+    const user = await prisma.user.findFirst({
       where: {
-        studentId: studentId,
+        AND: [{ studentId: studentId }, { citizenId: citizenId }],
       },
     });
-    if (userFromStudentId) {
-      return true;
-    }
-    const userFromCitizenId = await prisma.user.findFirst({
-      where: {
-        citizenId: citizenId,
-      },
-    });
-    if (userFromCitizenId) {
+    if (user) {
       return true;
     }
     return false;
