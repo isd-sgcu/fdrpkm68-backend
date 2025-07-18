@@ -228,7 +228,17 @@ export class GroupController {
         return;
       }
 
-      await this.groupUsecase.leaveGroup(userId);
+      const groupId = req.body.groupId as string;
+      if (!groupId) {
+        res.status(400).json({
+          success: false,
+          error: "Group ID is required",
+          timestamp: new Date().toISOString(),
+        });
+        return;
+      }
+
+      await this.groupUsecase.leaveGroup(groupId, userId);
 
       res.status(200).json({
         success: true,

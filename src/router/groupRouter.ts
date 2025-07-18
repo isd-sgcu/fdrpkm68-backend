@@ -32,7 +32,7 @@ export class GroupRouter extends BaseRouter {
       this.groupController.createGroup.bind(this.groupController)
     );
 
-    this.router.delete(
+    this.router.patch(
       "/leave",
       this.groupController.leaveGroup.bind(this.groupController)
     );

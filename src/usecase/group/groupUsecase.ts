@@ -185,9 +185,9 @@ export class GroupUsecase {
     }
   }
 
-  async leaveGroup(userId: string): Promise<void> {
+  async leaveGroup(groupId: string, userId: string): Promise<void> {
     try {
-      const currentGroup = await this.groupRepository.findUserGroup(userId);
+      const currentGroup = await this.getGroupByGroupId(groupId);
       if (!currentGroup) {
         throw new Error("User is not in any group");
       }
@@ -202,7 +202,6 @@ export class GroupUsecase {
 
       await prisma.$transaction(async (tx) => {
         await this.groupRepository.removeUserFromGroup(userId, currentGroup.id);
-
         await this.groupRepository.createGroupForUser(userId);
       });
     } catch (error) {
