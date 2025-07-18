@@ -68,17 +68,21 @@ export class GroupUsecase {
   }
 
   async getGroupByInviteCode(inviteCode: string): Promise<Group | null> {
-   
-      const data = await this.groupRepository.findGroupByInviteCode(inviteCode);
-      if (!data) {
-        throw new AppError("Group not found with the provided invite code", 404);
-      }
-      const group = await this.groupRepository.findUserGroup(data?.ownerId);
-      if (!group) {
-        throw new AppError("Group not found with the provided invite code", 404);
-      }
-      return group;
-
+    const data = await this.groupRepository.findGroupByInviteCode(inviteCode);
+    if (!data) {
+      throw new AppError("Group not found with the provided invite code", 404);
+    }
+    const group = await this.groupRepository.findUserGroup(data?.ownerId);
+    if (!group) {
+      throw new AppError("Group not found with the provided invite code", 404);
+    }
+    if (group.isConfirmed) {
+      throw new AppError("Cannot join a confirmed group", 403);
+    }
+    if (group.memberCount >= 3) {
+      throw new AppError("Group is at maximum capacity (3 members)", 403);
+    }
+    return group;
   }
 
   async createGroup(userId: string): Promise<Group> {
