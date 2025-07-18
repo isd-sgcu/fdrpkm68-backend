@@ -67,6 +67,32 @@ export class GroupUsecase {
     }
   }
 
+  async getGroupByGroupId(groupId: string): Promise<
+    | (Group & {
+        owner: User;
+        users: User[];
+        house1: House | null;
+        house2: House | null;
+        house3: House | null;
+        house4: House | null;
+        house5: House | null;
+        houseSub: House | null;
+      })
+    | null
+  > {
+    try {
+      return await this.groupRepository.findGroupById(groupId);
+    } catch (error) {
+      console.error("Error getting group by ID:", error);
+      throw new AppError(
+        `Failed to get group by ID: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
+        500
+      );
+    }
+  }
+
   async getGroupByInviteCode(inviteCode: string): Promise<Group | null> {
     const data = await this.groupRepository.findGroupByInviteCode(inviteCode);
     if (!data) {

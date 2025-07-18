@@ -55,6 +55,58 @@ export class GroupController {
       });
     }
   }
+
+  async getGroupByGroupId(
+    req: AuthenticatedRequest,
+    res: Response
+  ): Promise<void> {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          error: "User not authenticated",
+          timestamp: new Date().toISOString(),
+        });
+        return;
+      }
+
+      const groupId = req.body.groupId as string;
+      if (!groupId) {
+        res.status(400).json({
+          success: false,
+          error: "Group ID is required",
+          timestamp: new Date().toISOString(),
+        });
+        return;
+      }
+
+      const group = await this.groupUsecase.getGroupByGroupId(groupId);
+      if (!group) {
+        res.status(404).json({
+          success: false,
+          error: "Group not found",
+          timestamp: new Date().toISOString(),
+        });
+        return;
+      }
+
+      res.status(200).json({
+        success: true,
+        message: "Group retrieved successfully",
+        data: group,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error("Get group by ID error:", error);
+      res.status(500).json({
+        success: false,
+        error: "Internal server error",
+        timestamp: new Date().toISOString(),
+      });
+    }
+  }
+
   async getGroupByInviteCode(
     req: AuthenticatedRequest,
     res: Response
