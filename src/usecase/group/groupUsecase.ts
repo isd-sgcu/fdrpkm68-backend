@@ -132,11 +132,16 @@ export class GroupUsecase {
       }
 
       const currentGroup = await this.groupRepository.findUserGroup(userId);
-      if (currentGroup) {
+      if (currentGroup && currentGroup.memberCount !== 1) {
         throw new Error(
           "User is already in a group. Leave current group first."
         );
       }
+
+      await this.groupRepository.removeUserFromGroup(
+        userId,
+        currentGroup?.id || ""
+      );
 
       if (targetGroup.ownerId === userId) {
         throw new Error("Cannot join your own group");
