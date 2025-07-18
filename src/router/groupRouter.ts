@@ -22,7 +22,7 @@ export class GroupRouter extends BaseRouter {
       this.groupController.getGroup.bind(this.groupController)
     );
 
-    this.router.get(
+    this.router.post(
       "/getGroupByGroupId",
       this.groupController.getGroupByGroupId.bind(this.groupController)
     );
