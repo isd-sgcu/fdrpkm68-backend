@@ -144,7 +144,7 @@ export class GroupController {
       if (group.ownerId == userId) {
         res.status(403).json({
           success: false,
-          error: "User can't search for their own group.",
+          error: "User can't join their own group.",
           timestamp: new Date().toISOString(),
         });
         return;
