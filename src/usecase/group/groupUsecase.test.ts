@@ -365,21 +365,21 @@ describe("GroupUsecase", () => {
         houseSub: null,
       };
 
-      mockGroupRepository.findUserGroup.mockResolvedValue(currentGroup as any);
+      mockGroupRepository.findGroupById.mockResolvedValue(currentGroup as any);
 
       // Mock prisma transaction
       const { prisma } = require("@/lib/prisma");
       prisma.$transaction.mockImplementation((callback: any) => callback({}));
 
-      await groupUsecase.leaveGroup("user-1");
+      await groupUsecase.leaveGroup("group-1", "user-1");
 
-      expect(mockGroupRepository.findUserGroup).toHaveBeenCalledWith("user-1");
+      expect(mockGroupRepository.findGroupById).toHaveBeenCalledWith("group-1");
     });
 
     it("should throw error if user is not in any group", async () => {
-      mockGroupRepository.findUserGroup.mockResolvedValue(null);
+      mockGroupRepository.findGroupById.mockResolvedValue(null);
 
-      await expect(groupUsecase.leaveGroup("user-1")).rejects.toThrow(
+      await expect(groupUsecase.leaveGroup("group-1", "user-1")).rejects.toThrow(
         "User is not in any group"
       );
     });
@@ -399,9 +399,9 @@ describe("GroupUsecase", () => {
         houseSub: null,
       };
 
-      mockGroupRepository.findUserGroup.mockResolvedValue(currentGroup as any);
+      mockGroupRepository.findGroupById.mockResolvedValue(currentGroup as any);
 
-      await expect(groupUsecase.leaveGroup("user-1")).rejects.toThrow(
+      await expect(groupUsecase.leaveGroup("group-1", "user-1")).rejects.toThrow(
         "Cannot leave a confirmed group"
       );
     });
@@ -421,9 +421,9 @@ describe("GroupUsecase", () => {
         houseSub: null,
       };
 
-      mockGroupRepository.findUserGroup.mockResolvedValue(currentGroup as any);
+      mockGroupRepository.findGroupById.mockResolvedValue(currentGroup as any);
 
-      await expect(groupUsecase.leaveGroup("user-1")).rejects.toThrow(
+      await expect(groupUsecase.leaveGroup("group-1", "user-1")).rejects.toThrow(
         "Group owner cannot leave their own group"
       );
     });

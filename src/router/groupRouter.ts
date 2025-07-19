@@ -23,11 +23,16 @@ export class GroupRouter extends BaseRouter {
     );
 
     this.router.post(
+      "/getGroupByGroupId",
+      this.groupController.getGroupByGroupId.bind(this.groupController)
+    );
+
+    this.router.post(
       "/",
       this.groupController.createGroup.bind(this.groupController)
     );
 
-    this.router.delete(
+    this.router.patch(
       "/leave",
       this.groupController.leaveGroup.bind(this.groupController)
     );

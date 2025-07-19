@@ -162,14 +162,55 @@ export class GroupRepository {
           data: { groupId: null },
         });
 
-        await tx.group.update({
+        const updatedGroup = await tx.group.update({
           where: { id: groupId },
           data: {
             memberCount: {
               decrement: 1,
             },
           },
+          select: { memberCount: true },
         });
+
+        if (updatedGroup.memberCount === 0) {
+          const group = await tx.group.findUnique({
+            where: { id: groupId },
+            select: {
+              house1: true,
+              house2: true,
+              house3: true,
+              house4: true,
+              house5: true,
+              houseSub: true,
+            },
+          });
+
+          // ลด chosenCount ของบ้านที่ group เลือกไว้
+          for (const houseKey of [
+            "house1",
+            "house2",
+            "house3",
+            "house4",
+            "house5",
+            "houseSub",
+          ]) {
+            const house = group?.[houseKey as keyof typeof group];
+            if (house && house.id) {
+              await tx.house.update({
+                where: { id: house.id },
+                data: {
+                  chosenCount: {
+                    decrement: 1,
+                  },
+                },
+              });
+            }
+          }
+
+          await tx.group.delete({
+            where: { id: groupId },
+          });
+        }
       });
     } catch (error) {
       console.error("Error removing user from group:", error);
@@ -298,6 +339,40 @@ export class GroupRepository {
   async deleteGroup(groupId: string): Promise<void> {
     try {
       await prisma.$transaction(async (tx) => {
+        const group = await tx.group.findUnique({
+          where: { id: groupId },
+          select: {
+            house1: true,
+            house2: true,
+            house3: true,
+            house4: true,
+            house5: true,
+            houseSub: true,
+          },
+        });
+
+        // ลด chosenCount ของบ้านที่ group เลือกไว้
+        for (const houseKey of [
+          "house1",
+          "house2",
+          "house3",
+          "house4",
+          "house5",
+          "houseSub",
+        ]) {
+          const house = group?.[houseKey as keyof typeof group];
+          if (house && house.id) {
+            await tx.house.update({
+              where: { id: house.id },
+              data: {
+                chosenCount: {
+                  decrement: 1,
+                },
+              },
+            });
+          }
+        }
+
         await tx.user.updateMany({
           where: { groupId },
           data: { groupId: null },

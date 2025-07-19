@@ -67,18 +67,48 @@ export class GroupUsecase {
     }
   }
 
-  async getGroupByInviteCode(inviteCode: string): Promise<Group | null> {
-   
-      const data = await this.groupRepository.findGroupByInviteCode(inviteCode);
-      if (!data) {
-        throw new AppError("Group not found with the provided invite code", 404);
-      }
-      const group = await this.groupRepository.findUserGroup(data?.ownerId);
-      if (!group) {
-        throw new AppError("Group not found with the provided invite code", 404);
-      }
-      return group;
+  async getGroupByGroupId(groupId: string): Promise<
+    | (Group & {
+        owner: User;
+        users: User[];
+        house1: House | null;
+        house2: House | null;
+        house3: House | null;
+        house4: House | null;
+        house5: House | null;
+        houseSub: House | null;
+      })
+    | null
+  > {
+    try {
+      return await this.groupRepository.findGroupById(groupId);
+    } catch (error) {
+      console.error("Error getting group by ID:", error);
+      throw new AppError(
+        `Failed to get group by ID: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
+        500
+      );
+    }
+  }
 
+  async getGroupByInviteCode(inviteCode: string): Promise<Group | null> {
+    const data = await this.groupRepository.findGroupByInviteCode(inviteCode);
+    if (!data) {
+      throw new AppError("Group not found with the provided invite code", 404);
+    }
+    const group = await this.groupRepository.findUserGroup(data?.ownerId);
+    if (!group) {
+      throw new AppError("Group not found with the provided invite code", 404);
+    }
+    if (group.isConfirmed) {
+      throw new AppError("Cannot join a confirmed group", 403);
+    }
+    if (group.memberCount >= 3) {
+      throw new AppError("Group is at maximum capacity (3 members)", 403);
+    }
+    return group;
   }
 
   async createGroup(userId: string): Promise<Group> {
@@ -128,7 +158,7 @@ export class GroupUsecase {
       }
 
       const currentGroup = await this.groupRepository.findUserGroup(userId);
-      if (currentGroup) {
+      if (currentGroup && currentGroup.memberCount !== 1) {
         throw new Error(
           "User is already in a group. Leave current group first."
         );
@@ -136,6 +166,13 @@ export class GroupUsecase {
 
       if (targetGroup.ownerId === userId) {
         throw new Error("Cannot join your own group");
+      }
+
+      if (currentGroup) {
+        await this.groupRepository.removeUserFromGroup(
+          userId,
+          currentGroup.id
+        );
       }
 
       await this.groupRepository.addUserToGroup(userId, targetGroup.id);
@@ -150,9 +187,9 @@ export class GroupUsecase {
     }
   }
 
-  async leaveGroup(userId: string): Promise<void> {
+  async leaveGroup(groupId: string, userId: string): Promise<void> {
     try {
-      const currentGroup = await this.groupRepository.findUserGroup(userId);
+      const currentGroup = await this.getGroupByGroupId(groupId);
       if (!currentGroup) {
         throw new Error("User is not in any group");
       }
@@ -165,9 +202,8 @@ export class GroupUsecase {
         throw new Error("Group owner cannot leave their own group");
       }
 
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async () => {
         await this.groupRepository.removeUserFromGroup(userId, currentGroup.id);
-
         await this.groupRepository.createGroupForUser(userId);
       });
     } catch (error) {
@@ -207,7 +243,7 @@ export class GroupUsecase {
         throw new Error("Cannot kick the group owner");
       }
 
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async () => {
         await this.groupRepository.removeUserFromGroup(
           memberUserId,
           ownerGroup.id

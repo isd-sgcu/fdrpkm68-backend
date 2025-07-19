@@ -55,7 +55,62 @@ export class GroupController {
       });
     }
   }
-  async getGroupByInviteCode(req: AuthenticatedRequest, res: Response): Promise<void> {
+
+  async getGroupByGroupId(
+    req: AuthenticatedRequest,
+    res: Response
+  ): Promise<void> {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          error: "User not authenticated",
+          timestamp: new Date().toISOString(),
+        });
+        return;
+      }
+
+      const groupId = req.body.groupId as string;
+      if (!groupId) {
+        res.status(400).json({
+          success: false,
+          error: "Group ID is required",
+          timestamp: new Date().toISOString(),
+        });
+        return;
+      }
+
+      const group = await this.groupUsecase.getGroupByGroupId(groupId);
+      if (!group) {
+        res.status(404).json({
+          success: false,
+          error: "Group not found",
+          timestamp: new Date().toISOString(),
+        });
+        return;
+      }
+
+      res.status(200).json({
+        success: true,
+        message: "Group retrieved successfully",
+        data: group,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error("Get group by ID error:", error);
+      res.status(500).json({
+        success: false,
+        error: "Internal server error",
+        timestamp: new Date().toISOString(),
+      });
+    }
+  }
+
+  async getGroupByInviteCode(
+    req: AuthenticatedRequest,
+    res: Response
+  ): Promise<void> {
     try {
       const userId = req.user?.id;
       if (!userId) {
@@ -75,7 +130,7 @@ export class GroupController {
         });
         return;
       }
-      
+
       const group = await this.groupUsecase.getGroupByInviteCode(inviteCode);
       if (!group) {
         res.status(404).json({
@@ -83,7 +138,16 @@ export class GroupController {
           error: "Group not found with the provided invite code",
           timestamp: new Date().toISOString(),
         });
-        return ;
+        return;
+      }
+
+      if (group.ownerId == userId) {
+        res.status(403).json({
+          success: false,
+          error: "User can't join their own group.",
+          timestamp: new Date().toISOString(),
+        });
+        return;
       }
 
       res.status(200).json({
@@ -93,17 +157,17 @@ export class GroupController {
         timestamp: new Date().toISOString(),
       });
     } catch (error: unknown) {
-          if (error instanceof AppError) {
-            res.status(error.statusCode).json({
-              message: error.message,
-            });
-            return;
-          }
-          console.error("Error creating check-in by user ID:", error);
-          res.status(500).json({
-            message: "An unexpected error occurred",
-          });
-        }
+      if (error instanceof AppError) {
+        res.status(error.statusCode).json({
+          message: error.message,
+        });
+        return;
+      }
+      console.error("Error creating check-in by user ID:", error);
+      res.status(500).json({
+        message: "An unexpected error occurred",
+      });
+    }
   }
 
   async createGroup(req: AuthenticatedRequest, res: Response): Promise<void> {
@@ -164,7 +228,17 @@ export class GroupController {
         return;
       }
 
-      await this.groupUsecase.leaveGroup(userId);
+      const groupId = req.body.groupId as string;
+      if (!groupId) {
+        res.status(400).json({
+          success: false,
+          error: "Group ID is required",
+          timestamp: new Date().toISOString(),
+        });
+        return;
+      }
+
+      await this.groupUsecase.leaveGroup(groupId, userId);
 
       res.status(200).json({
         success: true,
