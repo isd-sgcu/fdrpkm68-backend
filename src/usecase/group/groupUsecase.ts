@@ -164,13 +164,15 @@ export class GroupUsecase {
         );
       }
 
-      await this.groupRepository.removeUserFromGroup(
-        userId,
-        currentGroup?.id || ""
-      );
-
       if (targetGroup.ownerId === userId) {
         throw new Error("Cannot join your own group");
+      }
+
+      if (currentGroup) {
+        await this.groupRepository.removeUserFromGroup(
+          userId,
+          currentGroup.id
+        );
       }
 
       await this.groupRepository.addUserToGroup(userId, targetGroup.id);
@@ -200,7 +202,7 @@ export class GroupUsecase {
         throw new Error("Group owner cannot leave their own group");
       }
 
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async () => {
         await this.groupRepository.removeUserFromGroup(userId, currentGroup.id);
         await this.groupRepository.createGroupForUser(userId);
       });
@@ -241,7 +243,7 @@ export class GroupUsecase {
         throw new Error("Cannot kick the group owner");
       }
 
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async () => {
         await this.groupRepository.removeUserFromGroup(
           memberUserId,
           ownerGroup.id

@@ -188,7 +188,11 @@ describe("GroupRepository", () => {
     it("should remove user from group with transaction", async () => {
       const mockTx = {
         user: { update: jest.fn() },
-        group: { update: jest.fn() },
+        group: { 
+          update: jest.fn().mockResolvedValue({ memberCount: 2 }), // Group still has members
+          findUnique: jest.fn(),
+        },
+        house: { update: jest.fn() }
       } as any;
 
       (mockPrisma.$transaction as jest.Mock).mockImplementation(
@@ -204,7 +208,10 @@ describe("GroupRepository", () => {
       expect(mockTx.group.update).toHaveBeenCalledWith({
         where: { id: "group-1" },
         data: { memberCount: { decrement: 1 } },
+        select: { memberCount: true },
       });
+      // Should not delete group since memberCount > 0
+      expect(mockTx.group.delete).not.toHaveBeenCalled();
     });
   });
 
