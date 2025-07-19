@@ -191,6 +191,7 @@ describe("GroupRepository", () => {
         group: { 
           update: jest.fn().mockResolvedValue({ memberCount: 2 }), // Group still has members
           findUnique: jest.fn(),
+          delete: jest.fn()
         },
         house: { update: jest.fn() }
       } as any;
