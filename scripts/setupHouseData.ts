@@ -52,7 +52,7 @@ async function setup() {
         tiktok:
           "https://www.tiktok.com/@baanjochula2025?_t=ZS-8xfBBeOKdx1&_r=1",
         sizeLetter: "XL",
-        capacity: 792,
+        capacity: 594,
       },
 
       {
@@ -141,7 +141,7 @@ async function setup() {
         instagram: "https://www.instagram.com/baankoom.chula/",
         tiktok: "https://www.tiktok.com/@baankoom.chula",
         sizeLetter: "XL",
-        capacity: 532,
+        capacity: 399,
       },
 
       {
@@ -306,7 +306,7 @@ async function setup() {
         tiktok:
           "https://www.tiktok.com/@baansoeiteelheemouy?_t=ZS-8xir5hmUlzW&_r=1",
         sizeLetter: "XL",
-        capacity: 784,
+        capacity: 588,
       },
 
       {
