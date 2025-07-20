@@ -168,13 +168,22 @@ export class GroupUsecase {
         throw new Error("Cannot join your own group");
       }
 
-      const houseIds = [
+      const currentGroupHouseIds = [
         currentGroup?.houseRank1 ?? null,
         currentGroup?.houseRank2 ?? null,
         currentGroup?.houseRank3 ?? null,
         currentGroup?.houseRank4 ?? null,
         currentGroup?.houseRank5 ?? null,
         currentGroup?.houseRankSub ?? null,
+      ].filter((id) => id !== null && id !== undefined) as string[];
+
+      const targetGroupHouseIds = [
+        targetGroup.houseRank1 ?? null,
+        targetGroup.houseRank2 ?? null,
+        targetGroup.houseRank3 ?? null,
+        targetGroup.houseRank4 ?? null,
+        targetGroup.houseRank5 ?? null,
+        targetGroup.houseRankSub ?? null,
       ].filter((id) => id !== null && id !== undefined) as string[];
 
       await prisma.$transaction(async (tx) => {
@@ -184,11 +193,19 @@ export class GroupUsecase {
             currentGroup.id,
             tx
           );
-          await this.houseRepository.decrementChosenCounts(houseIds, 1, tx);
+          await this.houseRepository.decrementChosenCounts(
+            currentGroupHouseIds,
+            1,
+            tx
+          );
         }
 
         await this.groupRepository.addUserToGroup(userId, targetGroup.id, tx);
-        await this.houseRepository.incrementChosenCounts(houseIds, 1, tx);
+        await this.houseRepository.incrementChosenCounts(
+          targetGroupHouseIds,
+          1,
+          tx
+        );
       });
     } catch (error) {
       console.error("Error joining group:", error);
