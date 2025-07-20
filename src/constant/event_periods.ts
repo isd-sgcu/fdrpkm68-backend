@@ -34,9 +34,9 @@ export const EVENT_PERIODS: Record<
   },
   FRESHMENNIGHT: {
     PRE_REGISTER: {
-      start: DateTime.fromISO("2025-08-01T19:00:00+07:00"),
+      start: DateTime.fromISO("2025-08-01T00:00:00+07:00"),
       end: DateTime.fromISO("2025-08-03T23:59:59+07:00"),
-      // 1/8 19.00 - 3/8 23.59
+      // 1/8 00.00 - 3/8 23.59
     },
     EVENT_REGISTER: {
       start: DateTime.fromISO("2025-08-03T00:00:00+07:00"),
