@@ -1,4 +1,4 @@
-import { Group, User, House } from "@prisma/client";
+import { Group, House, User } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 import { GroupRepository } from "@/repository/group/groupRepository";
@@ -13,32 +13,6 @@ export class GroupUsecase {
   constructor() {
     this.groupRepository = new GroupRepository();
     this.houseRepository = new HouseRepository();
-  }
-
-  async createGroupForUser(userId: string): Promise<Group> {
-    try {
-      const existingGroup = await this.groupRepository.findUserGroup(userId);
-      if (existingGroup?.ownerId === userId) {
-        throw new Error("User already owns a group");
-      }
-
-      if (existingGroup) {
-        await this.groupRepository.removeUserFromGroup(
-          userId,
-          existingGroup.id
-        );
-      }
-
-      return await this.groupRepository.createGroupForUser(userId);
-    } catch (error) {
-      console.error("Error in createGroupForUser:", error);
-      throw new AppError(
-        `Failed to create group for user: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`,
-        500
-      );
-    }
   }
 
   async getUserGroup(userId: string): Promise<
@@ -168,14 +142,28 @@ export class GroupUsecase {
         throw new Error("Cannot join your own group");
       }
 
-      if (currentGroup) {
-        await this.groupRepository.removeUserFromGroup(
-          userId,
-          currentGroup.id
-        );
-      }
+      const houseIds = [
+        currentGroup?.houseRank1 ?? "",
+        currentGroup?.houseRank2 ?? "",
+        currentGroup?.houseRank3 ?? "",
+        currentGroup?.houseRank4 ?? "",
+        currentGroup?.houseRank5 ?? "",
+        currentGroup?.houseRankSub ?? "",
+      ];
 
-      await this.groupRepository.addUserToGroup(userId, targetGroup.id);
+      await prisma.$transaction(async (tx) => {
+        if (currentGroup) {
+          await this.groupRepository.removeUserFromGroup(
+            userId,
+            currentGroup.id,
+            tx
+          );
+          await this.houseRepository.decrementChosenCounts(houseIds, 1, tx);
+        }
+
+        await this.groupRepository.addUserToGroup(userId, targetGroup.id, tx);
+        await this.houseRepository.incrementChosenCounts(houseIds, 1, tx);
+      });
     } catch (error) {
       console.error("Error joining group:", error);
       throw new AppError(
@@ -202,9 +190,23 @@ export class GroupUsecase {
         throw new Error("Group owner cannot leave their own group");
       }
 
-      await prisma.$transaction(async () => {
-        await this.groupRepository.removeUserFromGroup(userId, currentGroup.id);
-        await this.groupRepository.createGroupForUser(userId);
+      const houseIds = [
+        currentGroup.houseRank1 ?? "",
+        currentGroup.houseRank2 ?? "",
+        currentGroup.houseRank3 ?? "",
+        currentGroup.houseRank4 ?? "",
+        currentGroup.houseRank5 ?? "",
+        currentGroup.houseRankSub ?? "",
+      ];
+
+      await prisma.$transaction(async (tx) => {
+        await this.groupRepository.removeUserFromGroup(
+          userId,
+          currentGroup.id,
+          tx
+        );
+        await this.houseRepository.decrementChosenCounts(houseIds, 1, tx);
+        await this.groupRepository.createGroupForUser(userId, tx);
       });
     } catch (error) {
       console.error("Error leaving group:", error);
@@ -243,13 +245,23 @@ export class GroupUsecase {
         throw new Error("Cannot kick the group owner");
       }
 
-      await prisma.$transaction(async () => {
+      const houseIds = [
+        ownerGroup.houseRank1 ?? "",
+        ownerGroup.houseRank2 ?? "",
+        ownerGroup.houseRank3 ?? "",
+        ownerGroup.houseRank4 ?? "",
+        ownerGroup.houseRank5 ?? "",
+        ownerGroup.houseRankSub ?? "",
+      ];
+
+      await prisma.$transaction(async (tx) => {
         await this.groupRepository.removeUserFromGroup(
           memberUserId,
-          ownerGroup.id
+          ownerGroup.id,
+          tx
         );
-
-        await this.groupRepository.createGroupForUser(memberUserId);
+        await this.houseRepository.decrementChosenCounts(houseIds, 1, tx);
+        await this.groupRepository.createGroupForUser(memberUserId, tx);
       });
     } catch (error) {
       console.error("Error kicking member:", error);
@@ -372,20 +384,14 @@ export class GroupUsecase {
         }
       }
 
-      const ranks1to5 = [
-        preferences.houseRank1,
-        preferences.houseRank2,
-        preferences.houseRank3,
-        preferences.houseRank4,
-        preferences.houseRank5,
-      ].filter((id) => id !== null && id !== undefined);
-
-      const uniqueRanks = new Set(ranks1to5);
-      if (ranks1to5.length !== uniqueRanks.size) {
+      const uniqueRanks = new Set(houseIds);
+      if (houseIds.length !== uniqueRanks.size) {
         throw new Error(
           "Cannot select the same house for multiple ranks (1-5)"
         );
       }
+
+      const ranks1to6 = [...houseIds, ...Array(6 - houseIds.length).fill(null)];
 
       return await prisma.$transaction(async (tx) => {
         const currentPreferences = {
@@ -398,23 +404,25 @@ export class GroupUsecase {
         };
 
         const normalizedPreferences = {
-          houseRank1: preferences.houseRank1 ?? null,
-          houseRank2: preferences.houseRank2 ?? null,
-          houseRank3: preferences.houseRank3 ?? null,
-          houseRank4: preferences.houseRank4 ?? null,
-          houseRank5: preferences.houseRank5 ?? null,
-          houseRankSub: preferences.houseRankSub ?? null,
+          houseRank1: ranks1to6[0] ?? null,
+          houseRank2: ranks1to6[1] ?? null,
+          houseRank3: ranks1to6[2] ?? null,
+          houseRank4: ranks1to6[3] ?? null,
+          houseRank5: ranks1to6[4] ?? null,
+          houseRankSub: ranks1to6[5] ?? null,
         };
 
         await this.houseRepository.updateChosenCountsForPreferenceChange(
           currentPreferences,
           normalizedPreferences,
+          userGroup.memberCount,
           tx
         );
 
         return await this.groupRepository.updateHousePreferences(
           userGroup.id,
-          normalizedPreferences
+          normalizedPreferences,
+          tx
         );
       });
     } catch (error) {
@@ -475,8 +483,3 @@ export class GroupUsecase {
     }
   }
 }
-
-export const createGroupForUser = async (userId: string): Promise<Group> => {
-  const groupUsecase = new GroupUsecase();
-  return await groupUsecase.createGroupForUser(userId);
-};

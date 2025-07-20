@@ -1,4 +1,4 @@
-import { Group, User, House } from "@prisma/client";
+import { Group, House, Prisma, User } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 import { InviteCodeGenerator } from "@/utils/inviteCodeGenerator";
@@ -104,9 +104,13 @@ export class GroupRepository {
     }
   }
 
-  async createGroupForUser(userId: string): Promise<Group> {
+  async createGroupForUser(
+    userId: string,
+    ptx?: Prisma.TransactionClient
+  ): Promise<Group> {
     try {
-      return await prisma.$transaction(async (tx) => {
+      return await prisma.$transaction(async (_tx) => {
+        const tx = _tx || ptx;
         const inviteCode = await InviteCodeGenerator.generate();
 
         const group = await tx.group.create({
@@ -131,9 +135,15 @@ export class GroupRepository {
     }
   }
 
-  async addUserToGroup(userId: string, groupId: string): Promise<void> {
+  async addUserToGroup(
+    userId: string,
+    groupId: string,
+    ptx?: Prisma.TransactionClient
+  ): Promise<void> {
     try {
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async (_tx) => {
+        const tx = _tx || ptx;
+
         await tx.user.update({
           where: { id: userId },
           data: { groupId },
@@ -154,13 +164,23 @@ export class GroupRepository {
     }
   }
 
-  async removeUserFromGroup(userId: string, groupId: string): Promise<void> {
+  async removeUserFromGroup(
+    userId: string,
+    groupId: string,
+    ptx?: Prisma.TransactionClient
+  ): Promise<void> {
     try {
-      await prisma.$transaction(async (tx) => {
-        await tx.user.update({
-          where: { id: userId },
+      await prisma.$transaction(async (_tx) => {
+        const tx = _tx || ptx;
+
+        const userUpdate = await tx.user.update({
+          where: { id: userId, groupId: groupId },
           data: { groupId: null },
         });
+
+        if (!userUpdate) {
+          throw new Error("User not found in the specified group");
+        }
 
         const updatedGroup = await tx.group.update({
           where: { id: groupId },
@@ -173,40 +193,6 @@ export class GroupRepository {
         });
 
         if (updatedGroup.memberCount === 0) {
-          const group = await tx.group.findUnique({
-            where: { id: groupId },
-            select: {
-              house1: true,
-              house2: true,
-              house3: true,
-              house4: true,
-              house5: true,
-              houseSub: true,
-            },
-          });
-
-          // ลด chosenCount ของบ้านที่ group เลือกไว้
-          for (const houseKey of [
-            "house1",
-            "house2",
-            "house3",
-            "house4",
-            "house5",
-            "houseSub",
-          ]) {
-            const house = group?.[houseKey as keyof typeof group];
-            if (house && house.id) {
-              await tx.house.update({
-                where: { id: house.id },
-                data: {
-                  chosenCount: {
-                    decrement: 1,
-                  },
-                },
-              });
-            }
-          }
-
           await tx.group.delete({
             where: { id: groupId },
           });
@@ -220,9 +206,11 @@ export class GroupRepository {
 
   async confirmGroup(groupId: string): Promise<Group> {
     try {
-      return await prisma.group.update({
-        where: { id: groupId },
-        data: { isConfirmed: true },
+      return await prisma.$transaction(async (tx) => {
+        return await tx.group.update({
+          where: { id: groupId },
+          data: { isConfirmed: true },
+        });
       });
     } catch (error) {
       console.error("Error confirming group:", error);
@@ -255,10 +243,11 @@ export class GroupRepository {
       houseRank4?: string | null;
       houseRank5?: string | null;
       houseRankSub?: string | null;
-    }
+    },
+    tx?: Prisma.TransactionClient
   ): Promise<Group> {
     try {
-      return await prisma.group.update({
+      return await (tx || prisma).group.update({
         where: { id: groupId },
         data: preferences,
       });
@@ -336,6 +325,7 @@ export class GroupRepository {
     }
   }
 
+  // unused since this already handle in removeUserFromGroup
   async deleteGroup(groupId: string): Promise<void> {
     try {
       await prisma.$transaction(async (tx) => {
