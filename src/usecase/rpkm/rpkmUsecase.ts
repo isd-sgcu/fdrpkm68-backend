@@ -51,6 +51,28 @@ export class RpkmUsecase {
         );
       }
 
+      // max 100 participants per workshop time slot
+      const timeSlotParticipantCount =
+        await this.rpkmRepository.getWorkshopParticipantCountsByTypeAndTime(
+          body.workshopType,
+          body.workshopTime
+        );
+      if (timeSlotParticipantCount >= 100) {
+        throw new AppError(
+          `Workshop ${body.workshopType} at time slot ${body.workshopTime} is full.`,
+          400
+        );
+      }
+
+      // max 600 participants per workshop type
+      const workshopParticipantCount =
+        await this.rpkmRepository.getWorkshopParticipantCountsByType(
+          body.workshopType
+        );
+      if (workshopParticipantCount >= 600) {
+        throw new AppError(`Workshop ${body.workshopType} is full.`, 400);
+      }
+
       const registrationResult =
         await this.rpkmRepository.userRegisterNewWorkshop(body, userId);
       return registrationResult;
