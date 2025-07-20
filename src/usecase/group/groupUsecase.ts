@@ -169,13 +169,13 @@ export class GroupUsecase {
       }
 
       const houseIds = [
-        currentGroup?.houseRank1 ?? "",
-        currentGroup?.houseRank2 ?? "",
-        currentGroup?.houseRank3 ?? "",
-        currentGroup?.houseRank4 ?? "",
-        currentGroup?.houseRank5 ?? "",
-        currentGroup?.houseRankSub ?? "",
-      ];
+        currentGroup?.houseRank1 ?? null,
+        currentGroup?.houseRank2 ?? null,
+        currentGroup?.houseRank3 ?? null,
+        currentGroup?.houseRank4 ?? null,
+        currentGroup?.houseRank5 ?? null,
+        currentGroup?.houseRankSub ?? null,
+      ].filter((id) => id !== null && id !== undefined) as string[];
 
       await prisma.$transaction(async (tx) => {
         if (currentGroup) {
@@ -217,13 +217,13 @@ export class GroupUsecase {
       }
 
       const houseIds = [
-        currentGroup.houseRank1 ?? "",
-        currentGroup.houseRank2 ?? "",
-        currentGroup.houseRank3 ?? "",
-        currentGroup.houseRank4 ?? "",
-        currentGroup.houseRank5 ?? "",
-        currentGroup.houseRankSub ?? "",
-      ];
+        currentGroup?.houseRank1 ?? null,
+        currentGroup?.houseRank2 ?? null,
+        currentGroup?.houseRank3 ?? null,
+        currentGroup?.houseRank4 ?? null,
+        currentGroup?.houseRank5 ?? null,
+        currentGroup?.houseRankSub ?? null,
+      ].filter((id) => id !== null && id !== undefined) as string[];
 
       await prisma.$transaction(async (tx) => {
         await this.groupRepository.removeUserFromGroup(
@@ -272,13 +272,13 @@ export class GroupUsecase {
       }
 
       const houseIds = [
-        ownerGroup.houseRank1 ?? "",
-        ownerGroup.houseRank2 ?? "",
-        ownerGroup.houseRank3 ?? "",
-        ownerGroup.houseRank4 ?? "",
-        ownerGroup.houseRank5 ?? "",
-        ownerGroup.houseRankSub ?? "",
-      ];
+        ownerGroup.houseRank1 ?? null,
+        ownerGroup.houseRank2 ?? null,
+        ownerGroup.houseRank3 ?? null,
+        ownerGroup.houseRank4 ?? null,
+        ownerGroup.houseRank5 ?? null,
+        ownerGroup.houseRankSub ?? null,
+      ].filter((id) => id !== null && id !== undefined) as string[];
 
       await prisma.$transaction(async (tx) => {
         await this.groupRepository.removeUserFromGroup(
@@ -417,7 +417,8 @@ export class GroupUsecase {
         );
       }
 
-      const ranks1to6 = [...houseIds, ...Array(6 - houseIds.length).fill(null)];
+      // ไม่ต้องเรียงอันดับให้ ถ้ามัน null ก็ปล่อยไป
+      // const ranks1to6 = [...houseIds, ...Array(6 - houseIds.length).fill(null)];
 
       return await prisma.$transaction(async (tx) => {
         const currentPreferences = {
@@ -430,12 +431,12 @@ export class GroupUsecase {
         };
 
         const normalizedPreferences = {
-          houseRank1: ranks1to6[0] ?? null,
-          houseRank2: ranks1to6[1] ?? null,
-          houseRank3: ranks1to6[2] ?? null,
-          houseRank4: ranks1to6[3] ?? null,
-          houseRank5: ranks1to6[4] ?? null,
-          houseRankSub: ranks1to6[5] ?? null,
+          houseRank1: preferences.houseRank1 ?? null,
+          houseRank2: preferences.houseRank2 ?? null,
+          houseRank3: preferences.houseRank3 ?? null,
+          houseRank4: preferences.houseRank4 ?? null,
+          houseRank5: preferences.houseRank5 ?? null,
+          houseRankSub: preferences.houseRankSub ?? null,
         };
 
         await this.houseRepository.updateChosenCountsForPreferenceChange(

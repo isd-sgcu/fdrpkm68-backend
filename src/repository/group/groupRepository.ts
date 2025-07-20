@@ -110,7 +110,7 @@ export class GroupRepository {
   ): Promise<Group> {
     try {
       return await prisma.$transaction(async (_tx) => {
-        const tx = _tx || ptx;
+        const tx = ptx || _tx;
         const inviteCode = await InviteCodeGenerator.generate();
 
         const group = await tx.group.create({
@@ -142,7 +142,7 @@ export class GroupRepository {
   ): Promise<void> {
     try {
       await prisma.$transaction(async (_tx) => {
-        const tx = _tx || ptx;
+        const tx = ptx || _tx;
 
         await tx.user.update({
           where: { id: userId },
@@ -171,7 +171,7 @@ export class GroupRepository {
   ): Promise<void> {
     try {
       await prisma.$transaction(async (_tx) => {
-        const tx = _tx || ptx;
+        const tx = ptx || _tx;
 
         const userUpdate = await tx.user.update({
           where: { id: userId, groupId: groupId },
