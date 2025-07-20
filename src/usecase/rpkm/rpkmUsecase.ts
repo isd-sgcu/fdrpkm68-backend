@@ -51,10 +51,6 @@ export class RpkmUsecase {
         );
       }
 
-      if (body.workshopType === WorkshopType.DIFFUSER) {
-        throw new AppError("เต็มละครับน้อง.", 400);
-      }
-
       // max 100 participants per workshop time slot
       const timeSlotParticipantCount =
         await this.rpkmRepository.getWorkshopParticipantCountsByTypeAndTime(
