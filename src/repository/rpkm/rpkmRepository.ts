@@ -118,4 +118,48 @@ export class RpkmRepository {
       );
     }
   }
+
+  async getWorkshopParticipantCountsByTypeAndTime(
+    workshopType: WorkshopType,
+    workshopTime: number
+  ): Promise<number> {
+    try {
+      const count = await prisma.rPKMworkshop.count({
+        where: {
+          workshopType: workshopType,
+          workshopTime: workshopTime,
+        },
+      });
+      return count;
+    } catch (error) {
+      console.log(
+        `Error getting participant counts of RPKM workshops by type ${workshopType} and time ${workshopTime}: `,
+        error
+      );
+      throw new Error(
+        `Failed to get participant counts of RPKM workshops by type ${workshopType} and time ${workshopTime}.`
+      );
+    }
+  }
+
+  async getWorkshopParticipantCountsByType(
+    workshopType: WorkshopType
+  ): Promise<number> {
+    try {
+      const count = await prisma.rPKMworkshop.count({
+        where: {
+          workshopType: workshopType,
+        },
+      });
+      return count;
+    } catch (error) {
+      console.log(
+        `Error getting participant counts of RPKM workshops by type ${workshopType}: `,
+        error
+      );
+      throw new Error(
+        `Failed to get participant counts of RPKM workshops by type ${workshopType}.`
+      );
+    }
+  }
 }
