@@ -1,6 +1,3 @@
-import { Prisma, PrismaClient } from "@prisma/client";
-
-
 import { prisma } from "@/lib/prisma";
 import { House } from "@/types/house/house";
 
@@ -235,7 +232,7 @@ describe("HouseRepository", () => {
       const houseIds = ["house-1", "house-2", "house-3"];
       mockPrisma.house.update.mockResolvedValue(mockHouseData);
 
-      await houseRepository.incrementChosenCounts(houseIds);
+      await houseRepository.incrementChosenCounts(houseIds, 1);
 
       expect(mockPrisma.house.update).toHaveBeenCalledTimes(3);
       houseIds.forEach((id) => {
@@ -251,7 +248,7 @@ describe("HouseRepository", () => {
     });
 
     it("should do nothing when empty array is provided", async () => {
-      await houseRepository.incrementChosenCounts([]);
+      await houseRepository.incrementChosenCounts([], 1);
 
       expect(mockPrisma.house.update).not.toHaveBeenCalled();
     });
@@ -260,7 +257,7 @@ describe("HouseRepository", () => {
       const houseIds = ["house-1", null as any, "house-2"];
       mockPrisma.house.update.mockResolvedValue(mockHouseData);
 
-      await houseRepository.incrementChosenCounts(houseIds);
+      await houseRepository.incrementChosenCounts(houseIds, 1);
 
       expect(mockPrisma.house.update).toHaveBeenCalledTimes(2);
       expect(mockPrisma.house.update).toHaveBeenCalledWith({
@@ -294,7 +291,7 @@ describe("HouseRepository", () => {
       mockPrisma.house.update.mockRejectedValue(error);
 
       await expect(
-        houseRepository.incrementChosenCounts(["house-1"])
+        houseRepository.incrementChosenCounts(["house-1"], 1)
       ).rejects.toThrow("Failed to increment chosen counts");
     });
   });
@@ -304,7 +301,7 @@ describe("HouseRepository", () => {
       const houseIds = ["house-1", "house-2", "house-3"];
       mockPrisma.house.update.mockResolvedValue(mockHouseData);
 
-      await houseRepository.decrementChosenCounts(houseIds);
+      await houseRepository.decrementChosenCounts(houseIds, 1);
 
       expect(mockPrisma.house.update).toHaveBeenCalledTimes(3);
       houseIds.forEach((id) => {
@@ -320,7 +317,7 @@ describe("HouseRepository", () => {
     });
 
     it("should do nothing when empty array is provided", async () => {
-      await houseRepository.decrementChosenCounts([]);
+      await houseRepository.decrementChosenCounts([], 1);
 
       expect(mockPrisma.house.update).not.toHaveBeenCalled();
     });
@@ -329,7 +326,7 @@ describe("HouseRepository", () => {
       const houseIds = ["house-1", null as any, "house-2"];
       mockPrisma.house.update.mockResolvedValue(mockHouseData);
 
-      await houseRepository.decrementChosenCounts(houseIds);
+      await houseRepository.decrementChosenCounts(houseIds, 1);
 
       expect(mockPrisma.house.update).toHaveBeenCalledTimes(2);
       expect(mockPrisma.house.update).toHaveBeenCalledWith({
@@ -363,7 +360,7 @@ describe("HouseRepository", () => {
       mockPrisma.house.update.mockRejectedValue(error);
 
       await expect(
-        houseRepository.decrementChosenCounts(["house-1"])
+        houseRepository.decrementChosenCounts(["house-1"], 1)
       ).rejects.toThrow("Failed to decrement chosen counts");
     });
   });
@@ -391,7 +388,8 @@ describe("HouseRepository", () => {
 
       await houseRepository.updateChosenCountsForPreferenceChange(
         oldPreferences,
-        newPreferences
+        newPreferences,
+        1
       );
 
       // Verify decrement calls for old preferences
@@ -448,7 +446,8 @@ describe("HouseRepository", () => {
 
       await houseRepository.updateChosenCountsForPreferenceChange(
         oldPreferences,
-        newPreferences
+        newPreferences,
+        1
       );
 
       // Only increment calls should be made
@@ -486,7 +485,8 @@ describe("HouseRepository", () => {
 
       await houseRepository.updateChosenCountsForPreferenceChange(
         oldPreferences,
-        newPreferences
+        newPreferences,
+        1
       );
 
       // Only decrement calls should be made
@@ -522,7 +522,8 @@ describe("HouseRepository", () => {
 
       await houseRepository.updateChosenCountsForPreferenceChange(
         oldPreferences,
-        newPreferences
+        newPreferences,
+        1
       );
 
       // No database calls should be made
@@ -589,7 +590,8 @@ describe("HouseRepository", () => {
 
       await houseRepository.updateChosenCountsForPreferenceChange(
         oldPreferences,
-        newPreferences
+        newPreferences,
+        1
       );
 
       // Should only decrement old preferences that have corresponding keys in new preferences
@@ -628,7 +630,8 @@ describe("HouseRepository", () => {
       await expect(
         houseRepository.updateChosenCountsForPreferenceChange(
           oldPreferences,
-          newPreferences
+          newPreferences,
+          1
         )
       ).rejects.toThrow("Failed to update chosen counts for preference change");
     });
@@ -653,7 +656,8 @@ describe("HouseRepository", () => {
       await expect(
         houseRepository.updateChosenCountsForPreferenceChange(
           oldPreferences,
-          newPreferences
+          newPreferences,
+          1
         )
       ).rejects.toThrow("Failed to update chosen counts for preference change");
     });
@@ -680,7 +684,8 @@ describe("HouseRepository", () => {
 
       await houseRepository.updateChosenCountsForPreferenceChange(
         oldPreferences,
-        newPreferences
+        newPreferences,
+        1
       );
 
       // Should only process non-null values

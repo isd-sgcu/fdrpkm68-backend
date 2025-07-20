@@ -15,6 +15,32 @@ export class GroupUsecase {
     this.houseRepository = new HouseRepository();
   }
 
+  async createGroupForUser(userId: string): Promise<Group> {
+    try {
+      const existingGroup = await this.groupRepository.findUserGroup(userId);
+      if (existingGroup?.ownerId === userId) {
+        throw new Error("User already owns a group");
+      }
+
+      if (existingGroup) {
+        await this.groupRepository.removeUserFromGroup(
+          userId,
+          existingGroup.id
+        );
+      }
+
+      return await this.groupRepository.createGroupForUser(userId);
+    } catch (error) {
+      console.error("Error in createGroupForUser:", error);
+      throw new AppError(
+        `Failed to create group for user: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
+        500
+      );
+    }
+  }
+
   async getUserGroup(userId: string): Promise<
     | (Group & {
         owner: User;
