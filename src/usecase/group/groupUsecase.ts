@@ -1,4 +1,4 @@
-import { Group, User, House } from "@prisma/client";
+import { Group, House, User } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 import { GroupRepository } from "@/repository/group/groupRepository";
@@ -67,18 +67,48 @@ export class GroupUsecase {
     }
   }
 
-  async getGroupByInviteCode(inviteCode: string): Promise<Group | null> {
-   
-      const data = await this.groupRepository.findGroupByInviteCode(inviteCode);
-      if (!data) {
-        throw new AppError("Group not found with the provided invite code", 404);
-      }
-      const group = await this.groupRepository.findUserGroup(data?.ownerId);
-      if (!group) {
-        throw new AppError("Group not found with the provided invite code", 404);
-      }
-      return group;
+  async getGroupByGroupId(groupId: string): Promise<
+    | (Group & {
+        owner: User;
+        users: User[];
+        house1: House | null;
+        house2: House | null;
+        house3: House | null;
+        house4: House | null;
+        house5: House | null;
+        houseSub: House | null;
+      })
+    | null
+  > {
+    try {
+      return await this.groupRepository.findGroupById(groupId);
+    } catch (error) {
+      console.error("Error getting group by ID:", error);
+      throw new AppError(
+        `Failed to get group by ID: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
+        500
+      );
+    }
+  }
 
+  async getGroupByInviteCode(inviteCode: string): Promise<Group | null> {
+    const data = await this.groupRepository.findGroupByInviteCode(inviteCode);
+    if (!data) {
+      throw new AppError("Group not found with the provided invite code", 404);
+    }
+    const group = await this.groupRepository.findUserGroup(data?.ownerId);
+    if (!group) {
+      throw new AppError("Group not found with the provided invite code", 404);
+    }
+    if (group.isConfirmed) {
+      throw new AppError("Cannot join a confirmed group", 403);
+    }
+    if (group.memberCount >= 3) {
+      throw new AppError("Group is at maximum capacity (3 members)", 403);
+    }
+    return group;
   }
 
   async createGroup(userId: string): Promise<Group> {
@@ -128,7 +158,7 @@ export class GroupUsecase {
       }
 
       const currentGroup = await this.groupRepository.findUserGroup(userId);
-      if (currentGroup) {
+      if (currentGroup && currentGroup.memberCount !== 1) {
         throw new Error(
           "User is already in a group. Leave current group first."
         );
@@ -138,7 +168,28 @@ export class GroupUsecase {
         throw new Error("Cannot join your own group");
       }
 
-      await this.groupRepository.addUserToGroup(userId, targetGroup.id);
+      const houseIds = [
+        currentGroup?.houseRank1 ?? "",
+        currentGroup?.houseRank2 ?? "",
+        currentGroup?.houseRank3 ?? "",
+        currentGroup?.houseRank4 ?? "",
+        currentGroup?.houseRank5 ?? "",
+        currentGroup?.houseRankSub ?? "",
+      ];
+
+      await prisma.$transaction(async (tx) => {
+        if (currentGroup) {
+          await this.groupRepository.removeUserFromGroup(
+            userId,
+            currentGroup.id,
+            tx
+          );
+          await this.houseRepository.decrementChosenCounts(houseIds, 1, tx);
+        }
+
+        await this.groupRepository.addUserToGroup(userId, targetGroup.id, tx);
+        await this.houseRepository.incrementChosenCounts(houseIds, 1, tx);
+      });
     } catch (error) {
       console.error("Error joining group:", error);
       throw new AppError(
@@ -150,9 +201,9 @@ export class GroupUsecase {
     }
   }
 
-  async leaveGroup(userId: string): Promise<void> {
+  async leaveGroup(groupId: string, userId: string): Promise<void> {
     try {
-      const currentGroup = await this.groupRepository.findUserGroup(userId);
+      const currentGroup = await this.getGroupByGroupId(groupId);
       if (!currentGroup) {
         throw new Error("User is not in any group");
       }
@@ -165,10 +216,23 @@ export class GroupUsecase {
         throw new Error("Group owner cannot leave their own group");
       }
 
-      await prisma.$transaction(async (tx) => {
-        await this.groupRepository.removeUserFromGroup(userId, currentGroup.id);
+      const houseIds = [
+        currentGroup.houseRank1 ?? "",
+        currentGroup.houseRank2 ?? "",
+        currentGroup.houseRank3 ?? "",
+        currentGroup.houseRank4 ?? "",
+        currentGroup.houseRank5 ?? "",
+        currentGroup.houseRankSub ?? "",
+      ];
 
-        await this.groupRepository.createGroupForUser(userId);
+      await prisma.$transaction(async (tx) => {
+        await this.groupRepository.removeUserFromGroup(
+          userId,
+          currentGroup.id,
+          tx
+        );
+        await this.houseRepository.decrementChosenCounts(houseIds, 1, tx);
+        await this.groupRepository.createGroupForUser(userId, tx);
       });
     } catch (error) {
       console.error("Error leaving group:", error);
@@ -207,13 +271,23 @@ export class GroupUsecase {
         throw new Error("Cannot kick the group owner");
       }
 
+      const houseIds = [
+        ownerGroup.houseRank1 ?? "",
+        ownerGroup.houseRank2 ?? "",
+        ownerGroup.houseRank3 ?? "",
+        ownerGroup.houseRank4 ?? "",
+        ownerGroup.houseRank5 ?? "",
+        ownerGroup.houseRankSub ?? "",
+      ];
+
       await prisma.$transaction(async (tx) => {
         await this.groupRepository.removeUserFromGroup(
           memberUserId,
-          ownerGroup.id
+          ownerGroup.id,
+          tx
         );
-
-        await this.groupRepository.createGroupForUser(memberUserId);
+        await this.houseRepository.decrementChosenCounts(houseIds, 1, tx);
+        await this.groupRepository.createGroupForUser(memberUserId, tx);
       });
     } catch (error) {
       console.error("Error kicking member:", error);
@@ -336,20 +410,14 @@ export class GroupUsecase {
         }
       }
 
-      const ranks1to5 = [
-        preferences.houseRank1,
-        preferences.houseRank2,
-        preferences.houseRank3,
-        preferences.houseRank4,
-        preferences.houseRank5,
-      ].filter((id) => id !== null && id !== undefined);
-
-      const uniqueRanks = new Set(ranks1to5);
-      if (ranks1to5.length !== uniqueRanks.size) {
+      const uniqueRanks = new Set(houseIds);
+      if (houseIds.length !== uniqueRanks.size) {
         throw new Error(
           "Cannot select the same house for multiple ranks (1-5)"
         );
       }
+
+      const ranks1to6 = [...houseIds, ...Array(6 - houseIds.length).fill(null)];
 
       return await prisma.$transaction(async (tx) => {
         const currentPreferences = {
@@ -362,23 +430,25 @@ export class GroupUsecase {
         };
 
         const normalizedPreferences = {
-          houseRank1: preferences.houseRank1 ?? null,
-          houseRank2: preferences.houseRank2 ?? null,
-          houseRank3: preferences.houseRank3 ?? null,
-          houseRank4: preferences.houseRank4 ?? null,
-          houseRank5: preferences.houseRank5 ?? null,
-          houseRankSub: preferences.houseRankSub ?? null,
+          houseRank1: ranks1to6[0] ?? null,
+          houseRank2: ranks1to6[1] ?? null,
+          houseRank3: ranks1to6[2] ?? null,
+          houseRank4: ranks1to6[3] ?? null,
+          houseRank5: ranks1to6[4] ?? null,
+          houseRankSub: ranks1to6[5] ?? null,
         };
 
         await this.houseRepository.updateChosenCountsForPreferenceChange(
           currentPreferences,
           normalizedPreferences,
+          userGroup.memberCount,
           tx
         );
 
         return await this.groupRepository.updateHousePreferences(
           userGroup.id,
-          normalizedPreferences
+          normalizedPreferences,
+          tx
         );
       });
     } catch (error) {
@@ -439,8 +509,3 @@ export class GroupUsecase {
     }
   }
 }
-
-export const createGroupForUser = async (userId: string): Promise<Group> => {
-  const groupUsecase = new GroupUsecase();
-  return await groupUsecase.createGroupForUser(userId);
-};

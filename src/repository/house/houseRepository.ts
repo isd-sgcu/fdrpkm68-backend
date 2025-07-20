@@ -5,7 +5,6 @@ import { UUID } from "@/types/common";
 import { House } from "@/types/house/house";
 import { HouseModel } from "@/types/models";
 
-
 export class HouseRepository {
   async getAllHouses(): Promise<House[]> {
     try {
@@ -69,6 +68,7 @@ export class HouseRepository {
     }
   }
 
+  // unused
   async updateHouseMemberCount(
     houseId: string,
     memberCount: number
@@ -112,6 +112,7 @@ export class HouseRepository {
 
   async incrementChosenCounts(
     houseIds: string[],
+    memberChange: number,
     tx?: PrismaClient | Prisma.TransactionClient
   ): Promise<void> {
     const client = tx || prisma;
@@ -126,7 +127,7 @@ export class HouseRepository {
           where: { id: houseId },
           data: {
             chosenCount: {
-              increment: 1,
+              increment: memberChange,
             },
           },
         });
@@ -140,6 +141,7 @@ export class HouseRepository {
 
   async decrementChosenCounts(
     houseIds: string[],
+    memberChange: number,
     tx?: PrismaClient | Prisma.TransactionClient
   ): Promise<void> {
     const client = tx || prisma;
@@ -154,7 +156,7 @@ export class HouseRepository {
           where: { id: houseId },
           data: {
             chosenCount: {
-              decrement: 1,
+              decrement: memberChange,
             },
           },
         });
@@ -183,6 +185,7 @@ export class HouseRepository {
       houseRank5?: string | null;
       houseRankSub?: string | null;
     },
+    memberChange: number,
     tx?: PrismaClient | Prisma.TransactionClient
   ): Promise<void> {
     const client = tx || prisma;
@@ -205,9 +208,9 @@ export class HouseRepository {
         newPreferences.houseRank5,
       ].filter((id) => id !== null) as string[];
 
-      await this.decrementChosenCounts(oldRankedHouses, client);
+      await this.decrementChosenCounts(oldRankedHouses, memberChange, client);
 
-      await this.incrementChosenCounts(newRankedHouses, client);
+      await this.incrementChosenCounts(newRankedHouses, memberChange, client);
     } catch (error) {
       console.error(
         "Error updating chosen counts for preference change:",
