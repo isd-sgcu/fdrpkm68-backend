@@ -7,15 +7,18 @@ export function eventTimeMiddleware(
 ): void {
   // list of blocked routes
   const blockedRoutes = [
-    "/group/leave",
-    "/group/kick",
-    "/group/confirm",
-    "/group/invite/regenerate",
-    "/group/join",
-    "/group/house-preferences",
+    "/leave",
+    "/kick",
+    "/confirm",
+    "/invite/regenerate",
+    "/join",
+    "/house-preferences",
   ];
 
-  if (blockedRoutes.includes(req.url) && req.method === "POST") {
+  if (
+    blockedRoutes.some((route) => req.path.includes(route)) &&
+    req.method !== "GET"
+  ) {
     res.status(403).json({
       success: false,
       error: "This route is blocked during the event time.",
