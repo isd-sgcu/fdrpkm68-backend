@@ -2,6 +2,7 @@ import { GroupController } from "@/controller/group/groupController";
 import { authMiddleware } from "@/middleware/authMiddleware";
 
 import { BaseRouter } from "./baseRouter";
+import { eventTimeMiddleware } from "../middleware/eventTimeMiddleware";
 
 export class GroupRouter extends BaseRouter {
   private groupController: GroupController;
@@ -16,6 +17,7 @@ export class GroupRouter extends BaseRouter {
 
   private setupRoutes(): void {
     this.router.use(authMiddleware);
+    this.router.use(eventTimeMiddleware);
 
     this.router.get(
       "/",
