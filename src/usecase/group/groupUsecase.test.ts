@@ -1,4 +1,3 @@
-
 import { GroupRepository } from "@/repository/group/groupRepository";
 import { HouseRepository } from "@/repository/house/houseRepository";
 import { InviteCodeGenerator } from "@/utils/inviteCodeGenerator";
@@ -46,6 +45,7 @@ describe("GroupUsecase", () => {
         houseRank4: null,
         houseRank5: null,
         houseRankSub: null,
+        resultHouseId: null,
       };
 
       mockGroupRepository.findUserGroup.mockResolvedValue(null);
@@ -115,6 +115,7 @@ describe("GroupUsecase", () => {
         houseRank4: null,
         houseRank5: null,
         houseRankSub: null,
+        resultHouseId: null,
       };
 
       mockGroupRepository.findUserGroup.mockResolvedValue(existingGroup as any);
@@ -187,6 +188,7 @@ describe("GroupUsecase", () => {
         houseRank4: null,
         houseRank5: null,
         houseRankSub: null,
+        resultHouseId: null,
       };
 
       (InviteCodeGenerator.isValidFormat as jest.Mock).mockReturnValue(true);
@@ -255,6 +257,7 @@ describe("GroupUsecase", () => {
         houseRank4: null,
         houseRank5: null,
         houseRankSub: null,
+        resultHouseId: null,
       };
 
       (InviteCodeGenerator.isValidFormat as jest.Mock).mockReturnValue(true);
@@ -285,6 +288,7 @@ describe("GroupUsecase", () => {
         houseRank4: null,
         houseRank5: null,
         houseRankSub: null,
+        resultHouseId: null,
       };
 
       (InviteCodeGenerator.isValidFormat as jest.Mock).mockReturnValue(true);
@@ -308,6 +312,7 @@ describe("GroupUsecase", () => {
         houseRank4: null,
         houseRank5: null,
         houseRankSub: null,
+        resultHouseId: null,
       };
 
       const currentGroup = {
@@ -337,6 +342,7 @@ describe("GroupUsecase", () => {
         houseRank4: null,
         houseRank5: null,
         houseRankSub: null,
+        resultHouseId: null,
       };
 
       (InviteCodeGenerator.isValidFormat as jest.Mock).mockReturnValue(true);
@@ -379,9 +385,9 @@ describe("GroupUsecase", () => {
     it("should throw error if user is not in any group", async () => {
       mockGroupRepository.findGroupById.mockResolvedValue(null);
 
-      await expect(groupUsecase.leaveGroup("group-1", "user-1")).rejects.toThrow(
-        "User is not in any group"
-      );
+      await expect(
+        groupUsecase.leaveGroup("group-1", "user-1")
+      ).rejects.toThrow("User is not in any group");
     });
 
     it("should throw error if group is confirmed", async () => {
@@ -401,9 +407,9 @@ describe("GroupUsecase", () => {
 
       mockGroupRepository.findGroupById.mockResolvedValue(currentGroup as any);
 
-      await expect(groupUsecase.leaveGroup("group-1", "user-1")).rejects.toThrow(
-        "Cannot leave a confirmed group"
-      );
+      await expect(
+        groupUsecase.leaveGroup("group-1", "user-1")
+      ).rejects.toThrow("Cannot leave a confirmed group");
     });
 
     it("should throw error if owner tries to leave", async () => {
@@ -423,9 +429,9 @@ describe("GroupUsecase", () => {
 
       mockGroupRepository.findGroupById.mockResolvedValue(currentGroup as any);
 
-      await expect(groupUsecase.leaveGroup("group-1", "user-1")).rejects.toThrow(
-        "Group owner cannot leave their own group"
-      );
+      await expect(
+        groupUsecase.leaveGroup("group-1", "user-1")
+      ).rejects.toThrow("Group owner cannot leave their own group");
     });
   });
 
