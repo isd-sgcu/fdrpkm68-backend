@@ -103,6 +103,7 @@ model Group {
   houseRank4   String? @map("house_rank_4") @db.Uuid
   houseRank5   String? @map("house_rank_5") @db.Uuid
   houseRankSub String? @map("house_rank_sub") @db.Uuid
+  resultHouseId String? @map("result_house_id")  @db.Uuid
 
   owner    User   @relation("GroupOwner", fields: [ownerId], references: [id])
   users    User[] @relation("UserGroup")

@@ -177,6 +177,7 @@ describe("GroupController", () => {
         houseRank4: null,
         houseRank5: null,
         houseRankSub: null,
+        resultHouseId: null,
       };
 
       mockGroupUsecase.createGroup.mockResolvedValue(mockGroup);

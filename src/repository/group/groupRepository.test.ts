@@ -58,6 +58,7 @@ describe("GroupRepository", () => {
         house4: null,
         house5: null,
         houseSub: null,
+        resultHouseId: null,
       };
 
       (mockPrisma.group.findUnique as jest.Mock).mockResolvedValue(mockGroup);
@@ -188,12 +189,12 @@ describe("GroupRepository", () => {
     it("should remove user from group with transaction", async () => {
       const mockTx = {
         user: { update: jest.fn() },
-        group: { 
+        group: {
           update: jest.fn().mockResolvedValue({ memberCount: 2 }), // Group still has members
           findUnique: jest.fn(),
-          delete: jest.fn()
+          delete: jest.fn(),
         },
-        house: { update: jest.fn() }
+        house: { update: jest.fn() },
       } as any;
 
       (mockPrisma.$transaction as jest.Mock).mockImplementation(
@@ -227,6 +228,7 @@ describe("GroupRepository", () => {
         houseRank4: null,
         houseRank5: null,
         houseRankSub: null,
+        resultHouseId: null,
       };
 
       (mockPrisma.group.update as jest.Mock).mockResolvedValue(mockGroup);
