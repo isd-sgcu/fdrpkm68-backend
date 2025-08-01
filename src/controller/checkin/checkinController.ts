@@ -1,8 +1,7 @@
 import { EventType } from "@prisma/client";
 import { Response } from "express";
 
-
-import { CheckinRequest } from "@/types/checkin/POST";
+import { CheckinRequest, UserIdRequest } from "@/types/checkin/POST";
 import { AppError } from "@/types/error/AppError";
 import { CheckinUsecase } from "@/usecase/checkin/checkinUsecase";
 
@@ -94,9 +93,9 @@ export class CheckinController {
         return;
       }
 
-      const newCheckin = await this.checkinUsecase.createCheckinByUserId(
-        userId
-      );
+      const newCheckin = await this.checkinUsecase.createCheckinByUserId({
+        userId,
+      });
       res.status(201).json(newCheckin);
     } catch (error: unknown) {
       if (error instanceof AppError) {
